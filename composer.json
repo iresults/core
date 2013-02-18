@@ -1,0 +1,14 @@
+{
+    "name": "iresults/core",
+    "type": "library",
+    "description": "Iresults Framework",
+    "license": "MIT",
+    "version": "3.0.0.0.1",
+    "require": {
+    },
+    "autoload": {
+        "psr-0": {
+            "Iresults\\Core": "Classes"
+        }
+    }
+}
