@@ -97,7 +97,7 @@ class StringTool {
 	 */
 	static public function camelCaseToLowerCaseUnderscored($string) {
 		if (defined('TYPO3_MODE')) {
-			return t3lib_div::camelCaseToLowerCaseUnderscored($string);
+			return \t3lib_div::camelCaseToLowerCaseUnderscored($string);
 		}
 		return self::strtolower(preg_replace('/(?<=\w)([A-Z])/', '_\\1', $string));
 	}
@@ -110,7 +110,7 @@ class StringTool {
 	 */
 	static public function underscoredToUpperCamelCase($string) {
 		if (defined('TYPO3_MODE')) {
-			return t3lib_div::underscoredToUpperCamelCase($string);
+			return \t3lib_div::underscoredToUpperCamelCase($string);
 		}
 		$upperCamelCase = str_replace(' ', '', ucwords(str_replace('_', ' ', self::strtolower($string))));
 		return $upperCamelCase;
@@ -124,7 +124,7 @@ class StringTool {
 	 */
 	static public function underscoredToLowerCamelCase($string) {
 		if (defined('TYPO3_MODE')) {
-			return t3lib_div::underscoredToLowerCamelCase($string);
+			return \t3lib_div::underscoredToLowerCamelCase($string);
 		}
 		$upperCamelCase = str_replace(' ', '', ucwords(str_replace('_', ' ', self::strtolower($string))));
 		$lowerCamelCase = self::lcfirst($upperCamelCase);
@@ -139,7 +139,7 @@ class StringTool {
 	 */
 	static public function strtolower($string) {
 		if (defined('TYPO3_MODE')) {
-			return t3lib_div::strtolower($string);
+			return \t3lib_div::strtolower($string);
 		}
 		return strtolower($string);
 	}
@@ -152,7 +152,7 @@ class StringTool {
 	 */
 	static public function strtoupper($string) {
 		if (defined('TYPO3_MODE')) {
-			return t3lib_div::strtoupper($string);
+			return \t3lib_div::strtoupper($string);
 		}
 		return strtoupper($string);
 	}
@@ -165,7 +165,7 @@ class StringTool {
 	 */
 	static public function lcfirst($string) {
 		if (defined('TYPO3_MODE')) {
-			return t3lib_div::lcfirst($string);
+			return \t3lib_div::lcfirst($string);
 		}
 		if (IR_MODERN_PHP) {
 			return lcfirst($string);

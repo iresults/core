@@ -63,6 +63,7 @@ class ObjectTest extends \TYPO3\Flow\Tests\FunctionalTestCase {
 	 * @test
 	 */
 	public function isInstanceOfCoreObject() {
+		$this->assertEquals(get_class($this->fixture), 'b');
 		$this->assertTrue(is_a($this->fixture, '\Iresults\Core\Core'));
 	}
 
