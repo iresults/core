@@ -25,11 +25,7 @@ namespace Iresults\Core\Helpers;
  * This copyright notice MUST APPEAR in all copies of the script!
  */
 
-if (@class_exists('Mage_Core_Helper_Abstract')) {
-	class SortHelperAbstractBase extends Mage_Core_Helper_Abstract {}
-} else {
-	class SortHelperAbstractBase {}
-}
+
 
 /**
  * The iresults sort helper provides different methods to sort arrays of
@@ -41,7 +37,7 @@ if (@class_exists('Mage_Core_Helper_Abstract')) {
  * @subpackage Helpers
  * @version 1.5
  */
-abstract class SortHelperAbstract extends SortHelperAbstractBase {
+abstract class SortHelperAbstract {
 	protected $_alternativeCompare = array();
 	protected $_alternativeCompareWorkingCopy = array();
 	protected $_alternativeCompareConfig = array();

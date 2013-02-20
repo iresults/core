@@ -446,6 +446,55 @@ class Iresults {
 	# MWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWM
 	# MWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWM
 	/**
+	 * Returns the absolute path to the given resource
+	 *
+	 * @param  Iresults\FilesystemInterface|string	$resource 	Either a filesystem instance or the path of a resource
+	 * @return string       									The absolute path of the resource
+	 */
+	static public function getPathOfResource($resource) {
+		$path = '';
+		// Get the path if the resource is an object
+		if (is_object($resource)) {
+			$path = $resource->getPath();
+		} else {
+			$path = $resource;
+		}
+
+		if (defined('TYPO3_MODE')) {
+			$tempPath = \t3lib_div::getFileAbsFileName($path);
+			if ($tempPath) {
+				return $tempPath;
+			}
+		}
+		return realpath($path) ? realpath($path) : $path;
+	}
+
+	/**
+	 * Returns the URL of the resource.
+	 *
+	 * @param	Iresults\FilesystemInterface|string	$resource 	Either a filesystem instance or the path of a resource
+	 * @return	string											The URL of the resource
+	 */
+	static public function getUrlOfResource($resource) {
+		$url = '';
+		$path = $resource;
+		$basePath = self::getBasePath();
+		$basePathStrLen = strlen($basePath);
+
+		// Get the path if the resource is an object
+		if (is_object($resource)) {
+			$path = $resource->getPath();
+		}
+
+		if (substr($path, 0, $basePathStrLen) === $basePath) {
+			$url = substr($path, $basePathStrLen);
+			return self::getBaseURL() . $url;
+		}
+		return $path;
+	}
+
+
+	/**
 	 * Returns the path to the base directory of the installation.
 	 *
 	 * @return	string
@@ -500,14 +549,15 @@ class Iresults {
 		static $path = '';
 		if (!$path) {
 			$framework = self::getFramework();
+
 			switch ($framework) {
 				case self::FRAMEWORK_FLOW:
 					$path = __DIR__ . '/../../../';
 					break;
 
 				case self::FRAMEWORK_TYPO3:
-					$path = __DIR__ . '/../../../../../typo3temp/';
-
+					$path = static::getBaseDir() . 'typo3temp/';
+					break;
 
 				case self::FRAMEWORK_STANDALONE:
 				default:
@@ -556,30 +606,6 @@ class Iresults {
 			$filePath = $filePathWithoutSuffix . '_' . ++$i . '.' . $suffix;
 		} while(file_exists($filePath));
 		return $filePath;
-	}
-
-	/**
-	 * Returns the URL of the resource.
-	 *
-	 * @param	Iresults_FilesystemInterface|string	$resource 	Either a filesystem instance or the path of a resource
-	 * @return	string												The URL of the resource
-	 */
-	static public function getUrlOfResource($resource) {
-		$url = '';
-		$path = $resource;
-		$basePath = self::getBasePath();
-		$basePathStrLen = strlen($basePath);
-
-		// Get the path if the resource is an object
-		if (is_object($resource)) {
-			$path = $resource->getPath();
-		}
-
-		if (substr($path, 0, $basePathStrLen) === $basePath) {
-			$url = substr($path, $basePathStrLen);
-			return self::getBaseURL() . $url;
-		}
-		return $path;
 	}
 
 	/**
@@ -741,14 +767,14 @@ class Iresults {
 		}
 
 		if ($printPathInformation === -1) {
-			$printPathInformation = (bool)self::getConfiguration('displayDebugPath');
+			$printPathInformation = (bool)static::getConfiguration('displayDebugPath');
 
 			// If no backend user is logged in, doen't show the path info
 			if (!isset($GLOBALS['BE_USER'])
 				|| !isset($GLOBALS['BE_USER']->user)
 				|| !intval($GLOBALS['BE_USER']->user['uid'])) {
 				$printPathInformation = FALSE;
-		}
+			}
 		}
 
 		/*
@@ -769,7 +795,7 @@ class Iresults {
 		// Output the dumps
 		if ($printTags) {
 			if ($printAnchor) {
-				echo '<a href="#ir_debug_anchor_bottom_' . $counter . '" name="ir_debug_anchor_top_' . $counter . ' style="background:#555;color:#fff;font-size:0.6em;">&gt; bottom</a>';
+				echo '<a href="#ir_debug_anchor_bottom_' . $counter . '" name="ir_debug_anchor_top_' . $counter . '" style="background:#555;color:#fff;font-size:0.6em;">&gt; bottom</a>';
 			}
 			echo '<div class="ir_debug_container" style="text-align:left;"><pre class="ir_debug">';
 		}
@@ -981,7 +1007,7 @@ class Iresults {
 		/**
 		 * Get the renderer from the configuration.
 		 */
-		$renderer = intval(self::getConfiguration('debugRenderer'));
+		$renderer = intval(static::getConfiguration('debugRenderer'));
 		if ($renderer) {
 			self::setDebugRenderer($renderer);
 		}

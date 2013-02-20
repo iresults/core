@@ -137,24 +137,23 @@ class Ir extends \Iresults\Core\Cache\AbstractCache {
 		$foundPaths = glob($path);
 
 		if (!$foundPaths || empty($foundPaths)) {
-			$this->pd("No matching cache files found for pattern '$path'.");
+			$this->pd('No matching cache files found for pattern "' . $path . '"');
 			return;
 		}
 
 		self::$_lock->lock();
 		foreach ($foundPaths as $onePath) {
 			if (!unlink($onePath)) {
-				$this->pd("Cache could not be cleared because the cache file $onePath couldn't be deleted.");
+				$this->pd('Cache could not be cleared because the cache file $onePath couldn\'t be deleted');
 				$result = FALSE;
 			} else {
-				$this->pd("Cache file $onePath deleted.");
+				$this->pd('Cache file "' . $onePath . '" deleted');
 			}
 		}
 		self::$_lock->unlock();
 
-
 		if ($result) {
-			$this->pd('Cache cleared.');
+			$this->pd('Cache cleared');
 		}
 	}
 
@@ -195,7 +194,7 @@ class Ir extends \Iresults\Core\Cache\AbstractCache {
 		if (!self::$_cache || empty(self::$_cache)) {
 			return;
 		} else if (!self::$_cacheWasChanged) {
-			\Iresults\Core\Iresults::pd('Cache was not changed.');
+			\Iresults\Core\Iresults::pd('Cache was not changed');
 			return;
 		}
 		$path = self::getCacheDir() . self::$_fileName . self::_getLanguageSuffix();
@@ -205,7 +204,7 @@ class Ir extends \Iresults\Core\Cache\AbstractCache {
 
 		$fh = fopen($path, 'wb');
 		if (!$fh) {
-			$msg = "Couldn't open file $path for writing the cache information.";
+			$msg = 'Couldn\'t open file "' . $path . '" for writing the cache information';
 			trigger_error($msg);
 			if (defined('TYPO3_MODE')) {
 				t3lib_div::devLog($msg, 'iresults', 3);
@@ -214,7 +213,7 @@ class Ir extends \Iresults\Core\Cache\AbstractCache {
 		}
 
 		if (fwrite($fh, $contents) === FALSE) {
-			$msg = "Writing cache to file $path failed.";
+			$msg = 'Writing cache to file "' . $path . '" failed';
 			trigger_error($msg);
 			if (defined('TYPO3_MODE')) {
 				t3lib_div::devLog($msg, 'iresults', 3);
