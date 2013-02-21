@@ -25,7 +25,6 @@ namespace Iresults\Core;
  */
 
 
-
 /**
  * The interface for objects
  *

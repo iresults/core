@@ -1,23 +1,16 @@
-iresults Framework
-==================
+iresults core
+=============
 
-Introduction
-------------
+The iresults core package provides fundamental functionality and classes.
 
-The iresults Framework is primary intended as an extension for [TYPO3](http://typo3.org), but also provides useful functionality in other
-contexts, standalone and even with [FLOW3](http://flow3.typo3.org/). It is built strictly Object Oriented and supports PHP version 5.2 and 5.3
-(some functionality requires version 5.3 or higher).
+The features include:
 
-Features
---------
-
-- Database abstraction (Iresults_Persistence_Db_Adapter)
-- File abstraction (Iresults_System_FileManager)
-- Mutable objects (Iresults_Mutable)
-- PDF rendering (Iresults_Renderer_Pdf)
-- Excel file creation (Iresults_Renderer_Excel)
-- Key value coding (Iresults_KVCInterface)
-- Object property key paths (Iresults_Model)
-- Debugging (Iresults_Debug)
-- Profiling (Iresults_Profiler)
+- Mutable objects (Iresults\Core\Mutable) which read data from different input formats (XML, CSV, YAML,...)
+- Key value coding (Iresults\Core\KVCInterface)
+- Resolution of property key paths (Iresults\Core\Model)
+- Debugging (Iresults\Core\Debug)
+- Profiling (Iresults\Core\Profiler)
+- Locks (Iresults\Core\System\Lock)
+- Tree based data structures (Iresults\Core\Model\DataTree)
+- Cache abstraction (Iresults\Core\Cache)
 - and many more...

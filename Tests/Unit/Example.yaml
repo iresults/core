@@ -21,16 +21,16 @@ production:
         dbname: APPLICATION_PATH/../data/db/application.db
     layout:
       layoutPath: APPLICATION_PATH/layouts/scripts/
- 
+
 staging:
   _extends: production
- 
+
 testing:
   _extends: production
   phpSettings:
     display_startup_errors: true
     display_errors: true
- 
+
 development:
   _extends: production
   phpSettings:
