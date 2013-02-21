@@ -75,15 +75,9 @@ class DateTime extends \DateTime {
 			 * If it is an object of type \Iresults\Core\DateTime get the raw property
 			 * from the passed object and release the given object.
 			 */
-			if (is_object($dateTime) && is_a($dateTime, '\Iresults\Core\DateTime')) {
-				parent::__construct($dateTime);
-				$dateTime = NULL;
-			} else
-			/*
-			 * If it is an object of type DateTime set the raw property directly.
-			 */
 			if (is_object($dateTime) && is_a($dateTime, '\DateTime')) {
-				parent::__construct($dateTime);
+				parent::__construct($dateTime->format('r'));
+				$dateTime = NULL;
 			} else
 			/*
 			 * Else try to create a new DateTime object from the argument.

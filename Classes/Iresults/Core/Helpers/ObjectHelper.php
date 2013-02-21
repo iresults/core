@@ -135,7 +135,7 @@ class ObjectHelper {
 				} else {
 					$type = gettype($parentObject);
 				}
-				throw new InvalidArgumentException('Cannot get property \'' . $path . '\' of object of type ' . $type . '.', 1320769266);
+				throw new \InvalidArgumentException('Cannot get property \'' . $path . '\' of object of type ' . $type . '.', 1320769266);
 			}
 
 		}

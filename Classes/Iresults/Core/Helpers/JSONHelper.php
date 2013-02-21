@@ -89,7 +89,7 @@ class JSONHelper {
 	 * @param	string 		$objectWrap	A string to wrap the JavaScript objects into
 	 * @return	string    	Returns the given value in a JSON representation.
 	 */
-	static protected function _createJSONStringFromObject($object, $options = 0, $objectWrap = '|') {
+	static protected function _createJSONStringFromObject($object, $options = 0, $objectWrap = NULL) {
 		if (is_a($object, 'JsonSerializable')) { // If the object implements JsonSerializable
 			$object = $object->jsonSerialize();
 			$options = $options | JSON_FORCE_OBJECT;
@@ -99,7 +99,7 @@ class JSONHelper {
 		} else if (is_a($object, 'Tx_Extbase_Persistence_QueryResultInterface') ||
 				  is_array($object)) {
 			return self::arrayOrDictionaryToJSON($object, $options, $objectWrap);
-		} else if ($object instanceof Traversable) {
+		} else if ($object instanceof \Traversable) {
 			$object = iterator_to_array($object);
 			$options = $options | JSON_FORCE_OBJECT;
 		} else if (is_object($object)) {
@@ -113,7 +113,12 @@ class JSONHelper {
 			return self::stringFromValue($object);
 		}
 		$JSONString = json_encode($object, $options);
-		return str_replace('|', $JSONString, $objectWrap);
+
+		// If an object wrap was given, use it
+		if ($objectWrap) {
+			return str_replace('|', $JSONString, $objectWrap);
+		}
+		return $JSONString;
 	}
 
 	/**
@@ -183,9 +188,7 @@ class JSONHelper {
 	 */
 	static public function stringFromValue($value) {
 		if (is_bool($value)) { // Boolean
-			#$value = $value ? 'true' : 'false';
 			$value = $value ? 1 : 0;
-			#$value = json_encode($value);
 		} else
 		if (is_numeric($value)) { // Number
 			if (is_int($value)) {
@@ -195,14 +198,14 @@ class JSONHelper {
 			}
 		}
 
-		// Handle special values
+		// Handle special values and/or escape strings
 		if (is_string($value)) {
-			if (substr($value, 0, 1) == self::SPECIAL_CHAR) {
+			if ($value[0] === self::SPECIAL_CHAR) {
 				if (substr($value, 1, 2) == 'f:') { // Function
 					$value = substr($value, 3);
-				} else if (strtolower(substr($value, 1)) == 'true') {
+				} else if (strtolower(substr($value, 1)) === 'true') {
 					$value = 'true';
-				} else if (strtolower(substr($value, 1)) == 'false') {
+				} else if (strtolower(substr($value, 1)) === 'false') {
 					$value = 'false';
 				}
 			}

@@ -86,7 +86,7 @@ class SerializationHelper extends \Iresults\Core\Core {
 		 * If the input is an object try to get it's properties.
 		 */
 		if (is_object($input)) {
-			if (!$input instanceof Traversable) { // If it isn't a traversable
+			if (!$input instanceof \Traversable) { // If it isn't a traversable
 				$updatedKeyPrefix = ObjectHelper::createIdentfierForObject($input);
 
 				if (defined('TYPO3_MODE') && method_exists($input,'_getProperties')) {
