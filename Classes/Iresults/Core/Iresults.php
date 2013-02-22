@@ -181,24 +181,47 @@ class Iresults {
 	static protected $framework = '';
 
 	/**
-	 * @var string The cache for the base path.
+	 * The cache for the base path
+	 * @var string
 	 */
 	static protected $basePath = '';
 
 	/**
-	 * @var string The cache for the base url.
+	 * The cache for the base url
+	 * @var string
 	 */
 	static protected $baseURL = '';
 
 	/**
-	 * @var array The configuration from ext_conf_template.txt.
+	 * The main configuration (if used with TYPO3 CMS it will be read from
+	 * ext_conf_template.txt)
+	 * @var array
 	 */
 	static protected $configuration = NULL;
 
 	/**
+	 * The singleton instance
 	 * @var \Iresults\Core\Iresults
 	 */
-	static private $instance = NULL;
+	static protected $instance = NULL;
+
+	/**
+	 * Name of the singleton's class
+	 *
+	 * Singleton overloading:
+	 * If you want to use class A that inherits from Iresults\Core\Iresults the
+	 * getSharedInstance() method would still return an Iresults\Core\Iresults
+	 * instance instead of an instance of A. To solve this problem the static
+	 * $instanceClassName property is used, when getSharedInstance() or
+	 * __construct() is called, to check if the name of the called class did
+	 * change.
+	 * If it did change and the new class is above the previous class in the
+	 * inheritance chain (the new class is a subclass of the previous class) a
+	 * new instance will be created as the singleton instance.
+	 *
+	 * @var string
+	 */
+	static protected $instanceClassName = '';
 
 
 	# MWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWM
@@ -220,9 +243,22 @@ class Iresults {
 	 * @return	Iresults
 	 */
 	public function __construct() {
+		/*
+		 * Check if an instance exists
+		 */
 		if (self::$instance) {
-			return NULL;
+			/*
+			 * Singleton overloading:
+			 * Check if the called class changed and if the new class is above
+			 * the previous class in the inheritance chain (the new class is a
+			 * subclass of the previous class)
+			 */
+			$calledClass = get_called_class();
+			if ($calledClass === self::$instanceClassName || !is_a($calledClass, self::$instanceClassName)) {
+				return self::$instance; // This doesn't work but shows the purpose of this if-statement
+			}
 		}
+
 
 		/*
 		 * Check the debug renderer.
@@ -246,21 +282,21 @@ class Iresults {
 		if (defined('TYPO3_MODE')) {
 			self::$framework = self::FRAMEWORK_TYPO3;
 		} else {
-		foreach (get_declared_classes() as $name) {
-			if (strpos($name, 'TYPO3\\FLOW3\\') === 0) {
-				self::$framework = self::FRAMEWORK_FLOW3;
-				break;
-			} else if (strpos($name, 'TYPO3\\Flow\\') === 0) {
-				self::$framework = self::FRAMEWORK_FLOW;
-				break;
-			} else if (strpos($name, 'Symfony\\') === 0) {
-				self::$framework = self::FRAMEWORK_SYMFONY;
-				break;
+			foreach (get_declared_classes() as $name) {
+				if (strpos($name, 'TYPO3\\FLOW3\\') === 0) {
+					self::$framework = self::FRAMEWORK_FLOW3;
+					break;
+				} else if (strpos($name, 'TYPO3\\Flow\\') === 0) {
+					self::$framework = self::FRAMEWORK_FLOW;
+					break;
+				} else if (strpos($name, 'Symfony\\') === 0) {
+					self::$framework = self::FRAMEWORK_SYMFONY;
+					break;
+				}
 			}
-		}
-		if (!self::$framework) {
-			self::$framework = self::FRAMEWORK_STANDALONE;
-		}
+			if (!self::$framework) {
+				self::$framework = self::FRAMEWORK_STANDALONE;
+			}
 		}
 
 		self::$instance = $this;
@@ -560,7 +596,7 @@ class Iresults {
 
 				case self::FRAMEWORK_STANDALONE:
 				default:
-					$path = sys_get_temp_dir();
+					$path = sys_get_temp_dir() . '/';
 					break;
 			}
 
@@ -1294,11 +1330,23 @@ class Iresults {
 	 * Returns the singleton instance.
 	 * @return \Iresults\Core\Iresults
 	 */
-	static public function getInstance() {
-		if (!self::$instance) {
-			self::$instance = new static();
+	static public function getSharedInstance() {
+		/*
+		 * Check if an instance exists
+		 */
+		if (self::$instance) {
+			/*
+			 * Singleton overloading:
+			 * Check if the called class changed and if the new class is above
+			 * the previous class in the inheritance chain (the new class is a
+			 * subclass of the previous class)
+			 */
+			$calledClass = get_called_class();
+			if ($calledClass === self::$instanceClassName || !is_a($calledClass, self::$instanceClassName)) {
+				return self::$instance;
+			}
 		}
-		return self::$instance;
+		return new static();
 	}
 
 
@@ -1352,4 +1400,9 @@ class Iresults {
 		}
 	}
 }
+
+/*
+ * Initialize the environment
+ */
+Iresults::getSharedInstance();
 ?>
