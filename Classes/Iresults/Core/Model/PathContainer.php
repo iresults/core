@@ -72,9 +72,11 @@ class PathContainer extends \Iresults\Core\Model\PathAccess\AbstractContainer im
 	 * 	</paths>
 	 *
 	 * @param	\Iresults\Core\Mutable\Xml	$mutable The mutable object from which to read the data
+	 * @param 	boolean $throwOnDuplicatePaths If set to TRUE an exception will be thrown if a given path already exists in the pathToObject-map
 	 * @return	\Iresults\Core\Model\PathContainer
+	 * @throws \Iresults\Core\Model\PathAccess\Exception\DuplicatePath if $throwOnDuplicatePaths is TRUE and the path already exists
 	 */
-	public function initWithMutableFromXml(\Iresults\Core\Mutable\Xml $mutable) {
+	public function initWithMutableFromXml(\Iresults\Core\Mutable\Xml $mutable, $throwOnDuplicatePaths = FALSE) {
 		$array = $mutable->getObjectForKey('entry');
 		foreach ($array as $entry) {
 			$key = $entry->getObjectForKey('path');
@@ -85,6 +87,9 @@ class PathContainer extends \Iresults\Core\Model\PathAccess\AbstractContainer im
 			// If the value doesn't have a path property save the path there.
 			} else if ($value instanceof \Iresults\Core\KVCInterface && !$value->getObjectForKey('path')) {
 				$value->setObjectForKey('path', $key);
+			}
+			if ($throwOnDuplicatePaths && isset($this->pathToObjectMap[$key])) {
+				throw new PathAccess\Exception\DuplicatePath('Path "' . $key . '" already exists', 1363856583);
 			}
 			$this->pathToObjectMap[$key] = $value;
 			$this->hashToPathMap[spl_object_hash($value)] = $key;
@@ -98,13 +103,7 @@ class PathContainer extends \Iresults\Core\Model\PathAccess\AbstractContainer im
 	 * @return	\Iresults\Core\Model\PathContainerInterface
 	 */
 	static public function container() {
-		$container = NULL;
-		if (IR_MODERN_PHP) {
-			$container = new static();
-		} else {
-			$container = new self();
-		}
-		return $container;
+		return new static();
 	}
 
 	/**
