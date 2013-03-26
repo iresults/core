@@ -29,6 +29,8 @@ namespace Iresults\Core\Mutable;
  * The concrete implementation class for mutable objects that read data from a
  * XML file.
  *
+ * @TODO Make this work without TYPO3 CMS
+ *
  * @author	Daniel Corn <cod@iresults.li>
  * @package	Iresults
  * @subpackage	Iresults_Mutable
@@ -85,7 +87,7 @@ class Xml extends \Iresults\Core\Mutable {
 	 *
 	 * @var boolean
 	 */
-	static protected $noUTF8 = TRUE;
+	static protected $noUTF8 = FALSE;
 
 
 
@@ -100,6 +102,7 @@ class Xml extends \Iresults\Core\Mutable {
 	 */
 	public function initWithContentsOfUrl($url) {
 		$xmlString = '';
+
 		/*
 		 * Check if the environment is UTF-8
 		 */
@@ -146,6 +149,12 @@ class Xml extends \Iresults\Core\Mutable {
 	 */
 	public function asXML() {
 		$xmlString = '';
+
+		$encodingString = ' encoding="UTF-8"';
+		if (self::$noUTF8) {
+			$encodingString = ' encoding="ISO-8859-1"';
+		}
+
 		foreach ($this as $name => $data) {
 			$currentDataString = $data;
 			if (is_object($data) && $data instanceof \Iresults\Core\Mutable\Xml) {
@@ -160,27 +169,26 @@ class Xml extends \Iresults\Core\Mutable {
 					}
 				}
 			}
-			$currentDataString = str_replace(array('<?xml version=\'1.0\'?>', '<?xml version="1.0"?>', '<ir_Iresults_mutable_xml_root>', '</ir_Iresults_mutable_xml_root>'), '', $currentDataString);
+			$currentDataString = str_replace(array('<?xml version=\'1.0\'' . $encodingString . '?>', '<?xml version="1.0"' . $encodingString . '?>', '<ir_tx_iresults_mutable_xml_root>', '</ir_tx_iresults_mutable_xml_root>'), '', $currentDataString);
 			$xmlString .= '<' . $name . '>' . $currentDataString . '</' . $name . '>' . PHP_EOL;
 		}
 
 		// Format the XML string
 		$xmlString = trim($xmlString);
 		if (class_exists('DOMDocument')) {
-			$xmlString = '<?xml version=\'1.0\'?><ir_Iresults_mutable_xml_root>'  . $xmlString . '</ir_Iresults_mutable_xml_root>';
+			$xmlString = '<?xml version=\'1.0\'' . $encodingString . '?><ir_tx_iresults_mutable_xml_root>'  . $xmlString . '</ir_tx_iresults_mutable_xml_root>';
 			$dom = new DOMDocument('1.0');
 			$dom->preserveWhiteSpace = FALSE;
 			$dom->formatOutput = TRUE;
 			$dom->loadXML($xmlString);
 			$xmlString = $dom->saveXML();
 		} else {
-			$xmlObject = simplexml_load_string('<?xml version=\'1.0\'?><ir_Iresults_mutable_xml_root>'  . $xmlString . '</ir_Iresults_mutable_xml_root>');
+			$xmlObject = simplexml_load_string('<?xml version=\'1.0\'' . $encodingString . '?><ir_tx_iresults_mutable_xml_root>'  . $xmlString . '</ir_tx_iresults_mutable_xml_root>');
 			if (is_object($xmlObject)) {
 				$xmlString = $xmlObject->asXML();
 			}
 		}
-
-		$xmlString = str_replace(array('<?xml version=\'1.0\'?>', '<?xml version="1.0"?>', '<ir_Iresults_mutable_xml_root>', '</ir_Iresults_mutable_xml_root>'), '', $xmlString);
+		$xmlString = str_replace(array('<?xml version=\'1.0\'' . $encodingString . '?>', '<?xml version="1.0"' . $encodingString . '?>', '<ir_tx_iresults_mutable_xml_root>', '</ir_tx_iresults_mutable_xml_root>'), '', $xmlString);
 		return $xmlString;
 	}
 
@@ -341,8 +349,10 @@ class Xml extends \Iresults\Core\Mutable {
 	 * @return	string
 	 */
 	protected function _prepareXmlString($xmlString) {
-		$xmlString = t3lib_div::makeInstance('t3lib_cs')->specCharsToASCII('utf-8', $xmlString);
-		$xmlString = str_replace(array('encoding="UTF-8"?', 'encoding=\'UTF-8\'?'), 'encoding="ISO-8859-1"?', $xmlString);
+		if (self::$noUTF8) {
+			$xmlString = t3lib_div::makeInstance('t3lib_cs')->specCharsToASCII('utf-8', $xmlString);
+			$xmlString = str_replace(array('encoding="UTF-8"?', 'encoding=\'UTF-8\'?'), 'encoding="ISO-8859-1"?', $xmlString);
+		}
 		$xmlString = str_replace('<<', '&#171;;', $xmlString);
 		$xmlString = str_replace('>>', '&#187;', $xmlString);
 		return $xmlString;
@@ -522,44 +532,6 @@ class Xml extends \Iresults\Core\Mutable {
 	}
 
 	/**
-	 * If $flag is TRUE the configuration of keyTransformFormat will be set to
-	 * \Iresults\Core\Tools\StringTool::FORMAT_LOWER_CAMEL_CASE, otherwise to
-	 * \Iresults\Core\Tools\StringTool::FORMAT_KEEP.
-	 *
-	 * @param	boolean	$flag
-	 * @return	void
-	 * @deprecated
-	 */
-	static public function setMakeKeysUpperCamelCase($flag) {
-		if (IR_MODERN_PHP) {
-			trigger_error(__CLASS__ . '::' . __FUNCTION__ . ' is deprecated. Use setKeyTransformFormat() instead.', E_USER_DEPRECATED);
-		} else {
-			trigger_error(__CLASS__ . '::' . __FUNCTION__ . ' is deprecated. Use setKeyTransformFormat() instead.', E_USER_WARNING);
-		}
-		if ($flag) {
-			self::$keyTransformFormat = \Iresults\Core\Tools\StringTool::FORMAT_LOWER_CAMEL_CASE;
-		} else {
-			self::$keyTransformFormat = \Iresults\Core\Tools\StringTool::FORMAT_KEEP;
-		}
-	}
-
-	/**
-	 * Returns if the configuration of keyTransformFormat is
-	 * \Iresults\Core\Tools\StringTool::FORMAT_LOWER_CAMEL_CASE.
-	 *
-	 * @return	boolean    TRUE if self::$keyTransformFormat is \Iresults\Core\Tools\StringTool::FORMAT_LOWER_CAMEL_CASE, otherwise FALSE
-	 * @deprecated
-	 */
-	static public function getMakeKeysUpperCamelCase() {
-		if (IR_MODERN_PHP) {
-			trigger_error(__CLASS__ . '::' . __FUNCTION__ . ' is deprecated. Use getKeyTransformFormat() instead.', E_USER_DEPRECATED);
-		} else {
-			trigger_error(__CLASS__ . '::' . __FUNCTION__ . ' is deprecated. Use getKeyTransformFormat() instead.', E_USER_WARNING);
-		}
-		return self::$keyTransformFormat == \Iresults\Core\Tools\StringTool::FORMAT_LOWER_CAMEL_CASE;
-	}
-
-	/**
 	 * Sets the configuration of keyTransformFormat.
 	 *
 	 * @param	integer|\Iresults\Core\Tools\StringTool::FORMAT $format The format to transform to
@@ -642,5 +614,32 @@ class Xml extends \Iresults\Core\Mutable {
 	 */
 	static public function getAutomaticFeaturesEnabled() {
 		return self::$automaticFeaturesEnabled;
+	}
+
+	/**
+	 * Sets the configuration of 'noUTF8'.
+	 *
+	 * If the configuration is set to TRUE the node contents will be converted
+	 * to latin1 (ISO-8859-1).
+	 * The node names will be converted to latin1 anyway.
+	 *
+	 * @param	boolean	$flag
+	 * @return	boolean    The current value of self::$noUTF8
+	 */
+	static public function setNoUTF8($flag) {
+		self::$noUTF8 = $flag;
+}
+
+	/**
+	 * Returns the configuration of 'noUTF8'.
+	 *
+	 * If the configuration is set to TRUE the node contents will be converted
+	 * to latin1 (ISO-8859-1).
+	 * The node names will be converted to latin1 anyway.
+	 *
+	 * @return	boolean    The current value of self::$noUTF8
+	 */
+	static public function getNoUTF8() {
+		return self::$noUTF8;
 	}
 }
