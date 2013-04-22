@@ -65,6 +65,11 @@ abstract class Core implements \Iresults\Core\ObjectInterface {
 			$dynamicMethod = $this->$name;
 			return call_user_func_array($dynamicMethod, $arguments);
 		}
+		if (($method = static::_instanceMethodForSelector($name))) {
+			// Add the current object to the array of arguments
+			array_unshift($arguments, $this);
+			return call_user_func_array($method, $arguments);
+		}
 		throw \Iresults\Core\Exception\UndefinedMethod::exceptionWithMethod($name);
 	}
 
@@ -81,6 +86,28 @@ abstract class Core implements \Iresults\Core\ObjectInterface {
 		throw \Iresults\Core\Exception\UndefinedMethod::exceptionWithMethod($name);
 	}
 
+	/**
+	 * Returns or sets the callback for the given method name
+	 * @param  string $methodName
+	 * @param  callback $callback
+	 * @return callback 	Returns the method for the given name or FALSE
+	 */
+	static public function _instanceMethodForSelector($methodName, $callback = NULL) {
+		/**
+		 * An array of callables (i.e. closures)
+		 * @var array
+		 */
+		static $categoryMethods = array();
+
+		if ($callback) {
+			$categoryMethods[$methodName] = $callback;
+			return $callback;
+		} else if (isset($categoryMethods[$methodName])) {
+			return $categoryMethods[$methodName];
+		}
+		return FALSE;
+	}
+
 
 	/* MWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWM */
 	/* FACTORY METHODS   MWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWM */
@@ -93,6 +120,8 @@ abstract class Core implements \Iresults\Core\ObjectInterface {
 	static public function alloc() {
 		return new static();
 	}
+
+
 	/* MWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWM */
 	/* DEBUGGING         MWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWM */
 	/* MWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWM */

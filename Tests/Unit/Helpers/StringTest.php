@@ -24,7 +24,7 @@ namespace Iresults\Core\Tests\Helpers;
  * SOFTWARE.
  */
 
-use TYPO3\Flow\Annotations as Flow;
+require_once __DIR__ . '/../Autoloader.php';
 
 /**
  * Test case for the String Tool class.
@@ -38,7 +38,7 @@ use TYPO3\Flow\Annotations as Flow;
  *
  * @author Daniel Corn <cod@iresults.li>
  */
-class StringTest extends \TYPO3\Flow\Tests\FunctionalTestCase {
+class StringTest extends \PHPUnit_Framework_TestCase {
 	public function setUp() {
 	}
 

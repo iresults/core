@@ -24,10 +24,10 @@ namespace Iresults\Core\Tests\Core;
  * SOFTWARE.
  */
 
-use TYPO3\Flow\Annotations as Flow;
+require_once __DIR__ . '/../Autoloader.php';
 
 /**
- * Test case for Iresults_Mutable
+ * Test case for Iresults Mutable
  *
  * @version $Id$
  * @copyright Copyright belongs to the respective authors
@@ -38,7 +38,7 @@ use TYPO3\Flow\Annotations as Flow;
  *
  * @author Daniel Corn <cod@iresults.li>
  */
-class MutableTest extends \TYPO3\Flow\Tests\FunctionalTestCase {
+class MutableTest extends \PHPUnit_Framework_TestCase {
 	/**
 	 * @var Iresults_FakeObject
 	 */

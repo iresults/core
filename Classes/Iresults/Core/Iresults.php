@@ -523,6 +523,13 @@ class Iresults {
 
 		if (substr($path, 0, $basePathStrLen) === $basePath) {
 			$url = substr($path, $basePathStrLen);
+
+			// Special handling for the TYPO3 backend
+			if (defined('TYPO3_MODE') && TYPO3_MODE === 'BE') {
+				if (substr($url, 0, 5) === 'typo3') {
+					$url = '../' . $url;
+				}
+			}
 			return self::getBaseURL() . $url;
 		}
 		return $path;

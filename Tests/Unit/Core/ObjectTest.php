@@ -24,13 +24,20 @@ namespace Iresults\Core\Tests\Core;
  * SOFTWARE.
  */
 
-use TYPO3\Flow\Annotations as Flow;
+require_once __DIR__ . '/../Autoloader.php';
 
 /**
  * A subclass of Iresults_Core
  */
 class ObjectTestObject extends \Iresults\Core\Core {
 	protected $name = 'mars';
+}
+
+/**
+ * A subclass of Iresults_Core
+ */
+class ObjectTestObject2 extends \Iresults\Core\Core {
+	protected $name = 'pluto';
 }
 
 /**
@@ -45,13 +52,14 @@ class ObjectTestObject extends \Iresults\Core\Core {
  *
  * @author Daniel Corn <cod@iresults.li>
  */
-class ObjectTest extends \TYPO3\Flow\Tests\FunctionalTestCase {
+class ObjectTest extends \PHPUnit_Framework_TestCase {
 	/**
-	 * @var Iresults_Helpers_Fluid_Mail
+	 * @var Iresults\Core\Tests\Core\ObjectTestObject
 	 */
 	protected $fixture;
 
 	public function setUp() {
+		error_reporting(E_ALL);
 		$this->fixture = new ObjectTestObject();
 	}
 
@@ -62,7 +70,6 @@ class ObjectTest extends \TYPO3\Flow\Tests\FunctionalTestCase {
 	 * @test
 	 */
 	public function isInstanceOfCoreObject() {
-		$this->assertEquals(get_class($this->fixture), 'b');
 		$this->assertTrue(is_a($this->fixture, '\Iresults\Core\Core'));
 	}
 
@@ -88,25 +95,32 @@ class ObjectTest extends \TYPO3\Flow\Tests\FunctionalTestCase {
 		$this->assertEquals('hello world', $result);
 	}
 
-	// Setting the context isn't possible at the moment
-	///**
-	// * @test
-	// */
-	//public function canAddDynamicMethodWithArgumentsAndThis() {
-	//	$er = error_reporting(E_ALL);
-	//
-	//	$this->fixture->newMethod = function($name) {
-	//
-	//		$this->name = $name;
-	//		Ir::forceDebug();
-	//		Ir::pd($this);
-	//		die;
-	//		return 'hello ' . $this->name;
-	//	};
-	//	$result = $this->fixture->newMethod('world');
-	//
-	//	error_reporting($er);
-	//	$this->assertEquals('hello world', $result);
-	//}
+	/**
+	 * @test
+	 */
+	public function canAddInstanceMethodForSelector() {
+		\Iresults\Core\Tests\Core\ObjectTestObject::_instanceMethodForSelector('canAddInstanceMethodForSelector', function () {return 'hello world';});
+		$result = $this->fixture->canAddInstanceMethodForSelector();
+		$this->assertEquals('hello world', $result);
+	}
+
+	/**
+	 * @test
+	 */
+	public function canAddInstanceMethodForSelectorWithoutOverriding() {
+		\Iresults\Core\Tests\Core\ObjectTestObject::_instanceMethodForSelector('canAddInstanceMethodForSelectorWithoutOverriding', function () {return 'object 1';});
+		\Iresults\Core\Tests\Core\ObjectTestObject2::_instanceMethodForSelector('canAddInstanceMethodForSelectorWithoutOverriding', function () {return 'object 2';});
+		$result = $this->fixture->canAddInstanceMethodForSelectorWithoutOverriding();
+		$this->assertEquals('object 1', $result);
+	}
+
+	/**
+	 * @test
+	 * @expectedException \Iresults\Core\Exception\UndefinedMethod
+	 */
+	public function canAddInstanceMethodForSelectorWithoutInheriting() {
+		\Iresults\Core\Core::_instanceMethodForSelector('canAddInstanceMethodForSelectorWithoutInheriting', function () {return 'hello world';});
+		$this->fixture->canAddInstanceMethodForSelectorWithoutInheriting();
+	}
 }
 ?>

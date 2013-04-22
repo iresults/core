@@ -241,7 +241,7 @@ class Debug {
 			$this->_currentLevel = $this->_currentLevel - 1;
 			$this->_add('}');
 			/* MWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWM */
-		} else if (is_a($object, '\Iresults\Core\System\FilesystemInterface')) {
+		} else if (is_a($object, '\Iresults\FS\FilesystemInterface')) {
 			$this->_add(get_class($object) . $objectId . ' => {');
 			$this->_currentLevel = $this->_currentLevel + 1;
 			$this->_add('path => "' . $object->getPath() . '"');

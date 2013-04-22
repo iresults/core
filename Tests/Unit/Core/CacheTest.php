@@ -24,7 +24,7 @@ namespace Iresults\Core\Tests\Core;
  * SOFTWARE.
  */
 
-use TYPO3\Flow\Annotations as Flow;
+require_once __DIR__ . '/../Autoloader.php';
 
 /**
  * A subclass of Iresults_Core
@@ -45,7 +45,7 @@ class CacheTestObject extends \Iresults\Core\Core {
  *
  * @author Daniel Corn <cod@iresults.li>
  */
-class CacheTest extends \TYPO3\Flow\Tests\FunctionalTestCase {
+class CacheTest extends \PHPUnit_Framework_TestCase {
 	/**
 	 * @var Iresults_Helpers_Fluid_Mail
 	 */

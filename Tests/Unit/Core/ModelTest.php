@@ -24,7 +24,7 @@ namespace Iresults\Core\Tests\Core;
  * SOFTWARE.
  */
 
-use TYPO3\Flow\Annotations as Flow;
+require_once __DIR__ . '/../Autoloader.php';
 
 class Person extends \Iresults\Core\Model {
 	/**
@@ -87,14 +87,13 @@ class Person extends \Iresults\Core\Model {
  *
  * @author Daniel Corn <cod@iresults.li>
  */
-class ModelTest extends \TYPO3\Flow\Tests\FunctionalTestCase {
+class ModelTest extends \PHPUnit_Framework_TestCase {
 	/**
 	 * @var Iresults_FakeObject
 	 */
 	protected $fixture;
 
 	public function setUp() {
-		Ir::forceDebug();
 		$this->fixture = new Person();
 	}
 
