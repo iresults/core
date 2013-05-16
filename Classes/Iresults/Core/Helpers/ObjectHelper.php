@@ -113,13 +113,13 @@ class ObjectHelper {
 				} else {
 					$currentObject = NULL;
 				}
-			} else if (method_exists($parentObject, 'getData')) { // getData()
+			} else if (is_object($parentObject) && method_exists($parentObject, 'getData')) { // getData()
 				$currentObject = $parentObject->getData($path);
-			} else if (property_exists($parentObject, $path)) { // Direct access
+			} else if (is_object($parentObject) && property_exists($parentObject, $path)) { // Direct access
 				$currentObject = $parentObject->$path;
 			} else if (self::$treatStdClassAsMutable && get_class($parentObject) === 'stdClass') { // Mutable stdClass
 				@$currentObject = $parentObject->$path;
-			} else if (method_exists($parentObject, 'execute')) { // execute()
+			} else if (is_object($parentObject) && method_exists($parentObject, 'execute')) { // execute()
 				$currentObject = $parentObject->execute($path);
 				if (IR_MODERN_PHP) {
 					trigger_error('The accessor method execute is deprecated and will not be used in ObjectHelper in future versions.', E_USER_DEPRECATED);
