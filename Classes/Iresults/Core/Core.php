@@ -88,6 +88,14 @@ abstract class Core implements \Iresults\Core\ObjectInterface {
 
 	/**
 	 * Returns or sets the callback for the given method name
+	 *
+	 * Advanced information: Since the $categoryMethods is defined static (in
+	 * the local scope) it is not shared among subclasses. Say you add function
+	 * a() to class A. The subclass B has no access to function a().
+	 * But there seems to be a way to inherit dynamic functions if the class B
+	 * is compiled after function a() has been added to class A. Please be
+	 * aware that you should not rely on this behaviour!
+	 *
 	 * @param  string $methodName
 	 * @param  callback $callback
 	 * @return callback 	Returns the method for the given name or FALSE
