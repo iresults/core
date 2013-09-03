@@ -576,7 +576,11 @@ class Iresults {
 			} else if (isset($_SERVER['HTTP_ORIGIN'])) {
 				$tempBaseURL = $_SERVER['HTTP_ORIGIN'] . $tempBaseURL;
 			} else {
+				// @Todo: Make this convenient
 				$tempBaseURL = dirname($_SERVER['SCRIPT_NAME']) . '/';
+				if ($tempBaseURL === '//') {
+					$tempBaseURL = '/';
+				}
 			}
 			self::$baseURL = $tempBaseURL;
 		}
