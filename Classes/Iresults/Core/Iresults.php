@@ -501,7 +501,8 @@ class Iresults {
 				return $tempPath;
 			}
 		}
-		return realpath($path) ? realpath($path) : $path;
+		$realPath = realpath($path);
+		return  $realPath ? $realPath : $path;
 	}
 
 	/**
