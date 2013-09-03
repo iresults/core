@@ -573,14 +573,8 @@ class Iresults {
 			$tempBaseURL = '';
 			if (defined('TYPO3_MODE') && $GLOBALS['TSFE']->baseUrl) {
 				$tempBaseURL = $GLOBALS['TSFE']->baseUrl;
-			} else if (isset($_SERVER['HTTP_ORIGIN'])) {
-				$tempBaseURL = $_SERVER['HTTP_ORIGIN'] . $tempBaseURL;
 			} else {
-				// @Todo: Make this convenient
-				$tempBaseURL = dirname($_SERVER['SCRIPT_NAME']) . '/';
-				if ($tempBaseURL === '//') {
-					$tempBaseURL = '/';
-				}
+				$tempBaseURL = dirname($_SERVER['SCRIPT_NAME']);
 			}
 			self::$baseURL = $tempBaseURL;
 		}
