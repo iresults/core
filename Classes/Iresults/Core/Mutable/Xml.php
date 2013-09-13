@@ -403,14 +403,7 @@ class Xml extends \Iresults\Core\Mutable {
 	 * @return	\Iresults\Core\Mutable\Xml|object
 	 */
 	protected function _createSubObjectForNode($node) {
-		$newNodeObject = NULL;
-		if (IR_MODERN_PHP) {
-			$newNodeObject = new static();
-		} else {
-			$class = get_class($this);
-			$newNodeObject = new $class();
-		}
-		return $newNodeObject;
+		return new static();
 	}
 
 

@@ -25,8 +25,6 @@ namespace Iresults\Core;
  */
 
 
-define('IR_MODERN_PHP', TRUE);
-
 
 /**
  * Base class of the iresults framework.
@@ -268,7 +266,10 @@ class Iresults {
 		/*
 		 * Check the environment.
 		 */
-		if (isset($_SERVER['TERM']) && $_SERVER['TERM']) {
+		if (
+			(isset($_SERVER['TERM']) && $_SERVER['TERM'])
+			|| php_sapi_name() === 'cli'
+		) {
 			self::$environment = self::ENVIRONMENT_SHELL;
 			ini_set('display_errors', 1);
 			#error_reporting(E_ALL);

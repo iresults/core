@@ -766,12 +766,7 @@ class DataTree extends \Iresults\Core\Model\PathAccess\AbstractContainer impleme
 	 * @return	\Iresults\Core\Model\DataTree
 	 */
 	static public function tree() {
-		$dataTree = NULL;
-		if (IR_MODERN_PHP) {
-			$dataTree = new static();
-		} else {
-			$dataTree = new self();
-		}
+		$dataTree = new static();
 		return $dataTree;
 	}
 

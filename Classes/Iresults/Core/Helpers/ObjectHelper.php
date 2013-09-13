@@ -121,11 +121,7 @@ class ObjectHelper {
 				@$currentObject = $parentObject->$path;
 			} else if (is_object($parentObject) && method_exists($parentObject, 'execute')) { // execute()
 				$currentObject = $parentObject->execute($path);
-				if (IR_MODERN_PHP) {
-					trigger_error('The accessor method execute is deprecated and will not be used in ObjectHelper in future versions.', E_USER_DEPRECATED);
-				} else {
-					trigger_error('The accessor method execute is deprecated and will not be used in ObjectHelper in future versions.', E_USER_WARNING);
-				}
+				trigger_error('The accessor method execute is deprecated and will not be used in ObjectHelper in future versions.', E_USER_DEPRECATED);
 			} else {
 				$currentObject = NULL;
 

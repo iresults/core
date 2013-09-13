@@ -165,10 +165,7 @@ class StringTool {
 		if (defined('TYPO3_MODE')) {
 			return \t3lib_div::lcfirst($string);
 		}
-		if (IR_MODERN_PHP) {
-			return lcfirst($string);
-		}
-		return self::strtolower($string[0]) . substr($string, 1);
+		return lcfirst($string);
 	}
 
 	/**

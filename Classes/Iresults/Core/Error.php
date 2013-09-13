@@ -81,12 +81,7 @@ class Error extends \Exception implements JsonSerializable {
 	 * @return	\Iresults\Core\Error
 	 */
 	static public function errorWithMessageCodeAndUserInfo($message, $code = 0, $userInfo = array()) {
-		$error = NULL;
-		if (IR_MODERN_PHP) {
-			$error = new static($message, $code);
-		} else {
-			$error = new self($message, $code);
-		}
+		$error = new static($message, $code);
 		$error->_setUserInfo($userInfo);
 		return $error;
 	}

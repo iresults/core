@@ -85,41 +85,26 @@ class Csv extends \Iresults\Core\Mutable {
 			throw new UnexpectedValueException("Couldn't load CSV file from '$filePath'.", 1329750849);
 		}
 
-		if (IR_MODERN_PHP) {
-			/*
-			 * Use str_getcsv() if it is available, because fgetcsv() doesn't
-			 * seem to work with CSV-lines without enclosure.
-			 */
-			while (($lineString = fgets($fh)) !== FALSE && $line++ < $maxLines) {
-				$row = str_getcsv($lineString, $delimiter, $enclosure, $escape);
-                if (count($row) < 2) {
-                    throw new UnexpectedValueException("Error in input file '$filePath': The row at line $line has less than two values.", 1329750916);
-                }
-				$keyPath = trim($row[0]);
-				$value = trim($row[1]);
-
-				if ($treatFirstColumnAsKeyPathLocal) {
-					$this->setObjectForKeyPath($keyPath, $value);
-				} else {
-					$this->setObjectForKey($keyPath, $value);
-				}
-
+		/*
+		 * Use str_getcsv() if it is available, because fgetcsv() doesn't
+		 * seem to work with CSV-lines without enclosure.
+		 */
+		while (($lineString = fgets($fh)) !== FALSE && $line++ < $maxLines) {
+			$row = str_getcsv($lineString, $delimiter, $enclosure, $escape);
+			if (count($row) < 2) {
+				throw new UnexpectedValueException("Error in input file '$filePath': The row at line $line has less than two values.", 1329750916);
 			}
-		} else {
-			while (($row = fgetcsv($fh, 0, $delimiter, $enclosure)) !== FALSE && $line++ < $maxLines) {
-				if (count($row) < 2) {
-                    throw new UnexpectedValueException("Error in input file '$filePath': The row at line $line has less than two values.", 1329750916);
-                }
-				$keyPath = trim($row[0]);
-				$value = trim($row[1]);
+			$keyPath = trim($row[0]);
+			$value = trim($row[1]);
 
-				if ($treatFirstColumnAsKeyPathLocal) {
-					$this->setObjectForKeyPath($keyPath, $value);
-				} else {
-					$this->setObjectForKey($keyPath, $value);
-				}
+			if ($treatFirstColumnAsKeyPathLocal) {
+				$this->setObjectForKeyPath($keyPath, $value);
+			} else {
+				$this->setObjectForKey($keyPath, $value);
 			}
+
 		}
+
 
 		if (!feof($fh)) {
 			throw new LengthException("Unexpected end of line when reading CSV import file '$filePath'.", 1329750856);

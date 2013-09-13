@@ -1217,12 +1217,7 @@ class DataGrid extends \Iresults\Core\Core implements \Iterator, \ArrayAccess {
 	 * @return	\Iresults\Core\Model\DataGrid
 	 */
 	static public function gridWithContentsOfUrl($url) {
-		$mutable = NULL;
-		if (IR_MODERN_PHP) {
-			$mutable = new static();
-		} else {
-			$mutable = new self();
-		}
+		$mutable = new static();
 		$mutable->initWithContentsOfUrl($url);
 		return $mutable;
 	}
