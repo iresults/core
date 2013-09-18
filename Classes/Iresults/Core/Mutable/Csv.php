@@ -82,7 +82,7 @@ class Csv extends \Iresults\Core\Mutable {
 
 		$fh = fopen($filePath, 'r');
 		if ($fh === FALSE) {
-			throw new UnexpectedValueException("Couldn't load CSV file from '$filePath'.", 1329750849);
+			throw new \UnexpectedValueException("Couldn't load CSV file from '$filePath'.", 1329750849);
 		}
 
 		/*
@@ -92,7 +92,7 @@ class Csv extends \Iresults\Core\Mutable {
 		while (($lineString = fgets($fh)) !== FALSE && $line++ < $maxLines) {
 			$row = str_getcsv($lineString, $delimiter, $enclosure, $escape);
 			if (count($row) < 2) {
-				throw new UnexpectedValueException("Error in input file '$filePath': The row at line $line has less than two values.", 1329750916);
+				throw new \UnexpectedValueException("Error in input file '$filePath': The row at line $line has less than two values.", 1329750916);
 			}
 			$keyPath = trim($row[0]);
 			$value = trim($row[1]);
@@ -107,7 +107,7 @@ class Csv extends \Iresults\Core\Mutable {
 
 
 		if (!feof($fh)) {
-			throw new LengthException("Unexpected end of line when reading CSV import file '$filePath'.", 1329750856);
+			throw new \LengthException("Unexpected end of line when reading CSV import file '$filePath'.", 1329750856);
 		}
 
 		fclose($fh);

@@ -23,6 +23,7 @@ namespace Iresults\Core\Model;
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
+use Iresults\Core\Ui\Table;
 
 
 /**
@@ -114,10 +115,7 @@ class DataGrid extends \Iresults\Core\Core implements \Iterator, \ArrayAccess {
 	/* INITIALIZATION    MWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWM */
 	/* MWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWM */
 	/**
-	 * The constructor
-	 *
-	 * @param	array   $parameters	 Optional parameters to pass to the constructor
-	 * @return	Iresults_Model
+	 * @param array $parameters Optional parameters to pass to the constructor
 	 */
 	public function __construct(array $parameters = array()) {
 		//parent::__construct($parameters);
@@ -126,17 +124,14 @@ class DataGrid extends \Iresults\Core\Core implements \Iterator, \ArrayAccess {
 
 		$this->rowCount = $this->_getLengthOfElement($this->data);
 		$this->columnCount = $this->_getLengthOfLongestElementOfInput($this->data);
-
-		//$this->rowCount = count($this->data);
-		//$this->columnCount = count(current($this->data));
 		return $this;
 	}
 
 	/**
-	 * Initializes the object with the contents from the file at the given URL.
+	 * Initializes the object with the contents from the file at the given URL
 	 *
-	 * @param	string	$filePath The URL to the file to load data from
-	 * @return	\Iresults\Core\Model\DataGrid    Returns the initialized object
+	 * @param string $url The URL to the file to load data from
+	 * @return $this
 	 */
 	public function initWithContentsOfUrl($url) {
 		if (strtolower(substr($url,-4)) == '.csv') {
@@ -161,6 +156,8 @@ class DataGrid extends \Iresults\Core\Core implements \Iterator, \ArrayAccess {
 	 * @param	string	$enclosure The CSV field enclosure character
 	 * @param	string	$escape	\" The CSV files escape character
 	 * @return	\Iresults\Core\Model\DataGrid    Returns the initialized object
+	 * @throws \UnexpectedValueException
+	 * @throws \LengthException
 	 */
 	public function initWithContentsOfCSVFile($filePath, $delimiter = ',', $enclosure = '"', $escape = '\\') {
 		$line = 0;
@@ -175,7 +172,7 @@ class DataGrid extends \Iresults\Core\Core implements \Iterator, \ArrayAccess {
 
 		$fh = fopen($filePath, 'r');
 		if ($fh === FALSE) {
-			throw new UnexpectedValueException('Couldn\'t load CSV file from "' . $filePath . '".', 1315232117);
+			throw new \UnexpectedValueException('Couldn\'t load CSV file from "' . $filePath . '".', 1315232117);
 		}
 
 		/*
@@ -188,7 +185,7 @@ class DataGrid extends \Iresults\Core\Core implements \Iterator, \ArrayAccess {
 		}
 
 		if (!feof($fh)) {
-			throw new LengthException('Unexpected end of line when reading CSV import file.', 1326274982);
+			throw new \LengthException('Unexpected end of line when reading CSV import file.', 1326274982);
 		}
 
 		fclose($fh);
@@ -305,7 +302,7 @@ class DataGrid extends \Iresults\Core\Core implements \Iterator, \ArrayAccess {
 	/* FINDING VALUES       WMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWM */
 	/* MWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWM */
 	/**
-	 * Searches the given value in the grind and returns an array of objects
+	 * Searches the given value in the grid and returns an array of objects
 	 * with the properties row and column, for the cells the value was found in.
 	 *
 	 * @param	mixed	$value			The value to search for
@@ -313,20 +310,31 @@ class DataGrid extends \Iresults\Core\Core implements \Iterator, \ArrayAccess {
 	 * @return	array<object>
 	 */
 	public function findValue($value, $strictCompare = FALSE) {
+		// Reuse the last search
 		if (!$this->isDirty && $this->lastSearchResult
 			&& $this->lastSearchValue === $value
 			&& (!$strictCompare || $this->lastSearchStrict === TRUE)
 			) {
 			return $this->lastSearchResult;
 		}
-		$filledGrid =& $this->getFilledGridData();
+
+		// Check the primary key
+		if ($this->_primaryKeyColumn !== NULL) {
+			$primaryKeyObjectPoint = $this->getPrimaryKeyForValue($value, TRUE);
+			if ($primaryKeyObjectPoint) {
+				return array($primaryKeyObjectPoint);
+			}
+		}
+
+
+		$filledGrid = $this->getFilledGridData();
 		$foundCells = array();
 
 		$currentRowIndex = 0;
 		while (($currentRow = current($filledGrid)) !== FALSE) {
 			foreach ($currentRow as $currentColumnIndex => $cell) {
 				if ($cell === $value || ($strictCompare === FALSE && $cell == $value)) {
-					$point = new stdClass();
+					$point = new \stdClass();
 					$point->row = $currentRowIndex;
 					$point->column = $currentColumnIndex;
 					$foundCells[] = $point;
@@ -343,6 +351,85 @@ class DataGrid extends \Iresults\Core\Core implements \Iterator, \ArrayAccess {
 	}
 
 
+	/**
+	 * This contains the indexed data of a primary key column
+	 * @var array
+	 */
+	protected $_primaryKeys = array();
+
+	/**
+	 * The column to use as primary key
+	 * @var integer
+	 */
+	protected $_primaryKeyColumn = NULL;
+
+	/* MWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWM */
+	/* PRIMARY KEYS         WMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWM */
+	/* MWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWM */
+
+	/**
+	 * Defines the given column as primary key
+	 * @param integer $columnIndex
+	 */
+	public function setPrimaryKey($columnIndex) {
+		$this->_primaryKeyColumn = $columnIndex;
+	}
+
+	/**
+	 * Rebuilds the primary key index
+	 */
+	protected function _rebuildPrimaryKey() {
+		$columnIndex = $this->_primaryKeyColumn;
+		if ($columnIndex === NULL) {
+			return;
+		}
+		$temporaryPrimaryKeys = array();
+		$columnData = $this->getColumnAtIndex($columnIndex);
+
+		$rowCount = count($columnData);
+		$currentRowIndex = 0;
+		do {
+			$point = new \stdClass();
+			$point->row = $currentRowIndex;
+			$point->column = $columnIndex;
+
+			$data = $columnData[$currentRowIndex];
+
+			$primaryKeyObject = array(
+				'data'	=> $data,
+				'point'	=> $point
+			);
+
+			if (is_scalar($data)){
+				$temporaryPrimaryKeys[$data] = $primaryKeyObject;
+			} else if (is_object($data) && method_exists($data, '__toString')) {
+				$temporaryPrimaryKeys[$data . ''] = $primaryKeyObject;
+			} else {
+				throw new \UnexpectedValueException('Could not use value at row ' . $currentRowIndex . ' column ' . $columnIndex . ' as key', 1379504589);
+				#$temporaryPrimaryKeys[] = $primaryKey;
+			}
+		} while (++$currentRowIndex < $rowCount);
+	}
+
+	/**
+	 * Returns the full key object for the given value if it is a valid primary
+	 * key, or NULL if it doesn't exist
+	 *
+	 * @param mixed $value
+	 * @param bool  $returnPoint
+	 * @return mixed|null
+	 */
+	public function getPrimaryKeyForValue($value, $returnPoint = FALSE) {
+		if (isset($this->_primaryKeys[$value])) {
+			$primaryKeyObject = $this->_primaryKeys[$value];
+			if ($returnPoint) {
+				return $primaryKeyObject['point'];
+			} else {
+				return $primaryKeyObject['data'];
+			}
+		}
+		return NULL;
+	}
 
 	/* MWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWM */
 	/* ACCESS COLUMNS AND ROWS   MWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWM */
@@ -448,7 +535,7 @@ class DataGrid extends \Iresults\Core\Core implements \Iterator, \ArrayAccess {
 	 */
 	public function popRow() {
 		$lastRow = $this->getRowAtIndex($this->getRowCount() - 1);
-		$lastElement = end($this->data);
+		end($this->data);
 		$lastKey = key($this->data);
 		unset($this->data[$lastKey]);
 
@@ -467,7 +554,7 @@ class DataGrid extends \Iresults\Core\Core implements \Iterator, \ArrayAccess {
 
 		$filledDataL = $this->getFilledGridData();
 		$count = count($filledDataL);
-		for($rowIndex = 0; $rowIndex < $count; $rowIndex++) {
+		for ($rowIndex = 0; $rowIndex < $count; $rowIndex++) {
 			$row = $filledDataL[$rowIndex];
 			if (!array_key_exists($index,$row) && $index > count($row)) {
 				//$this->pd("DAG NOTEX",$index,$row,$rowIndex,$filledDataL);
@@ -670,7 +757,7 @@ class DataGrid extends \Iresults\Core\Core implements \Iterator, \ArrayAccess {
 	 * @return	boolean 	Returns TRUE on success, otherwise FALSE
 	 */
 	public function sortByRowAtIndex($index) {
-		throw new Exception("Sorry. This method is currently not implemented.");
+		throw new \Exception("Sorry. This method is currently not implemented.");
 	}
 
 	/**
@@ -1194,14 +1281,13 @@ class DataGrid extends \Iresults\Core\Core implements \Iterator, \ArrayAccess {
 	/* HELPER METHODS                   WMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWM */
 	/* MWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWM */
 	/**
-	 * Returns the data of the grid in an HTML table.
+	 * Returns the data of the grid as a table
 	 *
 	 * @return	string    The HTML code for the table
 	 */
 	public function createHtmlTable() {
-		//$this->rewind();
 		$data = $this->getGrid();
-		$table = \Iresults\Core\Iresults::makeInstance('\Iresults\Core\ViewHelpers\TableViewHelper');
+		$table = new Table();
 		return $table->render($data);
 	}
 
@@ -1217,6 +1303,7 @@ class DataGrid extends \Iresults\Core\Core implements \Iterator, \ArrayAccess {
 	 * @return	\Iresults\Core\Model\DataGrid
 	 */
 	static public function gridWithContentsOfUrl($url) {
+		/** @var \Iresults\Core\Model\DataGrid $mutable */
 		$mutable = new static();
 		$mutable->initWithContentsOfUrl($url);
 		return $mutable;
