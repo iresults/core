@@ -23,6 +23,7 @@ namespace Iresults\Core;
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
+use Iresults\Core\Exception\UndefinedMethod;
 
 
 /**
@@ -51,7 +52,7 @@ class Mutable extends \Iresults\Core\Model implements \Countable, \Iterator, \Ar
 	/**
 	 * Initialize the instance with the data from the given array.
 	 *
-	 * @param	array|Iterator The source from which to read the properties
+	 * @param	array|\Iterator The source from which to read the properties
 	 *
 	 * @return	\Iresults\Core\Mutable The mutable object
 	 */
@@ -116,7 +117,7 @@ class Mutable extends \Iresults\Core\Model implements \Countable, \Iterator, \Ar
 	public function setData($key, $value) {
 		//$key = $this->_functionNameToPropertyName($key);
 		if (func_num_args() < 2) {
-			throw new InvalidArgumentException('setData requires two arguments.', 1322234376);
+			throw new \InvalidArgumentException('setData requires two arguments.', 1322234376);
 		}
 		$this->__set($key, $value);
 	}
@@ -262,12 +263,12 @@ class Mutable extends \Iresults\Core\Model implements \Countable, \Iterator, \Ar
 			$this->__set($propertyName, $value);
 		} else if (substr($name, 0, 3) == 'get') {
 			if (!empty($arguments)) {
-				throw new BadMethodCallException('You called a virtual getter method with an argument.', 1319795026);
+				throw new UndefinedMethod('You called a virtual getter method with an argument.', 1319795026);
 			}
 			$propertyName = $this->_functionNameToPropertyName($name);
 			return $this->__get($propertyName);
 		} else {
-			throw new BadMethodCallException('You called the method \'' . $name . '\', which isn\'t a getter or setter.', 1323971571);
+			throw new UndefinedMethod('You called the method \'' . $name . '\', which isn\'t a getter or setter.', 1323971571);
 		}
 	}
 
