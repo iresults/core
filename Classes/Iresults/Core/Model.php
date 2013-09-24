@@ -208,7 +208,7 @@ abstract class Model extends \Iresults\Core\Core implements \Iresults\Core\KVCIn
 	public function hasObjectForKeyPath($propertyPath) {
 		try {
 			$value = ObjectHelper::getObjectForKeyPathOfObject($propertyPath, $this);
-		} catch (InvalidArgumentException $e) {
+		} catch (\InvalidArgumentException $e) {
 			$value = NULL;
 		}
 		if ($value) {
