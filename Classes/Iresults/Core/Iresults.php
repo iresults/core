@@ -1383,7 +1383,7 @@ class Iresults {
 	 *
 	 * This method will be used for exception handling in CLI environment.
 	 *
-	 * @param	Exception 	$exception 	The exception to handle
+	 * @param	\Exception 	$exception 	The exception to handle
 	 * @param	boolean		$graceful 	Set to TRUE if the handler should not stop the PHP script
 	 * @return		void
 	 */
