@@ -88,8 +88,7 @@ abstract class SortHelperAbstract {
 	const DEBUG_TRIGGER = 2;
 
 	/**
-	 * @var SortHelperAbstract A singleton instance for
-	 * static method calls.
+	 * @var SortHelperAbstract A singleton instance for static method calls
 	 */
 	static protected $_instance = NULL;
 

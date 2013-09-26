@@ -26,7 +26,7 @@ namespace Iresults\Core;
 
 
 /**
- * Abstract class for the cache classes. Defines a common interface.
+ * Abstract class for singletons
  *
  * @author	Daniel Corn <cod@iresults.li>
  * @package	Iresults

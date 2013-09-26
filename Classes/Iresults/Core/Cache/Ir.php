@@ -203,19 +203,13 @@ class Ir extends \Iresults\Core\Cache\AbstractCache {
 		$fh = fopen($path, 'wb');
 		if (!$fh) {
 			$msg = 'Couldn\'t open file "' . $path . '" for writing the cache information';
-			trigger_error($msg);
-			if (defined('TYPO3_MODE')) {
-				t3lib_div::devLog($msg, 'iresults', 3);
-			}
+			trigger_error($msg, E_USER_WARNING);
 			return;
 		}
 
 		if (fwrite($fh, $contents) === FALSE) {
 			$msg = 'Writing cache to file "' . $path . '" failed';
-			trigger_error($msg);
-			if (defined('TYPO3_MODE')) {
-				t3lib_div::devLog($msg, 'iresults', 3);
-			}
+			trigger_error($msg, E_USER_WARNING);
 		}
 		fclose($fh);
 

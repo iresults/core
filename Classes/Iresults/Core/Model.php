@@ -153,7 +153,7 @@ abstract class Model extends \Iresults\Core\Core implements \Iresults\Core\KVCIn
 	}
 
 	/**
-	 * Returns the value of the property at the given key path.
+	 * Returns the value of the property at the given key path
 	 *
 	 * @param	string	$propertyPath The property key path to resolve in the format "object.property"
 	 * @return	mixed
@@ -163,22 +163,22 @@ abstract class Model extends \Iresults\Core\Core implements \Iresults\Core\KVCIn
 	}
 
 	/**
-	 * Called if no object was found for the given property key.for the give
+	 * Called if no object was found for the given property key
 	 *
 	 * @param	string	$key The name of the undefined property
 	 * @return	mixed    Returns a substitue value
-	 * @throws InvalidArgumentException on default.
+	 * @throws \InvalidArgumentException on default.
 	 */
 	public function getObjectForUndefinedKey($key) {
-		throw new InvalidArgumentException("No value found for undefined key '$key'.");
+		throw new \InvalidArgumentException("No value found for undefined key '$key'.");
 	}
 
 	/**
 	 * Returns the object for the given (undefined) key, of this instance, or
-	 * the given object (if specified).
+	 * the given object (if specified)
 	 *
 	 * The default implementation only invokes getObjectForUndefinedKey() of the
-	 * this instance/the given object.
+	 * this instance/the given object
 	 *
 	 * @param	string	$key		The name of the undefined property
 	 * @param	object	$object	The object to get the property from
