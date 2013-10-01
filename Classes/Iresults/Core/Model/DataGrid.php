@@ -23,6 +23,8 @@ namespace Iresults\Core\Model;
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
+use Iresults\Core\Core;
+use Iresults\Core\Iresults;
 use Iresults\Core\Ui\Table;
 
 
@@ -34,7 +36,7 @@ use Iresults\Core\Ui\Table;
  * @package	Iresults
  * @subpackage	Iresults_Model
  */
-class DataGrid extends \Iresults\Core\Core implements \Iterator, \ArrayAccess {
+class DataGrid extends Core implements \Iterator, \ArrayAccess {
 	/**
 	 * The dictionary holding the data map.
 	 *
@@ -109,6 +111,27 @@ class DataGrid extends \Iresults\Core\Core implements \Iterator, \ArrayAccess {
 	 */
 	protected $lastSearchStrict = FALSE;
 
+	/**
+	 * Indexed Grid data
+	 *
+	 * @var array
+	 */
+	protected $_indexes = array();
+
+	/**
+	 * Array of columns to index
+	 *
+	 * @var array
+	 */
+	protected $_indexColumns = array();
+
+	/**
+	 * Defines if the data indexes are dirty and need to be rebuilt
+	 *
+	 * @var bool
+	 */
+	protected $_indexIsDirty = FALSE;
+
 
 
 	/* MWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWM */
@@ -119,7 +142,6 @@ class DataGrid extends \Iresults\Core\Core implements \Iterator, \ArrayAccess {
 	 */
 	public function __construct(array $parameters = array()) {
 		//parent::__construct($parameters);
-
 		$this->data = $parameters;
 
 		$this->rowCount = $this->_getLengthOfElement($this->data);
@@ -192,7 +214,7 @@ class DataGrid extends \Iresults\Core\Core implements \Iterator, \ArrayAccess {
 		ini_set('auto_detect_line_endings', $oldIniValue);
 
 		$this->data = $grid;
-		$this->isDirty = TRUE;
+		$this->_markAsDirty();
 		return $this;
 	}
 
@@ -206,7 +228,7 @@ class DataGrid extends \Iresults\Core\Core implements \Iterator, \ArrayAccess {
 	 * @return	integer
 	 */
 	public function getRowCount() {
-		$this->_repaireIfDirty();
+		$this->_repairIfDirty();
 		return $this->rowCount;
 	}
 
@@ -216,7 +238,7 @@ class DataGrid extends \Iresults\Core\Core implements \Iterator, \ArrayAccess {
 	 * @return	integer
 	 */
 	public function getColumnCount() {
-		$this->_repaireIfDirty();
+		$this->_repairIfDirty();
 		return $this->columnCount;
 	}
 
@@ -259,7 +281,7 @@ class DataGrid extends \Iresults\Core\Core implements \Iterator, \ArrayAccess {
 	 * @return	array<array<mixed>>
 	 */
 	public function getGrid() {
-		$this->_repaireIfDirty();
+		$this->_repairIfDirty();
 		return $this->filledData;
 	}
 
@@ -269,7 +291,7 @@ class DataGrid extends \Iresults\Core\Core implements \Iterator, \ArrayAccess {
 	 * @return	array<array<mixed>>
 	 */
 	public function getFilledGridData() {
-		$this->_repaireIfDirty();
+		$this->_repairIfDirty();
 		return $this->filledData;
 	}
 
@@ -318,12 +340,10 @@ class DataGrid extends \Iresults\Core\Core implements \Iterator, \ArrayAccess {
 			return $this->lastSearchResult;
 		}
 
-		// Check the primary key
-		if ($this->_primaryKeyColumn !== NULL) {
-			$primaryKeyObjectPoint = $this->getPrimaryKeyForValue($value, TRUE);
-			if ($primaryKeyObjectPoint) {
-				return array($primaryKeyObjectPoint);
-			}
+		// Check the indexes
+		$indexedObjectPoint = $this->getIndexedDataForValue($value, TRUE);
+		if ($indexedObjectPoint) {
+			return array($indexedObjectPoint);
 		}
 
 
@@ -351,38 +371,51 @@ class DataGrid extends \Iresults\Core\Core implements \Iterator, \ArrayAccess {
 	}
 
 
-	/**
-	 * This contains the indexed data of a primary key column
-	 * @var array
-	 */
-	protected $_primaryKeys = array();
-
-	/**
-	 * The column to use as primary key
-	 * @var integer
-	 */
-	protected $_primaryKeyColumn = NULL;
 
 	/* MWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWM */
-	/* PRIMARY KEYS         WMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWM */
+	/* DATA INDEX           WMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWM */
 	/* MWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWM */
-
 	/**
-	 * Defines the given column as primary key
-	 * @param integer $columnIndex
+	 * Adds the given column to the Data Index
+	 *
+	 * The Data Index will be queried by findValue() which speeds up the method
+	 * significantly for huge Data Grids and recurring calls to findValue()
+	 *
+	 * Information: The Data Index(es) will be built on the fly
+	 *
+	 * Example:
+	 *
+	 *  $grid->addIndexForColumn(0); // Add a Data Index for the first column
+	 *  $searched = array('Daniel', 'Peter', 'Andreas', ...);
+	 *  foreach ($searched as $search) {
+	 *  	$grid->findValue($search);
+	 *  }
+	 *
+	 * @param integer $column Key of the column
 	 */
-	public function setPrimaryKey($columnIndex) {
-		$this->_primaryKeyColumn = $columnIndex;
+	public function addIndexForColumn($column) {
+		$this->_indexColumns[$column] = TRUE;
+		$this->_indexIsDirty = TRUE;
 	}
 
 	/**
-	 * Rebuilds the primary key index
+	 * Rebuilds the data index
 	 */
-	protected function _rebuildPrimaryKey() {
-		$columnIndex = $this->_primaryKeyColumn;
-		if ($columnIndex === NULL) {
-			return;
+	protected function _rebuildIndex() {
+		$indexedColumns = array_keys($this->_indexColumns);
+		foreach ($indexedColumns as $columnIndexToRebuild) {
+			$this->_rebuildIndexOfColumn($columnIndexToRebuild);
 		}
+		$this->_indexIsDirty = FALSE;
+	}
+
+	/**
+	 * Rebuild the index of the given column
+	 *
+	 * @param integer $columnIndex
+	 * @throws \UnexpectedValueException if an invalid value should be used as key
+	 */
+	protected function _rebuildIndexOfColumn($columnIndex) {
 		$temporaryPrimaryKeys = array();
 		$columnData = $this->getColumnAtIndex($columnIndex);
 
@@ -406,9 +439,10 @@ class DataGrid extends \Iresults\Core\Core implements \Iterator, \ArrayAccess {
 				$temporaryPrimaryKeys[$data . ''] = $primaryKeyObject;
 			} else {
 				throw new \UnexpectedValueException('Could not use value at row ' . $currentRowIndex . ' column ' . $columnIndex . ' as key', 1379504589);
-				#$temporaryPrimaryKeys[] = $primaryKey;
 			}
 		} while (++$currentRowIndex < $rowCount);
+
+		$this->_indexes[$columnIndex] = $temporaryPrimaryKeys;
 	}
 
 	/**
@@ -419,13 +453,28 @@ class DataGrid extends \Iresults\Core\Core implements \Iterator, \ArrayAccess {
 	 * @param bool  $returnPoint
 	 * @return mixed|null
 	 */
-	public function getPrimaryKeyForValue($value, $returnPoint = FALSE) {
-		if (isset($this->_primaryKeys[$value])) {
-			$primaryKeyObject = $this->_primaryKeys[$value];
-			if ($returnPoint) {
-				return $primaryKeyObject['point'];
-			} else {
-				return $primaryKeyObject['data'];
+	public function getIndexedDataForValue($value, $returnPoint = FALSE) {
+		if ($this->_indexIsDirty) {
+			unset($this->_indexes);
+			#$this->_rebuildIndex()
+			$this->_indexIsDirty = FALSE;
+		}
+
+		$indexedColumns = array_keys($this->_indexColumns);
+		foreach ($indexedColumns as $columnIndexToSearchIn) {
+			// Check if the index for the current column is valid
+			if (!isset($this->_indexes[$columnIndexToSearchIn])) {
+				$this->_rebuildIndexOfColumn($columnIndexToSearchIn);
+			}
+
+			$dataIndex = $this->_indexes[$columnIndexToSearchIn];
+			if (isset($dataIndex[$value])) {
+				$indexDataObject = $dataIndex[$value];
+				if ($returnPoint) {
+					return $indexDataObject['point'];
+				} else {
+					return $indexDataObject['data'];
+				}
 			}
 		}
 		return NULL;
@@ -491,7 +540,39 @@ class DataGrid extends \Iresults\Core\Core implements \Iterator, \ArrayAccess {
 		if ($dataArray === FALSE) {
 			return FALSE;
 		}
-		return array_combine($keyArray, $dataArray);
+		return array_combine($this->_buildKeysFromArray($keyArray), $dataArray);
+	}
+
+	/**
+	 * Builds and returns an array of keys for the input array
+	 *
+	 * @param array $input
+	 * @return array<string>
+	 */
+	protected function _buildKeysFromArray($input) {
+		$keysArray = array();
+		$currentElement = reset($input);
+		do {
+			switch (TRUE) {
+				case is_scalar($currentElement):
+					$keysArray[] = $currentElement;
+					break;
+
+				case is_array($currentElement):
+					$keysArray[] = 'Array (' . count($currentElement) . ')';
+					break;
+
+				case is_object($currentElement):
+					if ($currentElement instanceof Core) {
+						/** @var Core $currentElement */
+						$keysArray[] = $currentElement->description();
+					} else if (method_exists($currentElement, '__toString')) {
+						$keysArray[] = $currentElement->__toString();
+					}
+					break;
+			}
+		} while ($currentElement = next($input));
+		return $keysArray;
 	}
 
 	/**
@@ -505,7 +586,7 @@ class DataGrid extends \Iresults\Core\Core implements \Iterator, \ArrayAccess {
 	 */
 	public function setRowAtIndex($index, $newRow) {
 		$this->data[$index] = $newRow;
-		$this->isDirty = TRUE;
+		$this->_markAsDirty();
 	}
 
 	/**
@@ -525,7 +606,7 @@ class DataGrid extends \Iresults\Core\Core implements \Iterator, \ArrayAccess {
 		unset($this->data);
 		$this->data = $tempData;
 
-		$this->isDirty = TRUE;
+		$this->_markAsDirty();
 	}
 
 	/**
@@ -539,7 +620,7 @@ class DataGrid extends \Iresults\Core\Core implements \Iterator, \ArrayAccess {
 		$lastKey = key($this->data);
 		unset($this->data[$lastKey]);
 
-		$this->isDirty = TRUE;
+		$this->_markAsDirty();
 		return $lastRow;
 	}
 
@@ -558,7 +639,7 @@ class DataGrid extends \Iresults\Core\Core implements \Iterator, \ArrayAccess {
 			$row = $filledDataL[$rowIndex];
 			if (!array_key_exists($index,$row) && $index > count($row)) {
 				//$this->pd("DAG NOTEX",$index,$row,$rowIndex,$filledDataL);
-				$this->pd("Warning: Index '$index' out of bounds in getColumnAtIndex().");
+				$this->pd('Warning: Index \'' . $index . '\' out of bounds in getColumnAtIndex()');
 				return FALSE;
 			}
 			$columnData[$rowIndex] = $row[$index];
@@ -632,7 +713,7 @@ class DataGrid extends \Iresults\Core\Core implements \Iterator, \ArrayAccess {
 			}
 			$this->data[$i][$index] = $newColumn[$i];
 		}
-		$this->isDirty = TRUE;
+		$this->_markAsDirty();
 	}
 
 	/**
@@ -658,7 +739,7 @@ class DataGrid extends \Iresults\Core\Core implements \Iterator, \ArrayAccess {
 				$this->data[$i] = $tempData;
 			}
 		}
-		$this->isDirty = TRUE;
+		$this->_markAsDirty();
 	}
 
 	/**
@@ -679,7 +760,7 @@ class DataGrid extends \Iresults\Core\Core implements \Iterator, \ArrayAccess {
 			}
 
 		}
-		$this->isDirty = TRUE;
+		$this->_markAsDirty();
 
 		return $lastColumn;
 	}
@@ -723,7 +804,7 @@ class DataGrid extends \Iresults\Core\Core implements \Iterator, \ArrayAccess {
 			}
 		}
 
-		$this->isDirty = TRUE;
+		$this->_markAsDirty();
 
 		return $result;
 	}
@@ -746,7 +827,7 @@ class DataGrid extends \Iresults\Core\Core implements \Iterator, \ArrayAccess {
 		}
 
 		$this->data = $tempGrid->getRawGridData();
-		$this->isDirty = TRUE;
+		$this->_markAsDirty();
 	}
 
 	/**
@@ -769,8 +850,10 @@ class DataGrid extends \Iresults\Core\Core implements \Iterator, \ArrayAccess {
 		$this->_sortRawData();
 		$this->data = array_reverse($this->data, false);
 
-		$this->isDirty = TRUE;
+		$this->_markAsDirty();
 	}
+
+
 
 	/* MWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWM */
 	/* ROTATION            MWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWM */
@@ -804,7 +887,7 @@ class DataGrid extends \Iresults\Core\Core implements \Iterator, \ArrayAccess {
 
 		$this->data = $newDataGrid->getRawGridData();
 		$this->filledData = NULL;
-		$this->isDirty = TRUE;
+		$this->_markAsDirty();
 
 		return $this;
 	}
@@ -839,7 +922,7 @@ class DataGrid extends \Iresults\Core\Core implements \Iterator, \ArrayAccess {
 
 		$this->data = $newDataGrid->getRawGridData();
 		$this->filledData = NULL;
-		$this->isDirty = TRUE;
+		$this->_markAsDirty();
 
 		return $this;
 
@@ -957,11 +1040,11 @@ class DataGrid extends \Iresults\Core\Core implements \Iterator, \ArrayAccess {
 	/* MWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWM */
 	/**
 	 * Checks if the grid data is dirty, which requires some data to be rebuilt.
-	 * The rebuilding is invoked automatically.
+	 * The rebuilding is invoked automatically
 	 *
 	 * @return	\Iresults\Core\Model\DataGrid
 	 */
-	protected function _repaireIfDirty() {
+	protected function _repairIfDirty() {
 		if ($this->checkIfDirty()) {
 			$this->_sortRawData();
 
@@ -980,6 +1063,14 @@ class DataGrid extends \Iresults\Core\Core implements \Iterator, \ArrayAccess {
 			$this->isDirty = FALSE;
 		}
 		return $this;
+	}
+
+	/**
+	 * Marks the data as dirty
+	 */
+	protected function _markAsDirty() {
+		$this->isDirty = TRUE;
+		$this->_indexIsDirty = TRUE;
 	}
 
 	/**
@@ -1131,23 +1222,23 @@ class DataGrid extends \Iresults\Core\Core implements \Iterator, \ArrayAccess {
 	/* ITERATOR       WMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWM */
 	/* MWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWM */
 	public function current() {
-		$this->_repaireIfDirty();
+		$this->_repairIfDirty();
 		return current($this->filledData);
 	}
 	public function key() {
-		$this->_repaireIfDirty();
+		$this->_repairIfDirty();
 		return key($this->filledData);
 	}
 	public function next() {
-		$this->_repaireIfDirty();
+		$this->_repairIfDirty();
 		return next($this->filledData);
 	}
 	public function rewind() {
-		$this->_repaireIfDirty();
+		$this->_repairIfDirty();
 		return reset($this->filledData);
 	}
 	public function valid() {
-		$this->_repaireIfDirty();
+		$this->_repairIfDirty();
 		return (current($this->filledData) == TRUE);
 	}
 
@@ -1155,20 +1246,20 @@ class DataGrid extends \Iresults\Core\Core implements \Iterator, \ArrayAccess {
 	/* ARRAY ACCESS   WMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWM */
 	/* MWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWM */
 	public function offsetExists($offset) {
-		$this->_repaireIfDirty();
+		$this->_repairIfDirty();
 		return array_key_exists($offset,$this->filledData);
 	}
 	public function offsetGet($offset) {
-		$this->_repaireIfDirty();
+		$this->_repairIfDirty();
 		return $this->filledData[$offset];
 	}
 	public function offsetSet($offset,$value) {
 		$this->data[$offset] = $value;
-		$this->isDirty = TRUE;
+		$this->_markAsDirty();
 	}
 	public function offsetUnset($offset) {
 		unset($this->data[$offset]);
-		$this->isDirty = TRUE;
+		$this->_markAsDirty();
 	}
 
 

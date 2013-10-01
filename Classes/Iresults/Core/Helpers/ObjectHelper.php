@@ -23,9 +23,8 @@ namespace Iresults\Core\Helpers;
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-
-
-
+use Iresults\Core\Helpers\Exception\ObjectHelperGetterException;
+use Iresults\Core\Helpers\Exception\ObjectHelperSetterException;
 
 
 /**
@@ -56,11 +55,20 @@ class ObjectHelper {
 	/* GETTING PROPERTIES    MWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWM */
 	/* MWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWM */
 	/**
-	 * Returns the given object's value for the property key path.
 	 *
-	 * @param	string 	$propertyPath 	The property key path to resolve in the format 'object.property'
-	 * @param	object	$object			The object to get the value of
-	 * @return		mixed 					The value of the property
+	 *
+	 * @param	string 	$propertyPath
+	 * @param	object	$object
+	 * @return		mixed
+	 */
+
+	/**
+	 * Returns the given object's value for the property key path
+	 *
+	 * @param string $propertyPath The property key path to resolve in the format 'object.property'
+	 * @param object $object       The object to get the value of
+	 * @return mixed|null The value of the property
+	 * @throws \Iresults\Core\Helpers\Exception\ObjectHelperGetterException if the property could not be retrieved
 	 */
 	static public function getObjectForKeyPathOfObject($propertyPath, $object) {
 		// @Info: FLOW3 $configuration = \TYPO3\FLOW3\Utility\Arrays::getValueByPath($array, $path);
@@ -138,7 +146,10 @@ class ObjectHelper {
 				} else {
 					$type = gettype($parentObject);
 				}
-				throw new \InvalidArgumentException('Cannot get property \'' . $path . '\' of object of type ' . $type . '.', 1320769266);
+				throw /** \Iresults\Core\Helpers\Exception\ObjectHelperGetterException */ ObjectHelperGetterException::errorWithMessageCodeAndUserInfo('Cannot get property \'' . $path . '\' of object of type ' . $type . '.', 1320769266, array(
+					'object' => $parentObject,
+					'property' => $path
+				));
 			}
 
 		}
@@ -160,7 +171,7 @@ class ObjectHelper {
 	 * Returns the properties from the given object as a dictionary.
 	 *
 	 * @param	object	$object The object to analyse
-	 * @return		void
+	 * @return	mixed
 	 */
 	static public function getPropertiesOfObject($object) {
 		return Tx_Extbase_Reflection_ObjectAccess::getGettableProperties($object);
@@ -170,14 +181,14 @@ class ObjectHelper {
 	 * Returns the value of the given object at the given key, even if it is not
 	 * accessible.
 	 *
-	 * Spying is evil, you maybe shouldn't use this function.
+	 * Spying is evil, you maybe should not use this function.
 	 *
 	 * @param	string	$key	The property key to get
 	 * @param	object	$object	The object to get the property from
 	 * @return	mixed			Returns the property's value
 	 */
 	static public function spyPropertyOfObject($key, $object) {
-		$refObject   = new ReflectionObject($object);
+		$refObject   = new \ReflectionObject($object);
 		$refProperty = $refObject->getProperty($key);
 		$refProperty->setAccessible(TRUE);
 		return $refProperty->getValue();
@@ -191,10 +202,11 @@ class ObjectHelper {
 	/**
 	 * Sets the target object's value for the property identified by the given key path.
 	 *
-	 * @param	string 	$propertyPath 	The property key path in the form (object.property)
-	 * @param	mixed 	$object 		The new value to assign
-	 * @param	object 	$targetObject 	The object from which the property path will be resolved
-	 * @return		mixed					Returns the object that has been modified
+	 * @param string $propertyPath The property key path in the form (object.property)
+	 * @param mixed  $object       The new value to assign
+	 * @param object $targetObject The object from which the property path will be resolved
+	 * @return array|\Iresults\Core\KVCInterface|mixed|null|object Returns the object that has been modified
+	 * @throws \Iresults\Core\Helpers\Exception\ObjectHelperSetterException if the property could not be set
 	 */
 	static public function setObjectForKeyPathOfObject($propertyPath, $object, $targetObject) {
 		/*
@@ -248,7 +260,11 @@ class ObjectHelper {
 			} else {
 				$type = gettype($setObject);
 			}
-			throw new \InvalidArgumentException('Cannot set property \'' . $setKey . '\' of object of type ' . $type . '.', 1320769037);
+			throw /** \Iresults\Core\Helpers\Exception\ObjectHelperSetterException */ ObjectHelperSetterException::errorWithMessageCodeAndUserInfo('Cannot set property \'' . $setKey . '\' of object of type ' . $type . '.', 1320769037, array(
+				'object' => $setObject,
+				'property' => $setKey,
+				'value' => $object
+			));
 		}
 		return $setObject;
 	}

@@ -76,11 +76,15 @@ class Error extends \Exception implements JsonSerializable {
 	/* MWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWM */
 	/**
 	 * Factory method: Returns a new error with the given message, code and
-	 * user information.
+	 * user information
 	 *
-	 * @return	\Iresults\Core\Error
+	 * @param string $message  Exception message
+	 * @param int    $code     Exception code
+	 * @param array  $userInfo User info array
+	 * @return \Iresults\Core\Error
 	 */
 	static public function errorWithMessageCodeAndUserInfo($message, $code = 0, $userInfo = array()) {
+		/** @var Error $error */
 		$error = new static($message, $code);
 		$error->_setUserInfo($userInfo);
 		return $error;
