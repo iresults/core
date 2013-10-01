@@ -44,6 +44,13 @@ class ObjectHelper {
 	 */
 	static protected $treatStdClassAsMutable = FALSE;
 
+	/**
+	 * Path delimiter that separates the parts of a key path
+	 *
+	 * @var string
+	 */
+	static protected $pathDelimiter = '.';
+
 
 	/* MWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWM */
 	/* GETTING PROPERTIES    MWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWM */
@@ -65,7 +72,7 @@ class ObjectHelper {
 		if ($propertyPath === '' || $propertyPath == 'this') {
 			return NULL;
 		}
-		$pathParts = explode('.', $propertyPath);
+		$pathParts = explode(self::$pathDelimiter, $propertyPath);
 
 		/** @var mixed $currentObject */
 		$currentObject = NULL;
@@ -200,10 +207,12 @@ class ObjectHelper {
 		}
 
 		$setObject = NULL;
-		$setKey = substr(strrchr($propertyPath, '.'), 1);
+		$propertyPathTillSetObject = '';
+		$setKey = substr(strrchr($propertyPath, self::$pathDelimiter), 1);
+
 		/*
-		 * If $setKey is not set the '.' was not found and no sub-object has to
-		 * be fetched.
+		 * If $setKey is not set the path delimiter ('.') was not found and no
+		 * sub-object has to be fetched
 		 */
 		if (!$setKey) {
 			$setKey = $propertyPath;
@@ -218,6 +227,9 @@ class ObjectHelper {
 		 */
 		if (is_array($setObject)) { // An array
 			$setObject[$setKey] = $object;
+			if (!$propertyPathTillSetObject) {
+				return $setObject;
+			}
 			self::setObjectForKeyPathOfObject(substr($propertyPathTillSetObject, 0, -1), $setObject, $targetObject);
 		} else if ($setObject instanceof \Iresults\Core\KVCInterface) { // \Iresults\Core\KVCInterface
 			$setObject->setObjectForKey($setKey, $object);
@@ -225,7 +237,7 @@ class ObjectHelper {
 			$setObject->_setProperty($setKey, $object);
 		} else if (method_exists($setObject, 'setData')) { // setData()
 			$setObject->setData($setKey, $object);
-		} else if (is_object($setObject) && class_exists($setObject) && property_exists($setObject, $setKey)) { // Direct access
+		} else if (is_object($setObject) && property_exists($setObject, $setKey)) { // Direct access
 			$setObject->$setKey = $object;
 		} else if (self::$treatStdClassAsMutable && get_class($setObject) === 'stdClass') { // Mutable stdClass
 			@$setObject->$setKey = $object;
@@ -395,6 +407,29 @@ class ObjectHelper {
 	static public function setTreatStdClassAsMutable($flag) {
 		self::$treatStdClassAsMutable = $flag;
 	}
+
+	/**
+	 * Sets the path delimiter that separates the parts of a key path
+	 *
+	 * @param string $pathDelimiter
+	 * @return string Returns the previous path delimiter
+	 */
+	static public function setPathDelimiter($pathDelimiter) {
+		$oldPathDelimiter = self::$pathDelimiter;
+		self::$pathDelimiter = $pathDelimiter;
+		return $oldPathDelimiter;
+	}
+
+	/**
+	 * Returns the path delimiter that separates the parts of a key path
+	 *
+	 * @return string
+	 */
+	static public function getPathDelimiter() {
+		return self::$pathDelimiter;
+	}
+
+
 
 
 
