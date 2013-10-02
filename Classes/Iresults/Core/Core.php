@@ -23,6 +23,7 @@ namespace Iresults\Core;
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
+use Iresults\Core\Exception\UndefinedMethod;
 
 
 /**
@@ -58,7 +59,7 @@ abstract class Core implements \Iresults\Core\ObjectInterface {
 	 * @param	string	$name		The originally called method
 	 * @param	array	$arguments	The arguments passed to the original method
 	 * @return	mixed
-	 * @throws	BadMethodCallException	If no dynamic method was found
+	 * @throws	UndefinedMethod	If no dynamic method was found
 	 */
 	public function __call($name, array $arguments) {
 		if (isset($this->$name) && is_callable($this->$name)) {
@@ -70,7 +71,7 @@ abstract class Core implements \Iresults\Core\ObjectInterface {
 			array_unshift($arguments, $this);
 			return call_user_func_array($method, $arguments);
 		}
-		throw \Iresults\Core\Exception\UndefinedMethod::exceptionWithMethod($name);
+		throw UndefinedMethod::exceptionWithMethod($name);
 	}
 
 	/**
@@ -80,10 +81,10 @@ abstract class Core implements \Iresults\Core\ObjectInterface {
 	 * @param	array   $arguments An enumerated array containing the parameters passed to the inaccessible method
 	 * @return	mixed    The return value
 	 *
-	 * @throws BadMethodCallException
+	 * @throws UndefinedMethod	If no dynamic method was found
 	 */
 	static public function __callStatic($name , array $arguments) {
-		throw \Iresults\Core\Exception\UndefinedMethod::exceptionWithMethod($name);
+		throw UndefinedMethod::exceptionWithMethod($name);
 	}
 
 	/**
@@ -135,7 +136,9 @@ abstract class Core implements \Iresults\Core\ObjectInterface {
 	/* MWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWM */
 	/**
 	 * Dumps a given variable (or the given variables) wrapped into a 'pre' tag.
+	 *
 	 * @var mixed $var1
+	 * @return string
 	 */
 	public function pd($var1 = '__iresults_pd_noValue') {
 		$args = func_get_args();
@@ -186,7 +189,8 @@ abstract class Core implements \Iresults\Core\ObjectInterface {
 	 * @param	string	$method The name of the method to invoke
 	 * @param	array	$arguments	 Optional arguments to pass to the object
 	 * @param	object	$object	 Optional object to be checked first
-	 * @return	mixed|METHOD_NOT_FOUND
+	 * @return	mixed|Core::IR_METHOD_NOT_FOUND
+	 * @throws \InvalidArgumentException if the arguments are not of type array
 	 */
 	protected function _callMethodIfExists($method, $arguments = array(), $object = NULL) {
 		if ($object !== NULL && is_object($object)) {
@@ -197,7 +201,7 @@ abstract class Core implements \Iresults\Core\ObjectInterface {
 		}
 		if ($this->_delegate && is_object($this->_delegate) && method_exists($this->_delegate, $method)) {
 			if (!is_array($arguments)) {
-				throw new Exception('Passed delegation argument is not an array. It is of type ' . gettype($arguments));
+				throw new \InvalidArgumentException('Passed delegation argument is not an array. It is of type ' . gettype($arguments));
 			}
 			$arguments[] = $this;
 			return call_user_func_array(array($this->_delegate, $method), $arguments);
