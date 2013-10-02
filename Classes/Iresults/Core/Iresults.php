@@ -167,14 +167,14 @@ class Iresults {
 	/**
 	 * The environment from which the class is called, as one of the environment constants.
 	 *
-	 * @var ENVIRONMENT|integer
+	 * @var Iresults::ENVIRONMENT|integer
 	 */
 	static protected $environment = 1;
 
 	/**
 	 * The main framework the Iresults framework is used with.
 	 *
-	 * @var FRAMEWORK|string
+	 * @var Iresults::FRAMEWORK|string
 	 */
 	static protected $framework = '';
 
@@ -252,7 +252,7 @@ class Iresults {
 			 * subclass of the previous class)
 			 */
 			$calledClass = get_called_class();
-			if ($calledClass === self::$instanceClassName || !is_a($calledClass, self::$instanceClassName)) {
+			if ($calledClass === self::$instanceClassName || !in_array($calledClass, class_parents(self::$instanceClassName))) {
 				return self::$instance; // This doesn't work but shows the purpose of this if-statement
 			}
 		}
@@ -509,7 +509,7 @@ class Iresults {
 	/**
 	 * Returns the URL of the resource.
 	 *
-	 * @param	Iresults\FilesystemInterface|string	$resource 	Either a filesystem instance or the path of a resource
+	 * @param	\Iresults\FS\FilesystemInterface|string	$resource 	Either a filesystem instance or the path of a resource
 	 * @return	string											The URL of the resource
 	 */
 	static public function getUrlOfResource($resource) {
@@ -777,6 +777,7 @@ class Iresults {
 	 * @return	boolean    			TRUE on success otherwise FALSE
 	 */
 	static public function log($var, $code = -1, $logfile = -1) {
+		// TODO: Implement me
 		return Log::log($var, $code, $logfile);
 	}
 
@@ -789,35 +790,18 @@ class Iresults {
 	static public function pd($var1 = '__iresults_pd_noValue') {
 		static $counter = 0;
 		static $scriptDir = '';
-		static $didSetDebug = FALSE;
-		static $printPathInformation = -1;
 		$bt = NULL;
 		$output = '';
 		$printTags = TRUE;
 		$printAnchor = TRUE;
 		$outputHandling = 0; // 0 = normal, 1 = shell, 2 >= non XML
-		$traceLevel = PHP_INT_MAX;
+		$traceLevel = 2000;
 
 		if (!self::willDebug()) {
-			return;
+			return '';
 		}
 
-		// Set debug to TRUE
-		if (defined('TYPO3_MODE') && !$didSetDebug && isset($GLOBALS['TSFE'])) {
-			$GLOBALS['TSFE']->config['config']['debug'] = 1;
-			$didSetDebug = TRUE;
-		}
-
-		if ($printPathInformation === -1) {
-			$printPathInformation = (bool)static::getConfiguration('displayDebugPath');
-
-			// If no backend user is logged in, doen't show the path info
-			if (!isset($GLOBALS['BE_USER'])
-				|| !isset($GLOBALS['BE_USER']->user)
-				|| !intval($GLOBALS['BE_USER']->user['uid'])) {
-				$printPathInformation = FALSE;
-			}
-		}
+		$printPathInformation = static::getDisplayDebugPath();
 
 		/*
 		 * If the environment is a shell or the output type is not XML capture
@@ -844,8 +828,8 @@ class Iresults {
 		$args = func_get_args();
 		foreach ($args as $var) {
 			if ($var !== '__iresults_pd_noValue') {
-				if (self::$_renderer == self::RENDERER_ZEND_DEBUG && class_exists('Zend_Debug', FALSE)) {
-					Zend_Debug::dump($var);
+				if (self::$_renderer == self::RENDERER_ZEND_DEBUG && class_exists('\Zend_Debug', FALSE)) {
+					\Zend_Debug::dump($var);
 				} else if (self::$_renderer === self::RENDERER_VAR_DUMP) {
 					var_dump($var);
 				} else if (self::$_renderer === self::RENDERER_VAR_EXPORT) {
@@ -1070,10 +1054,24 @@ class Iresults {
 		return $oldValue;
 	}
 
+
+	/**
+	 * Returns if the path information will be displayed
+	 *
+	 * @return boolean
+	 */
+	static public function getDisplayDebugPath() {
+		static $printPathInformation = -1;
+		if ($printPathInformation === -1) {
+			$printPathInformation = (bool)static::getConfiguration('displayDebugPath');
+		}
+		return $printPathInformation;
+	}
+
 	/**
 	 * Returns the environment.
 	 *
-	 * @return	ENVIRONMENT|integer    This run's environment
+	 * @return	integer|Iresults::ENVIRONMENT    This run's environment
 	 */
 	static public function getEnvironment() {
 		return self::$environment;
@@ -1100,7 +1098,7 @@ class Iresults {
 	/**
 	 * Returns the output format as one of the OUTPUT_FORMAT constants.
 	  *
-	 * @return	string|OUTPUT_FORMAT
+	 * @return	string|Iresults::OUTPUT_FORMAT
 	 */
 	static public function getOutputFormat() {
 		static $outputFormat = '';
@@ -1177,36 +1175,19 @@ class Iresults {
 	/**
 	 * Returns the main framework the Iresults framework is used with.
 	 *
-	 * @return	FRAMEWORK|string    The main framework
+	 * @return	Iresults::FRAMEWORK|string    The main framework
 	 */
 	static public function getFramework() {
 		return self::$framework;
 	}
 
 	/**
-	 * Returns if the current request is a full request.
-	 *
-	 * Requests with an eID, or the type set to the the AJAX type, are no full
-	 * requests.
+	 * Returns if the current request is a full request (i.e. not an AJAX
+	 * request)
 	 *
 	 * @return	boolean
 	 */
 	static public function isFullRequest() {
-		if (defined('TYPO3_MODE')) {
-			if (
-				(
-					isset($_GET['eID'])
-					&& htmlspecialchars($_GET['eID'])
-				)
-				|| (
-					isset($GLOBALS['TSFE']) && isset($GLOBALS['TSFE']->pSetup)
-					&& isset($GLOBALS['TSFE']->pSetup['config.'])
-					&& isset($GLOBALS['TSFE']->pSetup['config.']['disableAllHeaderCode'])
-			   )
-			   ) {
-				return FALSE;
-			}
-		}
 		return TRUE;
 	}
 	/**
@@ -1223,14 +1204,16 @@ class Iresults {
 	 * @return integer
 	 */
 	static public function getTraceLevel() {
-		return self::$tracelevel;
+		return self::$traceLevel;
 	}
 
 	/**
 	 * Sets the current trace level.
 	 *
 	 * The starting depth to determine the file and line number of the original function call in pd().
-	 * @return integer 	Returns the previous value
+	 *
+	 * @param int $newTraceLevel
+	 * @return int Returns the previous value
 	 */
 	static public function setTraceLevel($newTraceLevel) {
 		$lastTraceLevel = self::$traceLevel;
@@ -1349,7 +1332,7 @@ class Iresults {
 			 * subclass of the previous class)
 			 */
 			$calledClass = get_called_class();
-			if ($calledClass === self::$instanceClassName || !is_a($calledClass, self::$instanceClassName)) {
+			if ($calledClass === self::$instanceClassName || !in_array($calledClass, class_parents(self::$instanceClassName))) {
 				return self::$instance;
 			}
 		}

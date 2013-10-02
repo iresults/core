@@ -52,7 +52,7 @@ class CacheTest extends \PHPUnit_Framework_TestCase {
 	protected $fixture;
 
 	public function setUp() {
-		$this->fixture = \Iresults\Core\Cache\Factory::makeInstance();
+		$this->fixture = \Iresults\Core\Cache\Factory::getSharedInstance();
 	}
 
 	public function tearDown() {
@@ -62,7 +62,8 @@ class CacheTest extends \PHPUnit_Framework_TestCase {
 	 * @test
 	 */
 	public function isInstanceOfCacheAbstract() {
-		$this->assertTrue(is_a(\Iresults\Core\Cache\Factory::makeInstance(), '\Iresults\Core\Cache\AbstractCache'));
+		$this->assertTrue(is_a(\Iresults\Core\Cache\Factory::getSharedInstance(), 	'\Iresults\Core\Cache\AbstractCache'));
+		$this->assertTrue(is_a(\Iresults\Core\Cache\Factory::makeInstance(), 		'\Iresults\Core\Cache\AbstractCache'));
 	}
 
 	/**

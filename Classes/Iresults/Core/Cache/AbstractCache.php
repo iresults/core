@@ -66,22 +66,19 @@ abstract class AbstractCache extends \Iresults\Core\Core implements \Iresults\Co
 
 	/**
 	 * Constructor
-	 *
-	 * @return	Iresults_Cache_Abstract
 	 */
 	public function __construct() {
 		if (isset($_GET[self::CLEAR_CACHE]) && $_GET[self::CLEAR_CACHE]) {
 			$this->clear();
 		}
-		return $this;
 	}
 
 	/**
-	 * Returns the cache adapter that is supported by the server.
+	 * Returns the cache adapter that is supported by the server
 	 *
-	 * @return	Iresults_Cache_Abstract
+	 * @return \Iresults\Core\Cache\AbstractCache
 	 */
-	static public function makeInstance() {
+	static public function getSharedInstance() {
 		$temp = NULL;
 		$configuration = 'auto';
 		if (self::$instance) {
@@ -90,6 +87,7 @@ abstract class AbstractCache extends \Iresults\Core\Core implements \Iresults\Co
 
 		/*
 		 * Set the tracelevel to check where the cache was instantiated.
+		 * TODO: Remove the tracelevel stuff
 		 */
 		$oldTraceLevel = NULL;
 		if (isset($_GET['tracelevel'])) {
@@ -102,15 +100,21 @@ abstract class AbstractCache extends \Iresults\Core\Core implements \Iresults\Co
 		 * available.
 		 */
 		if ($configuration === 'auto') {
-			if (is_callable('apc_store')) { // APC
-				$configuration = 'APC';
-			} else if (is_callable('wincache_ucache_get')) { // WinCache
-				$configuration = 'WinCache';
-			} else if (class_exists('\Iresults\Core\Cache\Ir', FALSE) ||
-					  file_exists(__DIR__ . '/Ir.php')) { // IR
-				$configuration = 'IR';
-			} else {
-				$configuration = 'none';
+			switch (TRUE) {
+				case is_callable('apc_store'):
+					$configuration = 'APC';
+					break;
+
+				case is_callable('wincache_ucache_get'):
+					$configuration = 'WinCache';
+					break;
+
+				case class_exists('\\Iresults\\Core\\Cache\\Ir'):
+					$configuration = 'IR';
+					break;
+
+				default:
+					$configuration = 'none';
 			}
 		}
 
@@ -148,6 +152,12 @@ abstract class AbstractCache extends \Iresults\Core\Core implements \Iresults\Co
 		self::$instance = $temp;
 		return $temp;
 	}
+	/**
+	 * @see getSharedInstance()
+	 */
+	static public function makeInstance() {
+		return static::getSharedInstance();
+	}
 
 	/**
 	 * Removes the complete cache.
@@ -178,10 +188,10 @@ abstract class AbstractCache extends \Iresults\Core\Core implements \Iresults\Co
 	 * Returns the value for the given key, if it exists, otherwise performs the
 	 * closure given as the second argument.
 	 *
-	 * @param  string  	$key        The property key to retrieve
-	 * @param  Closure  $closure    The closure to perform if the property isn't set
-	 * @param  boolean 	$saveResult If set to FALSE to result will not be stored using setObjectForKey()
-	 * @return mixed				Returns the value for the given key, or the result of the closure
+	 * @param  string  	 $key        The property key to retrieve
+	 * @param  \Closure  $closure    The closure to perform if the property isn't set
+	 * @param  boolean 	 $saveResult If set to FALSE to result will not be stored using setObjectForKey()
+	 * @return mixed				 Returns the value for the given key, or the result of the closure
 	 */
 	public function getObjectForKeyOrPerformClosure($key, $closure, $saveResult = TRUE) {
 		$result = $this->getObjectForKey($key);

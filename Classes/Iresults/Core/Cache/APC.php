@@ -79,6 +79,6 @@ class APC extends \Iresults\Core\Cache\AbstractCache {
 	public function clear() {
 		$result = apc_clear_cache('user');
 		//$result = apc_clear_cache();
-		$this->debug("Cache cleared. Result=$result.");
+		$this->debug('Cache cleared. Result= ' . $result);
 	}
 }
