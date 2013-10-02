@@ -1251,7 +1251,7 @@ class Iresults {
 			$descCache[$hash] = TRUE;
 		}
 
-		if (is_array($value) || $value instanceof Traversable) {
+		if (is_array($value) || $value instanceof \Traversable) {
 			$elementContainer = array();
 			foreach($value as $key => $element) {
 				$elementContainer[] = ($key && is_string($key) ? "$key: " : '') . self::descriptionOfValue($element);
