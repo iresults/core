@@ -252,7 +252,7 @@ class Iresults {
 			 * subclass of the previous class)
 			 */
 			$calledClass = get_called_class();
-			if ($calledClass === self::$instanceClassName || !in_array($calledClass, class_parents(self::$instanceClassName))) {
+			if ($calledClass === self::$instanceClassName || in_array($calledClass, class_parents(self::$instanceClassName))) {
 				return self::$instance; // This doesn't work but shows the purpose of this if-statement
 			}
 		}
@@ -795,7 +795,7 @@ class Iresults {
 		$printTags = TRUE;
 		$printAnchor = TRUE;
 		$outputHandling = 0; // 0 = normal, 1 = shell, 2 >= non XML
-		$traceLevel = 2000;
+		$traceLevel = PHP_INT_MAX;
 
 		$implementationClass = static::getImplementationClassName();
 		if (!$implementationClass::willDebug()) {
@@ -893,9 +893,7 @@ class Iresults {
 
 			$file = str_replace($scriptDir, '', @$bt[$i]['file']);
 			if ($printTags) {
-				echo '<span style="font-size:0.8em">
-						<a href="file://' . @$bt[$i]['file'] . '" target="_blank">' . $file . ' @ ' . @$bt[$i]['line'] . '</a>
-					</span>';
+				echo '<span style="font-size:0.8em"><a href="file://' . @$bt[$i]['file'] . '" target="_blank">' . $file . ' @ ' . @$bt[$i]['line'] . '</a></span>';
 			} else if ($outputHandling < 2) {
 				echo "\033[0;35m" . $file . ' @ ' . @$bt[$i]['line'] . "\033[0m" . PHP_EOL;
 			} else {
@@ -1343,8 +1341,15 @@ class Iresults {
 			 * subclass of the previous class)
 			 */
 			$calledClass = get_called_class();
-			if ($calledClass === self::$instanceClassName || !in_array($calledClass, class_parents(self::$instanceClassName))) {
+			var_dump($calledClass , self::$instanceClassName);
+			var_dump(class_parents(self::$instanceClassName));
+			var_dump(!in_array($calledClass, class_parents(self::$instanceClassName)));
+
+			if ($calledClass === self::$instanceClassName || in_array($calledClass, class_parents(self::$instanceClassName))) {
 				return self::$instance;
+			} else {
+				var_dump('neu');
+
 			}
 		}
 		return new static();
