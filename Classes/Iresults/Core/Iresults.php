@@ -219,7 +219,7 @@ class Iresults {
 	 *
 	 * @var string
 	 */
-	static protected $instanceClassName = '';
+	static protected $instanceClassName = __CLASS__;
 
 
 	# MWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWM
@@ -797,11 +797,13 @@ class Iresults {
 		$outputHandling = 0; // 0 = normal, 1 = shell, 2 >= non XML
 		$traceLevel = 2000;
 
-		if (!self::willDebug()) {
+		$implementationClass = static::getImplementationClassName();
+		if (!$implementationClass::willDebug()) {
 			return '';
 		}
 
-		$printPathInformation = static::getDisplayDebugPath();
+		$printPathInformation = $implementationClass::getDisplayDebugPath();
+
 
 		/*
 		 * If the environment is a shell or the output type is not XML capture
@@ -883,7 +885,7 @@ class Iresults {
 
 			// Set the static script dir
 			if (!$scriptDir) {
-				$scriptDir = realpath(self::getBasePath());
+				$scriptDir = realpath($implementationClass::getBasePath());
 				if ($scriptDir === FALSE) {
 					$scriptDir = dirname($_SERVER['SCRIPT_FILENAME']);
 				}
@@ -1300,6 +1302,15 @@ class Iresults {
 	 */
 	static public function setConfiguration($key, $value) {
 		self::$configuration[$key] = $value;
+	}
+
+	/**
+	 * Returns the name of the currently used subclass
+	 *
+	 * @return Iresults
+	 */
+	static public function getImplementationClassName() {
+		return static::$instanceClassName;
 	}
 
 
