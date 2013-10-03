@@ -42,10 +42,16 @@ require_once __DIR__ . '/../Autoloader.php';
  * @author Daniel Corn <cod@iresults.li>
  */
 class EnvironmentTest extends \PHPUnit_Framework_TestCase {
+	static protected $systemLocale;
+
 	public function setUp() {
+		if (!self::$systemLocale) {
+			self::$systemLocale = Environment::getSharedInstance()->getLocale();
+		}
 	}
 
 	public function tearDown() {
+		Environment::getSharedInstance()->setLocale(self::$systemLocale);
 	}
 
 	/**

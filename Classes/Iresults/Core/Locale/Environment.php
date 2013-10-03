@@ -55,14 +55,12 @@ class Environment {
 	static protected $sharedInstance;
 
 	/**
-	 * @param string $locale Locale to use
+	 *
 	 */
-	function __construct($locale = '') {
-		if (!$locale) {
-			$locale = setlocale(LC_CTYPE, '0');
-			if ($locale === 'C') {
-				$locale = Iresults::getLocale();
-			}
+	function __construct() {
+		$locale = setlocale(LC_CTYPE, '0');
+		if ($locale === 'C') {
+			$locale = Iresults::getLocale();
 		}
 		$this->setLocale($locale);
 	}
