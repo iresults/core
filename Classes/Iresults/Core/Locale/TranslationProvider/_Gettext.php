@@ -30,10 +30,9 @@
  */
 
 
-namespace Iresults\Core\Locale;
+namespace Iresults\Core\Locale\TranslationProvider;
 
-
-class GettextTranslator extends AbstractLocaleAware implements TranslatorInterface {
+class Gettext extends AbstractTranslationProvider {
 	/**
 	 * An array of loaded packages whose Gettext domain was loaded
 	 *
@@ -45,12 +44,12 @@ class GettextTranslator extends AbstractLocaleAware implements TranslatorInterfa
 	 * Translates the given message
 	 *
 	 * @param string $message         The message to translate
-	 * @param array  $arguments       Arguments to be used in the message
-	 * @param string $extensionName   Extension name
 	 * @param string $locale          Locale to use for this translation
+	 * @param string $package         Extension name
+	 * @internal param array $arguments Arguments to be used in the message
 	 * @return string
 	 */
-	public function translate($message, $arguments = NULL, $extensionName = '', $locale = NULL) {
+	public function translate($message, $locale = NULL, $package = '') {
 		// TODO: Implement translate() method.
 	}
 

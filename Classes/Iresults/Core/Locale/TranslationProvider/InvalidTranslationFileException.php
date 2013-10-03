@@ -26,26 +26,16 @@
 
 /**
  * @author COD
- * Created 02.10.13 14:01
+ * Created 03.10.13 15:44
  */
 
 
-namespace Iresults\Core\Locale;
+namespace Iresults\Core\Locale\TranslationProvider;
 
 /**
- * Interface for a Translator utilizing a Translation Provider to retrieve
- * translated messages
+ * Exception thrown if an invalid translation file was detected
  *
- * @package Iresults\Core\Locale
+ * @package Iresults\Core\Locale\TranslationProvider
  */
-interface TranslatorInterface {
-	/**
-	 * Translates the given message
-	 *
-	 * @param string $message         The message to translate
-	 * @param array  $arguments       Arguments to be used in the message
-	 * @param string $locale          Locale to use for this translation
-	 * @return string
-	 */
-	public function translate($message, $arguments = NULL, $locale = NULL);
+class InvalidTranslationFileException extends \InvalidArgumentException {
 }

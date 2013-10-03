@@ -26,26 +26,55 @@
 
 /**
  * @author COD
- * Created 02.10.13 14:01
+ * Created 03.10.13 11:41
  */
 
 
 namespace Iresults\Core\Locale;
 
 /**
- * Interface for a Translator utilizing a Translation Provider to retrieve
- * translated messages
+ * Interface for Translation Providers which search for translations in the
+ * sources they can handle (i.e. CSV files are handled by the CsvTranslationProvider)
+ *
+ * Think of the Translation Providers as a backend for the Translator
  *
  * @package Iresults\Core\Locale
  */
-interface TranslatorInterface {
+interface TranslationProviderInterface {
+	/**
+	 * Language default key
+	 */
+	const PACKAGE_DEFAULT = 'default';
+
 	/**
 	 * Translates the given message
 	 *
 	 * @param string $message         The message to translate
-	 * @param array  $arguments       Arguments to be used in the message
 	 * @param string $locale          Locale to use for this translation
 	 * @return string
 	 */
-	public function translate($message, $arguments = NULL, $locale = NULL);
+	public function translate($message, $locale = NULL);
+
+	/**
+	 * Defines the locale to use for translation
+	 *
+	 * @param string $locale
+	 * @return $this
+	 */
+	public function setLocale($locale);
+
+	/**
+	 * Returns the locale to use for translation
+	 *
+	 * @return string
+	 */
+	public function getLocale();
+
+	/**
+	 * Sets the source to read the translations from
+	 *
+	 * @param mixed $source
+	 * @return void
+	 */
+	public function setSource($source);
 }

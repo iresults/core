@@ -24,6 +24,8 @@ namespace Iresults\Core\Tests\Locale;
  * SOFTWARE.
  */
 
+use Iresults\Core\Locale\TranslatorFactory;
+
 require_once __DIR__ . '/../Autoloader.php';
 
 /**
@@ -48,86 +50,39 @@ class TranslatorTest extends \PHPUnit_Framework_TestCase {
 	/**
 	 * @test
 	 */
-	public function guessWidthOfTextSansSerif(){
-		$text1 = str_repeat('lI', 50);
-		$text2 = str_repeat('eA', 50);
-		$text3 = str_repeat('mW', 50);
-
-		$croppedString1 = '';
-		$this->assertEquals(41, \Iresults\Core\Tools\StringTool::guessWidthOfText($text1, 15, $croppedString1, FALSE, TRUE));
-		$this->assertEquals('lIlIlIlIlIlIlIlIlIlIlIlIlIlIlIlIlIlI', $croppedString1);
-
-		$croppedString2 = '';
-		$this->assertEquals(100, \Iresults\Core\Tools\StringTool::guessWidthOfText($text2, 15, $croppedString2, FALSE, TRUE));
-		$this->assertEquals('eAeAeAeAeAeAeA', $croppedString2);
-
-		$croppedString3 = '';
-		$this->assertEquals(150, \Iresults\Core\Tools\StringTool::guessWidthOfText($text3, 15, $croppedString3, FALSE, TRUE));
-		$this->assertEquals('mWmWmWmWm', $croppedString3);
+	public function getOriginalMessageTest(){
+		$message = 'A simple translated string';
+		$translator = TranslatorFactory::translatorWithSource(__DIR__ . '/');
+		$this->assertEquals($message, $translator->translate($message));
 	}
 
 	/**
 	 * @test
 	 */
-	public function compareGuessedWidthOfSansSerifToSerif(){
-		$text = str_repeat('ea', 50);
-
-		$croppedSerif = '';
-		$this->assertEquals(80, \Iresults\Core\Tools\StringTool::guessWidthOfText($text, 40, $croppedSerif, FALSE, FALSE));
-
-		$croppedSansSerif = '';
-		$this->assertEquals(100, \Iresults\Core\Tools\StringTool::guessWidthOfText($text, 40, $croppedSansSerif, FALSE, TRUE));
-
-		$this->assertEquals('eaeaeaeaeaeaeaeaeaeaeaeaeaeaeaeaeaeaeaeaeaeaeaeae', $croppedSerif);
-		$this->assertEquals('eaeaeaeaeaeaeaeaeaeaeaeaeaeaeaeaeaeaeae', $croppedSansSerif);
-
-		// echo '<div style="font-family: Times,Arial,sans-serif; color: #fc0; font-size: 16px;">';
-		// echo $croppedSerif;
-		// echo '</div>';
-		// echo '<br />';
-		// echo '<div style="font-family: Arial,sans-serif; color: #fc0; font-size: 16px;">';
-		// echo $croppedSansSerif;
-		// echo '</div>';
+	public function getTranslatedMessageTest(){
+		$originalMessage = 'A simple translated string';
+		$translatedMessage = 'Ein einfacher übersetzter Text';
+		$translator = TranslatorFactory::translatorWithSource(__DIR__ . '/');
+		$this->assertEquals($translatedMessage, $translator->translate($originalMessage, NULL, 'de_DE'));
 	}
 
 	/**
 	 * @test
 	 */
-	public function guessWidthOfTextSerif(){
-		$text1 = str_repeat('lI', 100);
-		$text2 = str_repeat('ea', 100);
-		$text3 = str_repeat('mW', 100);
+	public function getOriginalMessageWithArgumentTest(){
+		$message = 'My name is %s';
+		$translator = TranslatorFactory::translatorWithSource(__DIR__ . '/');
+		$this->assertEquals('My name is Daniel', $translator->translate($message, array('Daniel')));
+	}
 
-		// $style = 'font-family: Georgia,Arial,sans-serif; color: #fc0; font-size: 16px;';
-		// echo '<div style="' . $style . '">';
-		// echo $text1;
-		// echo '<br />';
-		// echo $text2;
-		// echo '<br />';
-		// echo $text3;
-		// echo '</div>';
-		// echo '<br />';
-
-		$croppedString1 = '';
-		$this->assertEquals(111, \Iresults\Core\Tools\StringTool::guessWidthOfText($text1, 80, $croppedString1, FALSE, FALSE));
-		$this->assertEquals('lIlIlIlIlIlIlIlIlIlIlIlIlIlIlIlIlIlIlIlIlIlIlIlIlIlIlIlIlIlIlIlIlIlIlIlIlIlIlIlIlIlIlIlIlIlIlIlIlIlIlIlIlIlIlIlIlIlIlIlIlIlIlIlIlIlIlIlIlIlIlIlI', $croppedString1);
-
-		$croppedString2 = '';
-		$this->assertEquals(160, \Iresults\Core\Tools\StringTool::guessWidthOfText($text2, 80, $croppedString2, FALSE, FALSE));
-		$this->assertEquals('eaeaeaeaeaeaeaeaeaeaeaeaeaeaeaeaeaeaeaeaeaeaeaeaeaeaeaeaeaeaeaeaeaeaeaeaeaeaeaeaeaeaeaeaeaeaeaeaeae', $croppedString2);
-
-		$croppedString3 = '';
-		$this->assertEquals(310, \Iresults\Core\Tools\StringTool::guessWidthOfText($text3, 80, $croppedString3, FALSE, FALSE));
-		$this->assertEquals('mWmWmWmWmWmWmWmWmWmWmWmWmWmWmWmWmWmWmWmWmWmWmWmWmWm', $croppedString3);
-
-
-		// echo '<div style="' . $style . '">';
-		// echo $croppedString1;
-		// echo '<br />';
-		// echo $croppedString2;
-		// echo '<br />';
-		// echo $croppedString3;
-		// echo '</div>';
+	/**
+	 * @test
+	 */
+	public function getTranslatedMessageWithArgumentTest(){
+		$originalMessage = 'My name is %s';
+		$translatedMessage = 'Mein Name ist Daniel';
+		$translator = TranslatorFactory::translatorWithSource(__DIR__ . '/');
+		$this->assertEquals($translatedMessage, $translator->translate($originalMessage, array('Daniel'), 'de_DE'));
 	}
 }
 ?>
