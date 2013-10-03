@@ -81,6 +81,10 @@ abstract class AbstractTranslationProvider implements TranslationProviderInterfa
 		if ($currentLocale === 'C') {
 			$currentLocale = Iresults::getLocale();
 		}
+
+		// The current locale may be in the format "de_DE.UTF-8"
+		$currentLocale = explode('.', $currentLocale);
+		$currentLocale = $currentLocale[0];
 		$this->locale = $currentLocale;
 	}
 
