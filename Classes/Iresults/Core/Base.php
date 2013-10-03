@@ -84,6 +84,10 @@ class Base extends AbstractBase {
 			} else {
 				$tempBaseURL = dirname($_SERVER['SCRIPT_NAME']);
 			}
+
+			if (substr($tempBaseURL, -1) !== '/') {
+				$tempBaseURL .= '/';
+			}
 			self::$baseURL = $tempBaseURL;
 		}
 		return self::$baseURL;
@@ -128,7 +132,7 @@ class Base extends AbstractBase {
 	 * @return    string
 	 */
 	public function getNameOfCallingPackage($lowerCaseUnderscored = FALSE) {
-		return '';
+		return FALSE;
 	}
 
 
@@ -186,18 +190,18 @@ class Base extends AbstractBase {
 
 	# MWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWM
 	# MWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWM
-//	/**
-//	 * Logs the given variable.
-//	 *
-//	 * @param    mixed   $var         If $var is a scalar it will be written directly, else the output of var_export() is used
-//	 * @param    integer $code        The error code
-//	 * @param    string  $logfile     The path to the log file. The default path is /typo3conf/iresults.log
-//	 * @return    boolean                TRUE on success otherwise FALSE
-//	 */
-//	public function log($var, $code = -1, $logfile = -1) {
-//		// TODO: Implement me
-//		return FALSE;
-//	}
+	/**
+	 * Logs the given variable.
+	 *
+	 * @param    mixed   $var         If $var is a scalar it will be written directly, else the output of var_export() is used
+	 * @param    integer $code        The error code
+	 * @param    string  $logfile     The path to the log file. The default path is /typo3conf/iresults.log
+	 * @return    boolean                TRUE on success otherwise FALSE
+	 */
+	public function log($var, $code = -1, $logfile = -1) {
+		// TODO: Implement me
+		return FALSE;
+	}
 
 //	/**
 //	 * Returns if debugging is enabled in the current situation.

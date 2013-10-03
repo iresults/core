@@ -470,10 +470,10 @@ abstract class AbstractBase implements IresultsBaseInterface {
 	}
 
 	/**
-	 * Sets the debug renderer used by pd().
+	 * Sets the debug renderer used by pd()
 	 *
-	 * @param    integer $debugRenderer The debug renderer as one of the RENDERER constants
-	 * @return    integer    Returns the former configuration
+	 * @param    integer|Iresults::RENDERER $debugRenderer The debug renderer as one of the RENDERER constants
+	 * @return    integer|Iresults::RENDERER    Returns the former configuration
 	 */
 	public function setDebugRenderer($debugRenderer) {
 		$oldRenderer = self::$_renderer;
@@ -828,7 +828,7 @@ abstract class AbstractBase implements IresultsBaseInterface {
 	 * @return string
 	 */
 	public function getPackagePath($package) {
-		return '';
+		return FALSE;
 	}
 
 
@@ -854,9 +854,9 @@ abstract class AbstractBase implements IresultsBaseInterface {
 	# MWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWM
 	# MWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWM
 	/**
-	 * The iresults exception handler.
+	 * The iresults exception handler
 	 *
-	 * This method will be used for exception handling in CLI environment.
+	 * This method will be used for exception handling in CLI environment
 	 *
 	 * @param    \Exception $exception    The exception to handle
 	 * @param    boolean    $graceful     Set to TRUE if the handler should not stop the PHP script
