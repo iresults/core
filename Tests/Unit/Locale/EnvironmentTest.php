@@ -24,7 +24,8 @@ namespace Iresults\Core\Tests\Locale;
  * SOFTWARE.
  */
 
-use Iresults\Core\Locale\TranslatorFactory;
+use Iresults\Core\Iresults;
+use Iresults\Core\Locale\Environment;
 
 require_once __DIR__ . '/../Autoloader.php';
 
@@ -40,7 +41,7 @@ require_once __DIR__ . '/../Autoloader.php';
  *
  * @author Daniel Corn <cod@iresults.li>
  */
-class TranslatorTest extends \PHPUnit_Framework_TestCase {
+class EnvironmentTest extends \PHPUnit_Framework_TestCase {
 	public function setUp() {
 	}
 
@@ -50,49 +51,23 @@ class TranslatorTest extends \PHPUnit_Framework_TestCase {
 	/**
 	 * @test
 	 */
-	public function getOriginalMessageTest(){
-		$message = 'A simple translated string';
-		$translator = TranslatorFactory::translatorWithSource(__DIR__ . '/');
-		$this->assertEquals($message, $translator->translate($message));
+	public function getInitialLocaleTest(){
+		$locale = setlocale(LC_CTYPE, '0');
+		if ($locale === 'C') {
+			$locale = Iresults::getLocale();
+		}
+		$this->assertEquals($locale, Environment::getSharedInstance()->getLocale());
 	}
 
 	/**
 	 * @test
 	 */
-	public function getTranslatedMessageTest(){
-		$originalMessage = 'A simple translated string';
-		$translatedMessage = 'Ein einfacher übersetzter Text';
-		$translator = TranslatorFactory::translatorWithSource(__DIR__ . '/');
-		$this->assertEquals($translatedMessage, $translator->translate($originalMessage, NULL, 'de_DE'));
-	}
+	public function setLocaleTest(){
+		$newLocale = 'de_DE.UTF-8';
 
-	/**
-	 * @test
-	 */
-	public function getOriginalMessageWithArgumentTest(){
-		$message = 'My name is %s';
-		$translator = TranslatorFactory::translatorWithSource(__DIR__ . '/');
-		$this->assertEquals('My name is Daniel', $translator->translate($message, array('Daniel')));
-	}
-
-	/**
-	 * @test
-	 */
-	public function getTranslatedMessageWithArgumentTest(){
-		$originalMessage = 'My name is %s';
-		$translatedMessage = 'Mein Name ist Daniel';
-		$translator = TranslatorFactory::translatorWithSource(__DIR__ . '/');
-		$this->assertEquals($translatedMessage, $translator->translate($originalMessage, array('Daniel'), 'de_DE'));
-	}
-
-	/**
-	 * @test
-	 */
-	public function getTranslatedMessageWithUtf8LocaleTest(){
-		$originalMessage = 'My name is %s';
-		$translatedMessage = 'Mein Name ist Daniel';
-		$translator = TranslatorFactory::translatorWithSource(__DIR__ . '/');
-		$this->assertEquals($translatedMessage, $translator->translate($originalMessage, array('Daniel'), 'de_DE.UTF-8'));
+		Environment::getSharedInstance()->setLocale($newLocale);
+		$this->assertEquals($newLocale, Environment::getSharedInstance()->getLocale());
+		$this->assertEquals($newLocale, setlocale(LC_CTYPE, '0'));
 	}
 }
 ?>

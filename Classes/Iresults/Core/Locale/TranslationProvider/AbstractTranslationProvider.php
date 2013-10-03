@@ -34,6 +34,7 @@ namespace Iresults\Core\Locale\TranslationProvider;
 
 
 use Iresults\Core\Iresults;
+use Iresults\Core\Locale\Environment;
 use Iresults\Core\Locale\TranslationProviderInterface;
 
 /**
@@ -57,13 +58,6 @@ abstract class AbstractTranslationProvider implements TranslationProviderInterfa
 	protected $package = self::PACKAGE_DEFAULT;
 
 	/**
-	 * The system's locale configuration
-	 *
-	 * @var string
-	 */
-	static protected $systemLocale = '';
-
-	/**
 	 * Translates the given message
 	 *
 	 * @param string $message The message to translate
@@ -76,16 +70,6 @@ abstract class AbstractTranslationProvider implements TranslationProviderInterfa
 	 */
 	function __construct($package = self::PACKAGE_DEFAULT) {
 		$this->package = $package;
-
-		$currentLocale = setlocale(LC_CTYPE, '0');
-		if ($currentLocale === 'C') {
-			$currentLocale = Iresults::getLocale();
-		}
-
-		// The current locale may be in the format "de_DE.UTF-8"
-		$currentLocale = explode('.', $currentLocale);
-		$currentLocale = $currentLocale[0];
-		$this->locale = $currentLocale;
 	}
 
 	/**
@@ -141,8 +125,7 @@ abstract class AbstractTranslationProvider implements TranslationProviderInterfa
 	 * @param string $locale
 	 */
 	protected function setEnvironment($locale) {
-		putenv('LC_ALL=' . $locale);
-		setlocale(LC_ALL, $locale);
+		Environment::getSharedInstance()->setLocale($locale);
 	}
 
 	/**

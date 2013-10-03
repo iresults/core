@@ -140,7 +140,11 @@ abstract class AbstractFileBasedTranslationProvider extends AbstractTranslationP
 	 */
 	protected function getTranslationFilePath() {
 		$currentLocale = $this->getLocale();
-		return $this->sourcePath . $currentLocale . '.locallang.' . $this->translationFileSuffix;
+
+		// The current locale may be in the format "de_DE.UTF-8"
+		$filePrefix = explode('.', $currentLocale);
+		$filePrefix = $filePrefix[0];
+		return $this->sourcePath . $filePrefix . '.locallang.' . $this->translationFileSuffix;
 	}
 
 	/**
