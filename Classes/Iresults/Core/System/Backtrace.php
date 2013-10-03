@@ -23,14 +23,16 @@ namespace Iresults\Core\System;
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
+use Iresults\Core\Iresults;
 
 
 /**
- * The iresults backtrace enables you to display a backtrace.
+ * The iresults backtrace enables you to save a backtrace snapshot and display
+ * it later
  *
- * @author	Daniel Corn <cod@iresults.li>
- * @package	Iresults
- * @subpackage	Iresults_System
+ * @author        Daniel Corn <cod@iresults.li>
+ * @package       Iresults
+ * @subpackage    Iresults_System
  */
 class Backtrace {
 	/**
@@ -58,59 +60,72 @@ class Backtrace {
 	protected $time;
 
 	/**
-	 * Construtor for a backtrace object. The starting position in the backtrace
-	 * stack may be passed as $startLevel. Also a maximum depth of the backtrace
-	 * can be specified.
+	 * Constructor for a backtrace object
 	 *
-	 * @param	integer	$startLevel The starting position in the backtrace stack
-	 * @param	integer	$depthLevel The depth of the backtrace
-	 * @return	\Iresults\Core\System\Backtrace
+	 * The starting position in the backtrace stack may be passed as $startLevel.
+	 * Also a maximum depth of the backtrace can be specified.
+	 *
+	 * @param    integer $startLevel The starting position in the backtrace stack
+	 * @param    integer $depthLevel The depth of the backtrace
+	 * @return    \Iresults\Core\System\Backtrace
 	 */
 	public function __construct($startLevel = 2, $depthLevel = -1) {
+		$options = FALSE;
+		if ($depthLevel !== -1 && version_compare(PHP_VERSION, '5.4.0') >= 0) {
+			$backtrace = debug_backtrace($options, 10);
+		} else {
+			$backtrace = debug_backtrace($options);
+		}
+
 		$this->startLevel = $startLevel;
 		$this->depthLevel = $depthLevel;
-		$this->backtrace = debug_backtrace();
+		$this->backtrace = $backtrace;
 		$this->time = time();
 	}
 
 	/**
 	 * Renders the backtrace.
 	 *
-	 * @return	string
+	 * @return    string
 	 */
 	public function render() {
-		$bt = $this->backtrace;
+		$backtrace = $this->backtrace;
 		$level = 0;
 		$depth = $this->depthLevel;
-		if ($depth == -1) $depth = count($bt);
+		if ($depth == -1) $depth = count($backtrace);
 
 		$result = 'Backtrace from ' . date('H:i:s', $this->time) . ' (current time: ' . date('H:i:s') . ')' . PHP_EOL;
-		for($i = $this->startLevel; $i < $depth;$i++) {
-			$levelArray = $bt[$i];
-			$file = $this->_getLevelElement('file',$levelArray);
-			$line = $this->_getLevelElement('line',$levelArray);
-			$function = $this->_getLevelElement('function',$levelArray);
-			$class = $this->_getLevelElement('class',$levelArray);
-			$type = $this->_getLevelElement('type',$levelArray);
-			$args = $this->_getLevelElement('args',$levelArray);
+		for ($i = $this->startLevel; $i < $depth; $i++) {
+			$levelArray = $backtrace[$i];
+			$file = $this->_getLevelElement('file', $levelArray);
+			$line = $this->_getLevelElement('line', $levelArray);
+			$function = $this->_getLevelElement('function', $levelArray);
+			$class = $this->_getLevelElement('class', $levelArray);
+			$type = $this->_getLevelElement('type', $levelArray);
+			$args = $this->_getLevelElement('args', $levelArray);
 			$args = $this->_argsToString($args);
 
 			if ($class) {
-				$result .= "#$level: $class$type$function($args) \t\t called in $file @ $line" . PHP_EOL;
+				$result .= "#$level: $class$type$function($args) ";
 			} else {
-				$result .= "#$level: $function($args) \t\t called in $file @ $line" . PHP_EOL;
+				$result .= "#$level: $function($args) ";
+			}
+
+			if (Iresults::getEnvironment() === Iresults::ENVIRONMENT_WEB) {
+				$result .= "\t\t called in <a href='file://$file' target='_blank'>$file</a> @ $line" . PHP_EOL;
+			} else {
+				$result .= "\t\t called in $file @ $line" . PHP_EOL;
 			}
 
 			$level++;
 		}
-
 		return $result;
 	}
 
 	/**
 	 * Renders the backtrace.
 	 *
-	 * @return	string
+	 * @return    string
 	 */
 	public function __toString() {
 		return $this->render();
@@ -120,14 +135,14 @@ class Backtrace {
 	 * Returns the element of the backtrace level with the given key or an empty
 	 * string if the key doesn't exist.
 	 *
-	 * @param	string	$key        The element key
-	 * @param	array & $levelArray Reference to the backtrace level array
+	 * @param    string $key          The element key
+	 * @param    array  & $levelArray Reference to the backtrace level array
 	 *
-	 * @return	mixed
+	 * @return    mixed
 	 */
 	protected function _getLevelElement($key, &$levelArray) {
 		$value = '';
-		if (is_array($levelArray) || (is_object($levelArray) && $levelArray instanceof ArrayAccess)) {
+		if (is_array($levelArray) || (is_object($levelArray) && $levelArray instanceof \ArrayAccess)) {
 			if (isset($levelArray[$key])) {
 				$value = $levelArray[$key];
 			}
@@ -138,22 +153,22 @@ class Backtrace {
 	/**
 	 * Returns a string representation of the arguments array.
 	 *
-	 * @param	array	$args The arguments array
-	 * @return	string
+	 * @param    array $args The arguments array
+	 * @return    string
 	 */
 	protected function _argsToString($args) {
 		$result = array();
-		foreach ($args as $index => $arg) {
+		foreach ($args as $arg) {
 			if (is_scalar($arg)) {
 				$result[] = $arg;
 			} else if (is_null($arg)) {
 				$result[] = '(NULL)';
 			} else if (is_array($arg)) {
-				$result[] = 'Array('.count($arg).')';
+				$result[] = 'Array(' . count($arg) . ')';
 			} else if (is_object($arg) && method_exists($arg, '__toString')) {
-				try{
+				try {
 					$arg = '' . $arg;
-				} catch(Exception $e) {
+				} catch (\Exception $e) {
 					$arg = 'No argument info (' . $e->getMessage() . ')';
 				}
 				$result[] = $arg;
@@ -176,30 +191,9 @@ class Backtrace {
 	/**
 	 * Factory method: Returns a new Backtrace instance.
 	 *
-	 * @return	\Iresults\Core\System\Backtrace
+	 * @return    \Iresults\Core\System\Backtrace
 	 */
 	static public function makeInstance() {
-		return new self();
+		return new static();
 	}
 }
-/*
-
-'file' => '/var/www/vhosts/lieguide.li/httpdocs/src/lib/Smarty/Smarty.class.php',
-    'line' => 1591,
-    'function' => 'trigger_error',
-    'class' => 'Smarty',
-    'object' =>
-    Smarty::__set_state(array(
-
-      ),
-       '_cache_include' => NULL,
-       '_cache_including' => false,
-    )),
-    'type' => '->',
-    'args' =>
-    array (
-      0 => 'unable to read resource: "admin_login.tpl"',
-    ),
-  ),
-
-*/

@@ -24,6 +24,7 @@ namespace Iresults\Core;
  * SOFTWARE.
  */
 use Iresults\Core\Exception\UndefinedMethod;
+use Iresults\Core\System\Backtrace;
 
 
 /**
@@ -58,20 +59,14 @@ abstract class Iresults implements IresultsBaseConstants {
 	 * @param	integer	$level The depth of the backtrace
 	 * @return	void
 	 *
-	 * @deprecated since 3.1.0
+	 * @deprecated since 3.1.0 use \Iresults\Core\System\Backtrace instead
 	 */
-	public function backtrace($level = NULL) {
-		$bt = debug_backtrace();
-		if ($level === NULL) $level = count($bt);
-
-		echo '<pre>';
-		for($i = 1;$i <= $level;$i++) {
-			if (!isset($bt[$i]) || !is_array($bt[$i])) continue;
-			$cLevel = $bt[$i];
-			if (isset($cLevel['class']) && $cLevel['class']) echo @$cLevel['class']."::";
-			echo $cLevel['function']." <a href='file://".$cLevel['file']."' target='_blank'>".$cLevel['file']."</a> @ ".$cLevel['line']. PHP_EOL;
+	static public function backtrace($level = NULL) {
+		if ($level === NULL) {
+			$level = -1;
 		}
-		echo '</pre>';
+		$backtrace = new Backtrace(0, $level);
+		echo $backtrace->render();
 	}
 
 	/**
@@ -209,6 +204,26 @@ abstract class Iresults implements IresultsBaseConstants {
 	 */
 	static public function getTempDir() {
 		return static::getTempPath();
+	}
+
+	/**
+	 * Returns the path to the given package's directory
+	 *
+	 * @param string $package Package name
+	 * @return string
+	 */
+	static public function getPackagePath($package) {
+		return static::getSharedInstance()->getPackagePath($package);
+	}
+
+	/**
+	 * Returns the URL to the given package's resources
+	 *
+	 * @param string $package Package name
+	 * @return string
+	 */
+	static public function getPackageUrl($package) {
+		return static::getSharedInstance()->getPackageUrl($package);
 	}
 
 	/**
@@ -504,16 +519,6 @@ abstract class Iresults implements IresultsBaseConstants {
 	 */
 	static public function setConfiguration($key, $value) {
 		static::getSharedInstance()->setConfiguration($key, $value);
-	}
-
-	/**
-	 * Returns the path to the given package's directory
-	 *
-	 * @param string $package Package name
-	 * @return string
-	 */
-	static public function getPackagePath($package) {
-		return static::getSharedInstance()->getPackagePath($package);
 	}
 }
 ?>

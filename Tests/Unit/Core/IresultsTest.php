@@ -139,6 +139,14 @@ class IresultsTest extends \PHPUnit_Framework_TestCase {
 	/**
 	 * @test
 	 */
+	public function getPackageUrlTest() {
+		$package = 'WhateverPackage';
+		$this->assertEquals('', Iresults::getPackageUrl($package));
+	}
+
+	/**
+	 * @test
+	 */
 	public function getPathOfResourceTest() {
 		$resource = 'Resources/Public/JavaScript/main.js';
 		$this->assertEquals((string)$resource, Iresults::getPathOfResource($resource));

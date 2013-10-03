@@ -81,6 +81,14 @@ interface IresultsBaseInterface extends IresultsBaseConstants {
 	public function getPackagePath($package);
 
 	/**
+	 * Returns the URL to the given package
+	 *
+	 * @param string $package Package name
+	 * @return string
+	 */
+	public function getPackageUrl($package);
+
+	/**
 	 * Returns the absolute path to the given resource
 	 *
 	 * @param  Iresults\FS\FilesystemInterface|string $resource    Either a filesystem instance or the path of a resource

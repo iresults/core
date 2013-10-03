@@ -78,13 +78,7 @@ class Base extends AbstractBase {
 	 */
 	public function getBaseURL() {
 		if (!self::$baseURL) {
-			$tempBaseURL = '';
-			if (defined('TYPO3_MODE') && $GLOBALS['TSFE']->baseUrl) {
-				$tempBaseURL = $GLOBALS['TSFE']->baseUrl;
-			} else {
-				$tempBaseURL = dirname($_SERVER['SCRIPT_NAME']);
-			}
-
+			$tempBaseURL = dirname($_SERVER['SCRIPT_NAME']);
 			if (substr($tempBaseURL, -1) !== '/') {
 				$tempBaseURL .= '/';
 			}
@@ -121,6 +115,27 @@ class Base extends AbstractBase {
 		}
 		return $path;
 	}
+
+	/**
+	 * Returns the path to the given package's directory
+	 *
+	 * @param string $package Package name
+	 * @return string
+	 */
+	public function getPackagePath($package) {
+		return FALSE;
+	}
+
+	/**
+	 * Returns the URL to the given package
+	 *
+	 * @param string $package Package name
+	 * @return string
+	 */
+	public function getPackageUrl($package) {
+		return FALSE;
+	}
+
 
 	/**
 	 * Returns the name of the extension from which the iresults method was

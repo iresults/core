@@ -308,7 +308,7 @@ abstract class AbstractBase implements IresultsBaseInterface {
 	public function pd($var1 = '__iresults_pd_noValue') {
 		static $counter = 0;
 		static $scriptDir = '';
-		$bt = NULL;
+		$backtrace = NULL;
 		$output = '';
 		$printTags = TRUE;
 		$printAnchor = TRUE;
@@ -371,23 +371,23 @@ abstract class AbstractBase implements IresultsBaseInterface {
 
 		$i = 0;
 		if ($printPathInformation) {
-			$bt = NULL;
+			$backtrace = NULL;
 			$options = FALSE;
 			if (defined('DEBUG_BACKTRACE_IGNORE_ARGS')) {
 				$options = DEBUG_BACKTRACE_PROVIDE_OBJECT & DEBUG_BACKTRACE_IGNORE_ARGS;
 			}
 
 			if (version_compare(PHP_VERSION, '5.4.0') >= 0) {
-				$bt = debug_backtrace($options, 10);
+				$backtrace = debug_backtrace($options, 10);
 			} else {
-				$bt = debug_backtrace($options);
+				$backtrace = debug_backtrace($options);
 			}
 
-			$function = @$bt[$i]['function'];
+			$function = @$backtrace[$i]['function'];
 			while ($function == 'pd' OR $function == 'call_user_func_array' OR
 				$function == 'call_user_func') {
 				$i++;
-				$function = @$bt[$i]['function'];
+				$function = @$backtrace[$i]['function'];
 			}
 
 			// Get the current trace level
@@ -408,13 +408,13 @@ abstract class AbstractBase implements IresultsBaseInterface {
 				}
 			}
 
-			$file = str_replace($scriptDir, '', @$bt[$i]['file']);
+			$file = str_replace($scriptDir, '', @$backtrace[$i]['file']);
 			if ($printTags) {
-				echo '<span style="font-size:0.8em"><a href="file://' . @$bt[$i]['file'] . '" target="_blank">' . $file . ' @ ' . @$bt[$i]['line'] . '</a></span>';
+				echo '<span style="font-size:0.8em"><a href="file://' . @$backtrace[$i]['file'] . '" target="_blank">' . $file . ' @ ' . @$backtrace[$i]['line'] . '</a></span>';
 			} else if ($outputHandling < 2) {
-				echo "\033[0;35m" . $file . ' @ ' . @$bt[$i]['line'] . "\033[0m" . PHP_EOL;
+				echo "\033[0;35m" . $file . ' @ ' . @$backtrace[$i]['line'] . "\033[0m" . PHP_EOL;
 			} else {
-				echo $file . ' @ ' . @$bt[$i]['line'] . PHP_EOL;
+				echo $file . ' @ ' . @$backtrace[$i]['line'] . PHP_EOL;
 			}
 		}
 
@@ -479,26 +479,6 @@ abstract class AbstractBase implements IresultsBaseInterface {
 		$oldRenderer = self::$_renderer;
 		self::$_renderer = $debugRenderer;
 		return $oldRenderer;
-	}
-
-	/**
-	 * Outputs the debug backtrace.
-	 *
-	 * @param    integer $level The depth of the backtrace
-	 * @return    void
-	 */
-	public function backtrace($level = NULL) {
-		$bt = debug_backtrace();
-		if ($level === NULL) $level = count($bt);
-
-		echo '<pre>';
-		for ($i = 1; $i <= $level; $i++) {
-			if (!isset($bt[$i]) || !is_array($bt[$i])) continue;
-			$cLevel = $bt[$i];
-			if (isset($cLevel['class']) && $cLevel['class']) echo @$cLevel['class'] . "::";
-			echo $cLevel['function'] . " <a href='file://" . $cLevel['file'] . "' target='_blank'>" . $cLevel['file'] . "</a> @ " . $cLevel['line'] . PHP_EOL;
-		}
-		echo '</pre>';
 	}
 
 	/**
@@ -819,16 +799,6 @@ abstract class AbstractBase implements IresultsBaseInterface {
 	 */
 	public function setConfiguration($key, $value) {
 		self::$configuration[$key] = $value;
-	}
-
-	/**
-	 * Returns the path to the given package's directory
-	 *
-	 * @param string $package Package name
-	 * @return string
-	 */
-	public function getPackagePath($package) {
-		return FALSE;
 	}
 
 
