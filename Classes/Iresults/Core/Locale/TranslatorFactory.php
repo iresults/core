@@ -40,7 +40,7 @@ use Iresults\Core\Iresults;
  *
  * @package Iresults\Core\Locale
  */
-class TranslatorFactory {
+abstract class TranslatorFactory {
 	/**
 	 * Returns a translator with the given source path
 	 *
