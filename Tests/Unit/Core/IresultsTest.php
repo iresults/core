@@ -82,6 +82,21 @@ class IresultsTest extends \PHPUnit_Framework_TestCase {
 	/**
 	 * @test
 	 */
+	public function overrideImplementationWithGlobalTest() {
+		$this->assertInstanceOf('\\Iresults\\Core\\Base', 					Iresults::getSharedInstance());
+		Iresults::_destroySharedInstance();
+
+		$GLOBALS['IRESULTS_REGISTERED_IMPLEMENTATION_CLASS'] = '\\Iresults\\Core\\Tests\\Core\\IresultsTestImplementation';
+
+		$this->assertInstanceOf('\\Iresults\\Core\\IresultsBaseInterface', 						Iresults::getSharedInstance());
+		$this->assertInstanceOf('\\Iresults\\Core\\Tests\\Core\\IresultsTestImplementation', 	Iresults::getSharedInstance());
+
+		$this->assertFalse(Iresults::isFullRequest());
+	}
+
+	/**
+	 * @test
+	 */
 	public function overrideImplementationAndCallMagicMethodTest() {
 		Iresults::_registerImplementationClassName('\\Iresults\\Core\\Tests\\Core\\IresultsTestImplementation');
 

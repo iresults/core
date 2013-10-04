@@ -23,6 +23,7 @@ namespace Iresults\Core;
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
+use Iresults\Core\Exception\FatalErrorException;
 use Iresults\Core\Exception\UndefinedMethod;
 use Iresults\Core\System\Backtrace;
 
@@ -34,14 +35,21 @@ use Iresults\Core\System\Backtrace;
  * debugging to resolution of class files and paths. It is the base of the
  * framework.
  *
- * @author	Daniel Corn <cod@iresults.li>
- * @package	Iresults
- * @subpackage	Iresults_Core
- * @version 3.1.0
+ * @author        Daniel Corn <cod@iresults.li>
+ * @package       Iresults
+ * @subpackage    Iresults_Core
+ * @version       3.1.0
  */
 abstract class Iresults implements IresultsBaseConstants {
 	/**
+	 * Key for the $GLOBALS to define an implementation class for the shared
+	 * instance
+	 */
+	const REGISTERED_IMPLEMENTATION_CLASS = 'IRESULTS_REGISTERED_IMPLEMENTATION_CLASS';
+
+	/**
 	 * The singleton instance
+	 *
 	 * @var \Iresults\Core\Iresults
 	 */
 	static protected $sharedInstance = NULL;
@@ -56,8 +64,8 @@ abstract class Iresults implements IresultsBaseConstants {
 	/**
 	 * Outputs the debug backtrace.
 	 *
-	 * @param	integer	$level The depth of the backtrace
-	 * @return	void
+	 * @param    integer $level The depth of the backtrace
+	 * @return    void
 	 *
 	 * @deprecated since 3.1.0 use \Iresults\Core\System\Backtrace instead
 	 */
@@ -73,7 +81,7 @@ abstract class Iresults implements IresultsBaseConstants {
 	 * Forwards static calls to the shared instance
 	 *
 	 * @param string $name
-	 * @param array $arguments
+	 * @param array  $arguments
 	 * @return mixed
 	 * @throws Exception\UndefinedMethod
 	 */
@@ -109,13 +117,14 @@ abstract class Iresults implements IresultsBaseConstants {
 		 * Check if an instance exists
 		 */
 		if (!self::$sharedInstance) {
-			self::$sharedInstance = new self::$implementationClassName();
+			$implementationClassName = static::_getRegisteredImplementationClassName();
+			self::$sharedInstance = new $implementationClassName();
 		}
 		return self::$sharedInstance;
 	}
 
 	/**
-	 * Register a class to be used as implementation for of the shared instance
+	 * Register a class to be used as implementation for the shared instance
 	 *
 	 * @param string $instanceClassName
 	 */
@@ -130,6 +139,30 @@ abstract class Iresults implements IresultsBaseConstants {
 	 */
 	static public function _destroySharedInstance() {
 		self::$sharedInstance = NULL;
+	}
+
+	/**
+	 * Returns the registered class to be used as implementation for the shared
+	 * instance
+	 *
+	 * The global variable will be checked for an entry with the key
+	 * 'IRESULTS_REGISTERED_IMPLEMENTATION_CLASS' (see
+	 * Iresults::REGISTERED_IMPLEMENTATION_CLASS).
+	 * This allows the definition of an implementation without loading the full
+	 * iresults/core stack.
+	 * If the global isn't set, self::$implementationClassName will be used,
+	 * which defaults to \\Iresults\\Core\\Base
+	 *
+	 * @throws FatalErrorException if no implementation was found
+	 * @return string
+	 */
+	static protected function _getRegisteredImplementationClassName() {
+		if (isset($GLOBALS[self::REGISTERED_IMPLEMENTATION_CLASS]) && $GLOBALS[self::REGISTERED_IMPLEMENTATION_CLASS]) {
+			return $GLOBALS[self::REGISTERED_IMPLEMENTATION_CLASS];
+		} else if (self::$implementationClassName) {
+			return self::$implementationClassName;
+		}
+		throw new FatalErrorException('No implementation class found', 1380875841);
 	}
 
 
@@ -149,8 +182,8 @@ abstract class Iresults implements IresultsBaseConstants {
 	/**
 	 * Returns the absolute path to the given resource
 	 *
-	 * @param  \Iresults\FS\FilesystemInterface|string	$resource 	Either a filesystem instance or the path of a resource
-	 * @return string       									The absolute path of the resource
+	 * @param  \Iresults\FS\FilesystemInterface|string $resource    Either a filesystem instance or the path of a resource
+	 * @return string                                        The absolute path of the resource
 	 */
 	static public function getPathOfResource($resource) {
 		return static::getSharedInstance()->getPathOfResource($resource);
@@ -159,8 +192,8 @@ abstract class Iresults implements IresultsBaseConstants {
 	/**
 	 * Returns the URL of the resource.
 	 *
-	 * @param	\Iresults\FS\FilesystemInterface|string	$resource 	Either a filesystem instance or the path of a resource
-	 * @return	string											The URL of the resource
+	 * @param    \Iresults\FS\FilesystemInterface|string $resource    Either a filesystem instance or the path of a resource
+	 * @return    string                                            The URL of the resource
 	 */
 	static public function getUrlOfResource($resource) {
 		return static::getSharedInstance()->getUrlOfResource($resource);
@@ -170,11 +203,12 @@ abstract class Iresults implements IresultsBaseConstants {
 	/**
 	 * Returns the path to the base directory of the installation.
 	 *
-	 * @return	string
+	 * @return    string
 	 */
 	static public function getBasePath() {
 		return static::getSharedInstance()->getBasePath();
 	}
+
 	/**
 	 * @see getBasePath()
 	 */
@@ -185,7 +219,7 @@ abstract class Iresults implements IresultsBaseConstants {
 	/**
 	 * Returns the base URL of the index.php file.
 	 *
-	 * @return	string
+	 * @return    string
 	 */
 	static public function getBaseURL() {
 		return static::getSharedInstance()->getBaseURL();
@@ -194,11 +228,12 @@ abstract class Iresults implements IresultsBaseConstants {
 	/**
 	 * Returns the path to the temporary directory.
 	 *
-	 * @return	string
+	 * @return    string
 	 */
 	static public function getTempPath() {
 		return static::getSharedInstance()->getTempPath();
 	}
+
 	/**
 	 * @see getTempPath()
 	 */
@@ -230,8 +265,8 @@ abstract class Iresults implements IresultsBaseConstants {
 	 * Returns the versioned file path for the given file path, or the original
 	 * file path, if it doesn't exist.
 	 *
-	 * @param	string	$filePath	The file path to create versions
-	 * @return	string
+	 * @param    string $filePath    The file path to create versions
+	 * @return    string
 	 */
 	static public function createVersionedFilePathForPath($filePath) {
 		return static::getSharedInstance()->createVersionedFilePathForPath($filePath);
@@ -243,8 +278,8 @@ abstract class Iresults implements IresultsBaseConstants {
 	 *
 	 * You shouldn't use this in an production environment
 	 *
-	 * @param	boolean	$lowerCaseUnderscored	 Set to TRUE if you want the returned value to be in lower_case_underscored
-	 * @return	string
+	 * @param    boolean $lowerCaseUnderscored     Set to TRUE if you want the returned value to be in lower_case_underscored
+	 * @return    string
 	 */
 	static public function getNameOfCallingPackage($lowerCaseUnderscored = FALSE) {
 		return static::getSharedInstance()->getNameOfCallingPackage($lowerCaseUnderscored);
@@ -274,14 +309,15 @@ abstract class Iresults implements IresultsBaseConstants {
 	/**
 	 * Returns the translated value for the given key.
 	 *
-	 * @param	string 	$key			The key to translate
-	 * @param	array 	$arguments		An optional array of arguments that will be passed to vsprintf()
-	 * @param	string	$extensionName 	Optional extension name. If empty the extension name will be automatically determined
-	 * @return	string
+	 * @param    string $key              The key to translate
+	 * @param    array  $arguments        An optional array of arguments that will be passed to vsprintf()
+	 * @param    string $extensionName    Optional extension name. If empty the extension name will be automatically determined
+	 * @return    string
 	 */
 	static public function translate($key, array $arguments = array(), $extensionName = '') {
 		return static::getSharedInstance()->translate($key, $arguments, $extensionName);
 	}
+
 	/**
 	 * @see translate()
 	 */
@@ -309,7 +345,7 @@ abstract class Iresults implements IresultsBaseConstants {
 	 * @deprecated since 3.1.0
 	 */
 	static public function getLanguage() {
-		return strtoupper(substr(static::getLocale(), 0 ,2));
+		return strtoupper(substr(static::getLocale(), 0, 2));
 	}
 
 
@@ -337,10 +373,10 @@ abstract class Iresults implements IresultsBaseConstants {
 	/**
 	 * Logs the given variable.
 	 *
-	 * @param	mixed	$var		If $var is a scalar it will be written directly, else the output of var_export() is used
-	 * @param	integer	$code	    The error code
-	 * @param	string	$logfile 	The path to the log file. The default path is /typo3conf/iresults.log
-	 * @return	boolean    			TRUE on success otherwise FALSE
+	 * @param    mixed   $var         If $var is a scalar it will be written directly, else the output of var_export() is used
+	 * @param    integer $code        The error code
+	 * @param    string  $logfile     The path to the log file. The default path is /typo3conf/iresults.log
+	 * @return    boolean                TRUE on success otherwise FALSE
 	 */
 	static public function log($var, $code = -1, $logfile = -1) {
 		return static::getSharedInstance()->log($var, $code, $logfile);
@@ -349,8 +385,8 @@ abstract class Iresults implements IresultsBaseConstants {
 	/**
 	 * Dumps a given variable (or the given variables) wrapped into a 'pre' tag.
 	 *
-	 * @param	mixed	$var1
-	 * @return	string The printed content
+	 * @param    mixed $var1
+	 * @return    string The printed content
 	 */
 	static public function pd($var1 = '__iresults_pd_noValue') {
 		$arguments = func_get_args();
@@ -360,10 +396,10 @@ abstract class Iresults implements IresultsBaseConstants {
 	/**
 	 * Outputs the given string, taking the current environment into account.
 	 *
-	 * @param	string		$message 		The message to output
-	 * @param	string		$color  		An optional ASCII color to apply
-	 * @param	boolean		$insertBreak	Insert a line break
-	 * @return	void
+	 * @param    string  $message        The message to output
+	 * @param    string  $color          An optional ASCII color to apply
+	 * @param    boolean $insertBreak    Insert a line break
+	 * @return    void
 	 */
 	static public function say($message, $color = NULL, $insertBreak = TRUE) {
 		static::getSharedInstance()->say($message, $color, $insertBreak);
@@ -372,8 +408,8 @@ abstract class Iresults implements IresultsBaseConstants {
 	/**
 	 * Sets the debug renderer used by pd().
 	 *
-	 * @param	integer	$debugRenderer The debug renderer as one of the RENDERER constants
-	 * @return	integer    Returns the former configuration
+	 * @param    integer $debugRenderer The debug renderer as one of the RENDERER constants
+	 * @return    integer    Returns the former configuration
 	 */
 	static public function setDebugRenderer($debugRenderer) {
 		return static::getSharedInstance()->setDebugRenderer($debugRenderer);
@@ -382,7 +418,7 @@ abstract class Iresults implements IresultsBaseConstants {
 	/**
 	 * Returns if debugging is enabled in the current situation.
 	 *
-	 * @return	boolean
+	 * @return    boolean
 	 */
 	static public function willDebug() {
 		return static::getSharedInstance()->willDebug();
@@ -391,8 +427,8 @@ abstract class Iresults implements IresultsBaseConstants {
 	/**
 	 * Set the static $willDebug to the given flag.
 	 *
-	 * @param	boolean	$flag
-	 * @return	boolean    Returns the former setting
+	 * @param    boolean $flag
+	 * @return    boolean    Returns the former setting
 	 */
 	static public function forceDebug($flag = TRUE) {
 		return static::getSharedInstance()->forceDebug($flag);
@@ -411,7 +447,7 @@ abstract class Iresults implements IresultsBaseConstants {
 	/**
 	 * Returns the environment.
 	 *
-	 * @return	integer|Iresults::ENVIRONMENT    This run's environment
+	 * @return    integer|Iresults::ENVIRONMENT    This run's environment
 	 */
 	static public function getEnvironment() {
 		return static::getSharedInstance()->getEnvironment();
@@ -420,7 +456,7 @@ abstract class Iresults implements IresultsBaseConstants {
 	/**
 	 * Returns the protocol used for the current request.
 	 *
-	 * @return	string    Returns 'http', 'https' or whatever protocol was used for the current request
+	 * @return    string    Returns 'http', 'https' or whatever protocol was used for the current request
 	 */
 	static public function getProtocol() {
 		return static::getSharedInstance()->getProtocol();
@@ -428,8 +464,8 @@ abstract class Iresults implements IresultsBaseConstants {
 
 	/**
 	 * Returns the output format as one of the OUTPUT_FORMAT constants.
-	  *
-	 * @return	string|Iresults::OUTPUT_FORMAT
+	 *
+	 * @return    string|Iresults::OUTPUT_FORMAT
 	 */
 	static public function getOutputFormat() {
 		return static::getSharedInstance()->getOutputFormat();
@@ -438,7 +474,7 @@ abstract class Iresults implements IresultsBaseConstants {
 	/**
 	 * Returns the main framework the Iresults framework is used with.
 	 *
-	 * @return	Iresults::FRAMEWORK|string    The main framework
+	 * @return    Iresults::FRAMEWORK|string    The main framework
 	 */
 	static public function getFramework() {
 		return static::getSharedInstance()->getFramework();
@@ -448,11 +484,12 @@ abstract class Iresults implements IresultsBaseConstants {
 	 * Returns if the current request is a full request (i.e. not an AJAX
 	 * request)
 	 *
-	 * @return	boolean
+	 * @return    boolean
 	 */
 	static public function isFullRequest() {
 		return static::getSharedInstance()->isFullRequest();
 	}
+
 	/**
 	 * @see isFullRequest()
 	 */
@@ -488,8 +525,8 @@ abstract class Iresults implements IresultsBaseConstants {
 	/**
 	 * Returns a description of the given value.
 	 *
-	 * @param	mixed	$value The value to describe
-	 * @return	string    The description text
+	 * @param    mixed $value The value to describe
+	 * @return    string    The description text
 	 */
 	static public function descriptionOfValue($value) {
 		return static::getSharedInstance()->descriptionOfValue($value);
@@ -503,8 +540,8 @@ abstract class Iresults implements IresultsBaseConstants {
 	 * FALSE. If no key is given, the whole configuration array will be
 	 * returned.
 	 *
-	 * @param	string	$key	The key for a configuration entry
-	 * @return	array|mixed	The whole configuration array, or the key's entry or FALSE for an unfound key
+	 * @param    string $key    The key for a configuration entry
+	 * @return    array|mixed    The whole configuration array, or the key's entry or FALSE for an unfound key
 	 */
 	static public function getConfiguration($key = NULL) {
 		return static::getSharedInstance()->getConfiguration($key);
@@ -513,12 +550,13 @@ abstract class Iresults implements IresultsBaseConstants {
 	/**
 	 * Overwrite the configuration at the given key with the new value.
 	 *
-	 * @param	string	$key   The key of the configuration to change
-	 * @param	mixed	$value The new configuration value
-	 * @return	void
+	 * @param    string $key   The key of the configuration to change
+	 * @param    mixed  $value The new configuration value
+	 * @return    void
 	 */
 	static public function setConfiguration($key, $value) {
 		static::getSharedInstance()->setConfiguration($key, $value);
 	}
 }
+
 ?>
