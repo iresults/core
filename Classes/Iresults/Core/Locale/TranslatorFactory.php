@@ -54,7 +54,7 @@ class TranslatorFactory {
 		$translatorClassName = '\\Iresults\\Core\\Locale\\TranslationProvider\\' . ucfirst($translatorSuffix) . 'TranslationProvider';
 
 		if (!class_exists($translatorClassName)) {
-			throw new \UnexpectedValueException('No Translation Provider found for source', 1380804058);
+			throw new \UnexpectedValueException('No Translation Provider found for source "' . $sourcePath . '"', 1380804058);
 		}
 		/** @var TranslationProviderInterface $translatorInstance */
 		$translatorInstance = new $translatorClassName($package);
