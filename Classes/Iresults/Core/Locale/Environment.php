@@ -89,16 +89,40 @@ class Environment {
 	/**
 	 * Invokes the given callable with the locale temporary set
 	 *
-	 * @param string $locale
-	 * @param \Closure $callable
+	 * If an array is given as callable it has to be in one of the following
+	 * formats:
+	 *
+	 * 	array(
+	 * 		'functionName',
+	 * 		array($arg0, $arg1, ... $argN) // Optional
+	 * 	)
+	 *
+	 * 	array(
+	 * 		array($object, 'methodName'),
+	 * 		array($arg0, $arg1, ... $argN) // Optional
+	 * 	)
+	 *
+	 * The callable array will be invoked through call_
+	 *
+	 * @param string $locale The temporary locale to use
+	 * @param \Closure|array $callable The callable code
 	 * @return mixed Returns the invocations result
 	 */
-	public function invokeWithTemporaryLocale($locale, $callable) {
+	public function executeWithLocale($locale, $callable) {
 		// Set the temporary locale
 		$oldLocale = $this->getLocale();
 		$this->setLocale($locale);
 
-		$result = $callable();
+		// Check if the callable is an array
+		if (is_array($callable)) {
+			if (count($callable) > 1) {
+				$result = call_user_func_array($callable[0], $callable[1]);
+			} else {
+				$result = call_user_func($callable[0]);
+			}
+		} else {
+			$result = $callable();
+		}
 
 		// Reset the locale
 		$this->setLocale($oldLocale);

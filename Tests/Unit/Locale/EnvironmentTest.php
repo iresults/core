@@ -80,11 +80,11 @@ class EnvironmentTest extends \PHPUnit_Framework_TestCase {
 	/**
 	 * @test
 	 */
-	public function invokeWithTemporaryLocaleTest(){
+	public function executeWithLocaleAndCallableTest(){
 //		$newLocale = 'ne_NP.UTF-8';
 		$newLocale = 'de_DE.UTF-8';
 
-		$result = Environment::getSharedInstance()->invokeWithTemporaryLocale($newLocale,
+		$result = Environment::getSharedInstance()->executeWithLocale($newLocale,
 			function () {
 				return setlocale(LC_CTYPE, '0');
 			}
@@ -92,6 +92,49 @@ class EnvironmentTest extends \PHPUnit_Framework_TestCase {
 		$this->assertEquals($newLocale, $result);
 		$this->assertEquals(self::$systemLocale, Environment::getSharedInstance()->getLocale());
 		$this->assertEquals(self::$systemLocale, setlocale(LC_CTYPE, '0'));
+	}
+
+	/**
+	 * @test
+	 */
+	public function executeWithLocaleAndArrayWithoutArgumentsTest(){
+//		$newLocale = 'ne_NP.UTF-8';
+		$newLocale = 'de_DE.UTF-8';
+
+		$result = Environment::getSharedInstance()->executeWithLocale($newLocale,
+			array(
+				array($this, 'functionWithoutArguments')
+			)
+		);
+		$this->assertEquals($newLocale, $result);
+		$this->assertEquals(self::$systemLocale, Environment::getSharedInstance()->getLocale());
+		$this->assertEquals(self::$systemLocale, setlocale(LC_CTYPE, '0'));
+	}
+
+	/**
+	 * @test
+	 */
+	public function executeWithLocaleAndArrayWithArgumentsTest(){
+//		$newLocale = 'ne_NP.UTF-8';
+		$newLocale = 'de_DE.UTF-8';
+
+		$result = Environment::getSharedInstance()->executeWithLocale($newLocale,
+			array(
+				array($this, 'functionWithArguments'),
+				array('My current locale: ')
+			)
+		);
+		$this->assertEquals('My current locale: ' . $newLocale, $result);
+		$this->assertEquals(self::$systemLocale, Environment::getSharedInstance()->getLocale());
+		$this->assertEquals(self::$systemLocale, setlocale(LC_CTYPE, '0'));
+	}
+
+	public function functionWithoutArguments() {
+		return setlocale(LC_CTYPE, '0');
+	}
+	public function functionWithArguments($arg0) {
+		return $arg0 . setlocale(LC_CTYPE, '0');
+
 	}
 }
 ?>
