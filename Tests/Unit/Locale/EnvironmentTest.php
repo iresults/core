@@ -69,11 +69,29 @@ class EnvironmentTest extends \PHPUnit_Framework_TestCase {
 	 * @test
 	 */
 	public function setLocaleTest(){
+//		$newLocale = 'ne_NP.UTF-8';
 		$newLocale = 'de_DE.UTF-8';
 
 		Environment::getSharedInstance()->setLocale($newLocale);
 		$this->assertEquals($newLocale, Environment::getSharedInstance()->getLocale());
 		$this->assertEquals($newLocale, setlocale(LC_CTYPE, '0'));
+	}
+
+	/**
+	 * @test
+	 */
+	public function invokeWithTemporaryLocaleTest(){
+//		$newLocale = 'ne_NP.UTF-8';
+		$newLocale = 'de_DE.UTF-8';
+
+		$result = Environment::getSharedInstance()->invokeWithTemporaryLocale($newLocale,
+			function () {
+				return setlocale(LC_CTYPE, '0');
+			}
+		);
+		$this->assertEquals($newLocale, $result);
+		$this->assertEquals(self::$systemLocale, Environment::getSharedInstance()->getLocale());
+		$this->assertEquals(self::$systemLocale, setlocale(LC_CTYPE, '0'));
 	}
 }
 ?>

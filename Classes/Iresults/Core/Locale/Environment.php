@@ -87,6 +87,25 @@ class Environment {
 	}
 
 	/**
+	 * Invokes the given callable with the locale temporary set
+	 *
+	 * @param string $locale
+	 * @param \Closure $callable
+	 * @return mixed Returns the invocations result
+	 */
+	public function invokeWithTemporaryLocale($locale, $callable) {
+		// Set the temporary locale
+		$oldLocale = $this->getLocale();
+		$this->setLocale($locale);
+
+		$result = $callable();
+
+		// Reset the locale
+		$this->setLocale($oldLocale);
+		return $result;
+	}
+
+	/**
 	 * Returns the shared instance
 	 *
 	 * @return Environment
