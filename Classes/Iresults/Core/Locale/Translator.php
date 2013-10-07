@@ -48,6 +48,13 @@ class Translator implements TranslatorInterface {
 	protected $translationProviderCollection;
 
 	/**
+	 * Sets the locale this Translator is bound to
+	 *
+	 * @var string
+	 */
+	protected $boundLocale = '';
+
+	/**
 	 * Initialize a new Translator
 	 *
 	 * @param TranslationProviderInterface $translationProvider
@@ -106,6 +113,38 @@ class Translator implements TranslatorInterface {
 	 * @param \Iresults\Core\Locale\TranslationProviderInterface $translationProvider
 	 */
 	public function addTranslationProvider($translationProvider) {
+		if ($this->getBoundLocale()) {
+			$translationProvider->setLocale($this->getBoundLocale());
+		}
 		$this->translationProviderCollection[] = $translationProvider;
 	}
+
+	/**
+	 * Sets the locale this Translator is bound to
+	 *
+	 * This method is used to "lock" the Translator (and it's Translation
+	 * Providers) to the given locale. If it isn't set, the objects will read
+	 * the locale from \Locale\Environment
+	 *
+	 * @param string $locale
+	 */
+	public function bindToLocale($locale) {
+		$this->boundLocale = $locale;
+
+		/** @var TranslationProviderInterface $translationProvider */
+		foreach ($this->getTranslationProviderCollection() as $translationProvider) {
+			$translationProvider->setLocale($locale);
+		}
+	}
+
+	/**
+	 * Returns the locale this Translator is bound to
+	 *
+	 * @return string
+	 */
+	public function getBoundLocale() {
+		return $this->boundLocale;
+	}
+
+
 }

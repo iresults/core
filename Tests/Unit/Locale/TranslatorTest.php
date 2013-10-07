@@ -24,6 +24,7 @@ namespace Iresults\Core\Tests\Locale;
  * SOFTWARE.
  */
 
+use Iresults\Core\Locale\Environment;
 use Iresults\Core\Locale\TranslatorFactory;
 
 require_once __DIR__ . '/../Autoloader.php';
@@ -41,10 +42,16 @@ require_once __DIR__ . '/../Autoloader.php';
  * @author Daniel Corn <cod@iresults.li>
  */
 class TranslatorTest extends \PHPUnit_Framework_TestCase {
+	static protected $systemLocale;
+
 	public function setUp() {
+		if (!self::$systemLocale) {
+			self::$systemLocale = Environment::getSharedInstance()->getLocale();
+		}
 	}
 
 	public function tearDown() {
+		Environment::getSharedInstance()->setLocale(self::$systemLocale);
 	}
 
 	/**
@@ -64,6 +71,8 @@ class TranslatorTest extends \PHPUnit_Framework_TestCase {
 		$translatedMessage = 'Ein einfacher übersetzter Text';
 		$translator = TranslatorFactory::translatorWithSource(__DIR__ . '/');
 		$this->assertEquals($translatedMessage, $translator->translate($originalMessage, NULL, 'de_DE'));
+
+		$this->assertEquals($originalMessage, $translator->translate($originalMessage));
 	}
 
 	/**
@@ -93,6 +102,32 @@ class TranslatorTest extends \PHPUnit_Framework_TestCase {
 		$translatedMessage = 'Mein Name ist Daniel';
 		$translator = TranslatorFactory::translatorWithSource(__DIR__ . '/');
 		$this->assertEquals($translatedMessage, $translator->translate($originalMessage, array('Daniel'), 'de_DE.UTF-8'));
+	}
+
+	/**
+	 * @test
+	 */
+	public function getTranslatedMessageWithEnvironmentLocaleTest(){
+		$originalMessage = 'A simple translated string';
+		$translatedMessage = 'Ein einfacher übersetzter Text';
+		$translator = TranslatorFactory::translatorWithSource(__DIR__ . '/');
+		$this->assertEquals($originalMessage, $translator->translate($originalMessage));
+
+		Environment::getSharedInstance()->setLocale('de_DE.UTF-8');
+		$this->assertEquals($translatedMessage, $translator->translate($originalMessage));
+	}
+
+	/**
+	 * @test
+	 */
+	public function getPerTranslatedMessageWithEnvironmentLocaleTest(){
+		$originalMessage = 'A simple translated string';
+		$translatedMessage = 'Ein einfacher übersetzter Text';
+		$translator = TranslatorFactory::translatorWithSource(__DIR__ . '/');
+		$this->assertEquals($originalMessage, $translator->translate($originalMessage));
+
+		Environment::getSharedInstance()->setLocale('de_DE.UTF-8');
+		$this->assertEquals($translatedMessage, $translator->translate($originalMessage));
 	}
 }
 ?>

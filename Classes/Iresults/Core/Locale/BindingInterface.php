@@ -26,26 +26,30 @@
 
 /**
  * @author COD
- * Created 02.10.13 14:01
+ * Created 07.10.13 13:21
  */
 
 
 namespace Iresults\Core\Locale;
 
 /**
- * Interface for a Translator utilizing a Translation Provider to retrieve
- * translated messages
+ * Defines a common interface for class instances that can be bound to a specific
+ * locale
  *
  * @package Iresults\Core\Locale
  */
-interface TranslatorInterface extends BindingInterface {
+interface BindingInterface {
 	/**
-	 * Translates the given message
+	 * Binds the instance to the given locale
 	 *
-	 * @param string $message         The message to translate
-	 * @param array  $arguments       Arguments to be used in the message
-	 * @param string $locale          Locale to use for this translation
+	 * @param string $locale
+	 */
+	public function bindToLocale($locale);
+
+	/**
+	 * Returns the locale this instance is bound to
+	 *
 	 * @return string
 	 */
-	public function translate($message, $arguments = NULL, $locale = NULL);
+	public function getBoundLocale();
 }

@@ -70,7 +70,6 @@ abstract class AbstractTranslationProvider implements TranslationProviderInterfa
 	 */
 	function __construct($package = self::PACKAGE_DEFAULT) {
 		$this->package = $package;
-		$this->locale = Environment::getSharedInstance()->getLocale();
 	}
 
 	/**
@@ -80,7 +79,7 @@ abstract class AbstractTranslationProvider implements TranslationProviderInterfa
 	 */
 	public function getLocale() {
 		if (!$this->locale) {
-			$this->locale = Environment::getSharedInstance()->getLocale();
+			return Environment::getSharedInstance()->getLocale();
 		}
 		return $this->locale;
 	}
@@ -109,7 +108,6 @@ abstract class AbstractTranslationProvider implements TranslationProviderInterfa
 		// Set the environment to the temporary locale
 		if ($locale !== NULL) {
 			$previousLocale = $this->getLocale();
-			$this->setLocale($locale);
 			$this->setEnvironment($locale);
 		}
 
