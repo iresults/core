@@ -40,7 +40,7 @@ namespace Iresults\Core\Locale;
  *
  * @package Iresults\Core\Locale
  */
-interface TranslationProviderInterface {
+interface TranslationProviderInterface extends BindingInterface {
 	/**
 	 * Language default key
 	 */
@@ -54,21 +54,6 @@ interface TranslationProviderInterface {
 	 * @return string
 	 */
 	public function translate($message, $locale = NULL);
-
-	/**
-	 * Defines the locale to use for translation
-	 *
-	 * @param string $locale
-	 * @return $this
-	 */
-	public function setLocale($locale);
-
-	/**
-	 * Returns the locale to use for translation
-	 *
-	 * @return string
-	 */
-	public function getLocale();
 
 	/**
 	 * Sets the source to read the translations from

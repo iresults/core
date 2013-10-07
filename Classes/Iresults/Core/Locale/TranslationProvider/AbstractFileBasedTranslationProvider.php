@@ -100,7 +100,7 @@ abstract class AbstractFileBasedTranslationProvider extends AbstractTranslationP
 	 * @return array
 	 */
 	public function getTranslations() {
-		$locale = $this->getLocale();
+		$locale = $this->getBoundLocale();
 		$package = $this->getPackage();
 		$suffix = $this->translationFileSuffix;
 		if (!isset(static::$translations[$suffix])
@@ -118,7 +118,7 @@ abstract class AbstractFileBasedTranslationProvider extends AbstractTranslationP
 	 */
 	protected function loadTranslations() {
 		$package = $this->getPackage();
-		$locale = $this->getLocale();
+		$locale = $this->getBoundLocale();
 		$suffix = $this->translationFileSuffix;
 		$packageTranslations = $this->parseTranslationFile($this->getTranslationFilePath());
 
@@ -139,7 +139,7 @@ abstract class AbstractFileBasedTranslationProvider extends AbstractTranslationP
 	 * @return string
 	 */
 	protected function getTranslationFilePath() {
-		$currentLocale = $this->getLocale();
+		$currentLocale = $this->getBoundLocale();
 
 		// The current locale may be in the format "de_DE.UTF-8"
 		$filePrefix = explode('.', $currentLocale);

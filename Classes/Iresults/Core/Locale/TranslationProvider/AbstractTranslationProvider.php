@@ -48,7 +48,7 @@ abstract class AbstractTranslationProvider implements TranslationProviderInterfa
 	 *
 	 * @var string
 	 */
-	protected $locale = '';
+	protected $boundLocale = '';
 
 	/**
 	 * The current package name
@@ -77,11 +77,11 @@ abstract class AbstractTranslationProvider implements TranslationProviderInterfa
 	 *
 	 * @return string
 	 */
-	public function getLocale() {
-		if (!$this->locale) {
+	public function getBoundLocale() {
+		if (!$this->boundLocale) {
 			return Environment::getSharedInstance()->getLocale();
 		}
-		return $this->locale;
+		return $this->boundLocale;
 	}
 
 	/**
@@ -90,8 +90,8 @@ abstract class AbstractTranslationProvider implements TranslationProviderInterfa
 	 * @param string $locale
 	 * @return $this
 	 */
-	public function setLocale($locale) {
-		$this->locale = $locale;
+	public function bindToLocale($locale) {
+		$this->boundLocale = $locale;
 		return $this;
 	}
 
@@ -107,7 +107,7 @@ abstract class AbstractTranslationProvider implements TranslationProviderInterfa
 
 		// Set the environment to the temporary locale
 		if ($locale !== NULL) {
-			$previousLocale = $this->getLocale();
+			$previousLocale = $this->getBoundLocale();
 			$this->setEnvironment($locale);
 		}
 

@@ -43,6 +43,7 @@ interface BindingInterface {
 	 * Binds the instance to the given locale
 	 *
 	 * @param string $locale
+	 * @return $this
 	 */
 	public function bindToLocale($locale);
 

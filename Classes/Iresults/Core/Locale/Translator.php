@@ -114,7 +114,7 @@ class Translator implements TranslatorInterface {
 	 */
 	public function addTranslationProvider($translationProvider) {
 		if ($this->getBoundLocale()) {
-			$translationProvider->setLocale($this->getBoundLocale());
+			$translationProvider->bindToLocale($this->getBoundLocale());
 		}
 		$this->translationProviderCollection[] = $translationProvider;
 	}
@@ -127,14 +127,16 @@ class Translator implements TranslatorInterface {
 	 * the locale from \Locale\Environment
 	 *
 	 * @param string $locale
+	 * @return $this
 	 */
 	public function bindToLocale($locale) {
 		$this->boundLocale = $locale;
 
 		/** @var TranslationProviderInterface $translationProvider */
 		foreach ($this->getTranslationProviderCollection() as $translationProvider) {
-			$translationProvider->setLocale($locale);
+			$translationProvider->bindToLocale($locale);
 		}
+		return $this;
 	}
 
 	/**

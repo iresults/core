@@ -120,14 +120,24 @@ class TranslatorTest extends \PHPUnit_Framework_TestCase {
 	/**
 	 * @test
 	 */
-	public function getPerTranslatedMessageWithEnvironmentLocaleTest(){
+	public function localeBindingTest(){
 		$originalMessage = 'A simple translated string';
 		$translatedMessage = 'Ein einfacher übersetzter Text';
 		$translator = TranslatorFactory::translatorWithSource(__DIR__ . '/');
 		$this->assertEquals($originalMessage, $translator->translate($originalMessage));
 
-		Environment::getSharedInstance()->setLocale('de_DE.UTF-8');
+		// Set de_DE
+		$translator->bindToLocale('de_DE.UTF-8');
 		$this->assertEquals($translatedMessage, $translator->translate($originalMessage));
+
+		// Still de_DE
+		Environment::getSharedInstance()->setLocale('en_US');
+		$this->assertEquals($translatedMessage, $translator->translate($originalMessage));
+
+		// Set to en_US
+		$translator->bindToLocale('en_US');
+		$this->assertEquals($originalMessage, $translator->translate($originalMessage));
+
 	}
 }
 ?>
