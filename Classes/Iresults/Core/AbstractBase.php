@@ -128,7 +128,7 @@ abstract class AbstractBase implements IresultsBaseInterface {
 			ini_set('display_errors', 1);
 			#error_reporting(E_ALL);
 
-			set_exception_handler(array(__CLASS__, 'handleException'));
+			set_exception_handler(array($this, 'handleException'));
 		}
 
 		/*
