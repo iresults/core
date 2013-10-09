@@ -287,6 +287,7 @@ abstract class Iresults implements IresultsBaseConstants {
 
 	/**
 	 * @see getNameOfCallingPackage()
+	 * @deprecated since 3.1 use getNameOfCallingPackage()
 	 */
 	static public function getNameOfCallingExtension($lowerCaseUnderscored = FALSE) {
 		return static::getNameOfCallingPackage($lowerCaseUnderscored);
