@@ -252,7 +252,7 @@ abstract class Iresults implements IresultsBaseConstants {
 	}
 
 	/**
-	 * Returns the URL to the given package's resources
+	 * Returns the URL to the given package's directory
 	 *
 	 * @param string $package Package name
 	 * @return string
