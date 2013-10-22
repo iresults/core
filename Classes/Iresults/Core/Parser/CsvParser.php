@@ -47,33 +47,34 @@ class CsvParser extends AbstractParser {
 	 * @throws ParserInvalidInputException if the input could not be parsed
 	 */
 	public function parse($input) {
-		$line = 0;
 		$data = NULL;
 		$parsedData = array();
 		$lineString = NULL;
 		$oldIniValue = ini_set('auto_detect_line_endings', TRUE);
-		$delimiter = FALSE;
-		$enclosure = FALSE;
-		$escape = FALSE;
-		static $maxLines = 100000;
 
-		$fh = @fopen($input, 'r');
-		if ($fh === FALSE) {
+		$fileHandle = @fopen($input, 'r');
+		if ($fileHandle === FALSE) {
 			throw new ParserInvalidInputException('Could not load CSV file from "' . $input . '".', 1315232117);
 		}
 
+		$firstTwoLines = fgets($fileHandle) . fgets($fileHandle);
+		list($delimiter, $enclosure, $escape) = $this->autoDetectMissingParserConfiguration($firstTwoLines);	rewind($fileHandle);
+
 		/*
-		 * Use str_getcsv() if it is available, because fgetcsv() doesn't
-		 * seem to work with CSV-lines without enclosure.
+		 * fgetcsv() can handle multi line cells, but does not work without an
+		 * enclosure
 		 */
-		while (($lineString = fgets($fh)) !== FALSE && $line++ < $maxLines) {
-			if (!$delimiter) {
-				list($delimiter, $enclosure, $escape) = $this->autoDetectMissingParserConfiguration($lineString);
+		if ($enclosure) {
+			while (($data = fgetcsv($fileHandle, 10000, $delimiter, $enclosure, $escape)) !== FALSE) {
+				$parsedData[] = $data;
 			}
-			$data = str_getcsv($lineString, $delimiter, $enclosure, $escape);
-			$parsedData[] = $data;
+		} else {
+			while (($lineString = fgets($fileHandle)) !== FALSE) {
+				$data = str_getcsv($lineString, $delimiter, $enclosure, $escape);
+				$parsedData[] = $data;
+			}
 		}
-		fclose($fh);
+		fclose($fileHandle);
 		ini_set('auto_detect_line_endings', $oldIniValue);
 
 		return $parsedData;

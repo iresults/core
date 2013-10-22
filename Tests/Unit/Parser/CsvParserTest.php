@@ -176,4 +176,29 @@ class CsvParserTest extends \PHPUnit_Framework_TestCase {
 			array('14',	'Sunday',		'Afternoon',	'2:00'),
 		), $result);
 	}
+
+	/**
+	 * @test
+	 */
+	public function parseFile6Test() {
+		$filePath = __DIR__ . '/../SampleData/csv-example-6.csv';
+		$result = $this->fixture->parse($filePath);
+
+		$this->assertEquals(array(
+			array('01',	"Monday\nMorning",		'2:00'),
+			array('02',	"Monday\nAfternoon",	'2:00'),
+			array('03',	"Tuesday\nMorning",		'2:00'),
+			array('04',	"Tuesday\nAfternoon",	'2:00'),
+			array('05',	"Wednesday\nMorning",	'2:00'),
+			array('06',	"Wednesday\nAfternoon",	'2:00'),
+			array('07',	"Thursday\nMorning",	'2:00'),
+			array('08',	"Thursday\nAfternoon",	'2:00'),
+			array('09',	"Friday\nMorning",		'2:00'),
+			array('10',	"Friday\nAfternoon",	'2:00'),
+			array('11',	"Saturday\nMorning",	'2:00'),
+			array('12',	"Saturday\nAfternoon",	'2:00'),
+			array('13',	"Sunday\nMorning",		'2:00'),
+			array('14',	"Sunday\nAfternoon",	'2:00'),
+		), $result);
+	}
 }
