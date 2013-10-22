@@ -125,4 +125,13 @@ class DataGridTest extends \PHPUnit_Framework_TestCase {
 			$this->assertEquals(array((object)array('row' => $i, 'column' => 0)), $position);
 		}
 	}
+
+	/**
+	 * @test
+	 */
+	public function gridWithContentsOfCsv() {
+		$filePath = __DIR__ . '/../../SampleData/csv-example-1.csv';
+		$grid = DataGrid::gridWithContentsOfUrl($filePath);
+
+	}
 }

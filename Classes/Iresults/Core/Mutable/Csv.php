@@ -49,7 +49,7 @@ class Csv extends \Iresults\Core\Mutable {
 	/* INITIALIZATION        MWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWM */
 	/* MWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWM */
 	/**
-	 * Initialize the instance with the contents of the given URL.
+	 * Initialize the instance with the contents of the given URL
 	 *
 	 * @param	string	$url Path to the XML file
 	 * @return	\Iresults\Core\Mutable\Xml
@@ -60,10 +60,10 @@ class Csv extends \Iresults\Core\Mutable {
 
 	/**
 	 * Initializes the object with the contents from the CSV file at the given
-	 * path.
+	 * path
 	 *
 	 * @param	string	$filePath  The path to the file to load data from
-	 * @param	string	$delimiter	," The CSV field delimiter
+	 * @param	string	$delimiter	The CSV field delimiter
 	 * @param	string	$enclosure The CSV field enclosure character
 	 * @param	string	$escape	\" The CSV files escape character
 	 * @return	\Iresults\Core\Mutable\Csv   Returns the initialized object

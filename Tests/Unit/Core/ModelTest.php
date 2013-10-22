@@ -89,7 +89,7 @@ class Person extends \Iresults\Core\Model {
  */
 class ModelTest extends \PHPUnit_Framework_TestCase {
 	/**
-	 * @var Iresults_FakeObject
+	 * @var Person
 	 */
 	protected $fixture;
 

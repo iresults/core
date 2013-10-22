@@ -178,42 +178,23 @@ class DataGrid extends Core implements \Iterator, \ArrayAccess {
 	 * @param	string	$enclosure The CSV field enclosure character
 	 * @param	string	$escape	\" The CSV files escape character
 	 * @return	\Iresults\Core\Model\DataGrid    Returns the initialized object
-	 * @throws \UnexpectedValueException
-	 * @throws \LengthException
 	 */
 	public function initWithContentsOfCSVFile($filePath, $delimiter = ',', $enclosure = '"', $escape = '\\') {
-		$line = 0;
-		$data = NULL;
-		$grid = array();
-		$lineString = NULL;
-		$oldIniValue = FALSE;
-
-		static $maxLines = 100000;
-
-		$oldIniValue = ini_set('auto_detect_line_endings', TRUE);
-
-		$fh = fopen($filePath, 'r');
-		if ($fh === FALSE) {
-			throw new \UnexpectedValueException('Couldn\'t load CSV file from "' . $filePath . '".', 1315232117);
+		$csvParser = new \Iresults\Core\Parser\CsvParser();
+		$csvParserConfiguration = array();
+		$numberOfArguments = func_num_args();
+		switch (TRUE) {
+			case $numberOfArguments > 3:
+				$csvParserConfiguration['escape'] = $escape;
+			case $numberOfArguments > 2:
+				$csvParserConfiguration['delimiter'] = $delimiter;
+			case $numberOfArguments > 1:
+				$csvParserConfiguration['enclosure'] = $enclosure;
+			default;
 		}
+		$csvParser->setConfiguration($csvParserConfiguration);
 
-		/*
-		 * Use str_getcsv() if it is available, because fgetcsv() doesn't
-		 * seem to work with CSV-lines without enclosure.
-		 */
-		while (($lineString = fgets($fh)) !== FALSE && $line++ < $maxLines) {
-			$data = str_getcsv($lineString, $delimiter, $enclosure, $escape);
-			$grid[] = $data;
-		}
-
-		if (!feof($fh)) {
-			throw new \LengthException('Unexpected end of line when reading CSV import file.', 1326274982);
-		}
-
-		fclose($fh);
-		ini_set('auto_detect_line_endings', $oldIniValue);
-
-		$this->data = $grid;
+		$this->data = $csvParser->parse($filePath);
 		$this->_markAsDirty();
 		return $this;
 	}

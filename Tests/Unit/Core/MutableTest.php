@@ -40,7 +40,7 @@ require_once __DIR__ . '/../Autoloader.php';
  */
 class MutableTest extends \PHPUnit_Framework_TestCase {
 	/**
-	 * @var Iresults_FakeObject
+	 * @var \Iresults\Core\Mutable
 	 */
 	protected $fixture;
 

@@ -1,4 +1,5 @@
 <?php
+namespace Iresults\Core\Tests;
 
 /*
  * The MIT License (MIT)
