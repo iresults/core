@@ -303,6 +303,54 @@ class DataTree extends \Iresults\Core\Model\PathAccess\AbstractContainer impleme
 	}
 
 	/**
+	 * Returns the child objects at the given path recursive, with the callback invoked for each found node
+	 *
+	 * Example:
+	 *
+	 *                Root
+	 *                 |
+	 *          0-------------(1)                  __________ Level 0 __
+	 *          |              |
+	 *         0.0   [1.0]---[1.1]---[1.2]         __________ Level 1 __
+	 *                 |               |
+	 *              [1.0.0]    [1.2.0]---[1.2.1]   __________ Level 2 __
+	 *
+	 *
+	 * The path 1 would return the objects in square brackets on Level 1 and all
+	 * their children.
+	 *
+	 * @param	string	$path The path to the parent object
+	 * @param	callable $callback The callable that will be invoked with the found object as argument see getChildObjectsAtPathRecursiveExampleCallback()
+	 * @return	array<array<...>>    An array of arrays of objects
+	 */
+	public function getChildObjectsAtPathRecursiveWithCallback($path, $callback) {
+		$returnArray = array();
+		$path = $path . $this->pathSeparator . '*';
+		$foundObjects = $this->findAllObjectsWithPathsMatchingPattern($path);
+		foreach ($foundObjects as $foundPath => $foundObject) {
+			$returnArray[$foundPath] = $callback($foundObject, $foundPath, $callback, $this);
+		}
+		return $returnArray;
+	}
+
+	/**
+	 * An example callback for getChildObjectsAtPathRecursiveWithCallback()
+	 *
+	 * @param mixed    $foundObject The node
+	 * @param string   $foundPath   The found path
+	 * @param callable $callback    The original callback
+	 * @param DataTree $treeObject	The data tree instance
+	 * @return mixed
+	 */
+	public function getChildObjectsAtPathRecursiveExampleCallback($foundObject, $foundPath, $callback, $treeObject) {
+		$currentObjectArray = array();
+		$currentObjectArray['obj'] = $foundObject;
+		$currentObjectArray['path'] = $foundPath;
+		$currentObjectArray['children'] = $treeObject->getChildObjectsAtPathRecursiveWithCallback($foundPath, $callback);
+		return $currentObjectArray;
+	}
+
+	/**
 	 * Adds a child object to the object at the given path.
 	 *
 	 * Example:
@@ -327,14 +375,14 @@ class DataTree extends \Iresults\Core\Model\PathAccess\AbstractContainer impleme
 		$lastNodeId = -1;
 
 		if (!$this->hasObjectAtPath($path)) {
-			throw new \Iresults\Core\Model\PathAccess\Exception\EntryNotFound("No object exists at the tree path $path.", 1321368357);
+			throw new \Iresults\Core\Model\PathAccess\Exception\EntryNotFound('No object exists at the tree path ' . $path, 1321368357);
 		}
 
 		/*
 		 * Search the current children of the given path and get the ID that
 		 * the given object will have.
 		 */
-		$foundPaths = $this->findAllPathsMatchingPattern($path . $this->pathSeparator . '*');
+		$foundPaths = $this->findAllPathsWithPrefix($path);
 		$foundPaths = array_values($foundPaths);
 		$foundPathsCount = count($foundPaths);
 		$nodeIdLength = strlen($this->pathSeparator) + strlen($path);
@@ -559,7 +607,7 @@ class DataTree extends \Iresults\Core\Model\PathAccess\AbstractContainer impleme
 			 * property key and value) add an error to the errors array.
 			 */
 			if (empty($childrenWithMatchingProperty)) {
-				$userInfo = array('child' => $currentChild, 'children' => $children, 'propertyValue' => $currentValue, 'propertyKey' => $propertyKey, 'level' => $loopNumber);
+				$userInfo = array('child' => $currentValue, 'children' => $children, 'propertyValue' => $currentValue, 'propertyKey' => $propertyKey, 'level' => $loopNumber);
 				$message = '';
 				if (is_scalar($currentValue)) {
 					$message = "No children found matching the property key '$propertyKey' and value '$currentValue' of the current child at loop number $loopNumber.";

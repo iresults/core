@@ -68,6 +68,11 @@ interface IresultsBaseConstants {
 	 */
 	const RENDERER_IRESULTS_DEBUG = 4;
 
+	/**
+	 * Render the variable information inside pd using the class Kint (http://raveren.github.io/kint/)
+	 */
+	const RENDERER_KINT = 5;
+
 
 	/**
 	 * The different environment constants for web and shell or CLI.

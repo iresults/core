@@ -337,33 +337,63 @@ abstract class AbstractBase implements IresultsBaseInterface {
 			ob_start();
 		}
 
-		// Output the dumps
-		if ($printTags) {
-			if ($printAnchor) {
-				echo '<a href="#ir_debug_anchor_bottom_' . $counter . '" name="ir_debug_anchor_top_' . $counter . '" style="background:#555;color:#fff;font-size:0.6em;">&gt; bottom</a>';
-			}
-			echo '<div class="ir_debug_container" style="text-align:left;"><pre class="ir_debug">';
-		}
+
 		$args = func_get_args();
-		foreach ($args as $var) {
-			if ($var !== '__iresults_pd_noValue') {
-				if (self::$_renderer == self::RENDERER_ZEND_DEBUG && class_exists('\\Zend_Debug', FALSE)) {
-					\Zend_Debug::dump($var);
-				} else if (self::$_renderer === self::RENDERER_VAR_DUMP) {
-					var_dump($var);
-				} else if (self::$_renderer === self::RENDERER_VAR_EXPORT) {
-					var_export($var);
-					echo PHP_EOL;
-				} else if (self::$_renderer === self::RENDERER_IRESULTS_DEBUG) {
-					$debug = new \Iresults\Core\Debug($var);
-					if ($printTags) {
-						echo '<span style="font-size:1.1em;line-height:1.6em;">' . $debug . '</span>';
-					} else {
-						echo $debug;
+
+		/** @var bool $isFullDebugRenderer */
+		$isFullDebugRenderer = (self::$_renderer === self::RENDERER_KINT);
+		if ($isFullDebugRenderer) {
+			switch (self::$_renderer) {
+				case self::RENDERER_KINT:
+					call_user_func_array(array('Kint', 'dump'), $args);
+					break;
+			}
+		}
+
+		// If the debug renderer provides all information don't step into below
+		if (!$isFullDebugRenderer) {
+
+			// Output the dumps
+			if ($printTags) {
+				if ($printAnchor) {
+					echo '<a href="#ir_debug_anchor_bottom_' . $counter . '" name="ir_debug_anchor_top_' . $counter . '" style="background:#555;color:#fff;font-size:0.6em;">&gt; bottom</a>';
+				}
+				echo '<div class="ir_debug_container" style="text-align:left;"><pre class="ir_debug">';
+			}
+
+			foreach ($args as $var) {
+				if ($var !== '__iresults_pd_noValue') {
+					switch (self::$_renderer) {
+						case self::RENDERER_ZEND_DEBUG:
+							\Zend_Debug::dump($var);
+							break;
+
+						case self::RENDERER_KINT:
+							\Kint::dump($var);
+							break;
+
+						case self::RENDERER_VAR_DUMP:
+							var_dump($var);
+							break;
+
+						case self::RENDERER_VAR_EXPORT:
+							var_export($var);
+							echo PHP_EOL;
+							break;
+
+						case self::RENDERER_IRESULTS_DEBUG:
+							$debug = new \Iresults\Core\Debug($var);
+							if ($printTags) {
+								echo '<span style="font-size:1.1em;line-height:1.6em;">' . $debug . '</span>';
+							} else {
+								echo $debug;
+							}
+							unset($debug);
+							break;
+
+						case self::RENDERER_NONE:
+						default:
 					}
-					unset($debug);
-				} else if (self::$_renderer === self::RENDERER_NONE) {
-				} else {
 				}
 			}
 		}
@@ -410,7 +440,7 @@ abstract class AbstractBase implements IresultsBaseInterface {
 
 			$file = str_replace($scriptDir, '', @$backtrace[$i]['file']);
 			if ($printTags) {
-				echo '<span style="font-size:0.8em"><a href="file://' . @$backtrace[$i]['file'] . '" target="_blank">' . $file . ' @ ' . @$backtrace[$i]['line'] . '</a></span>';
+				echo '<span style="font-size:0.7em;font-family:Menlo,monospace"><a href="file://' . @$backtrace[$i]['file'] . '" target="_blank">' . $file . ' @ ' . @$backtrace[$i]['line'] . '</a></span>';
 			} else if ($outputHandling < 2) {
 				echo "\033[0;35m" . $file . ' @ ' . @$backtrace[$i]['line'] . "\033[0m" . PHP_EOL;
 			} else {
@@ -418,7 +448,7 @@ abstract class AbstractBase implements IresultsBaseInterface {
 			}
 		}
 
-		if ($printTags) {
+		if ($printTags && !$isFullDebugRenderer) {
 			echo '</pre></div>';
 			if ($printAnchor) {
 				echo '<a href="#ir_debug_anchor_top_' . $counter . '" name="ir_debug_anchor_bottom_' . $counter . '" style="background:#555;color:#fff;font-size:0.6em;">&gt; top</a><br />';

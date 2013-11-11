@@ -39,7 +39,7 @@ class DateTime extends \DateTime {
 	const THROW_EXCEPTION_ON_BAD_INPUT = 0;
 
 	/**
-	 * If the input year is not clearly defined, this treshold is used to choose
+	 * If the input year is not clearly defined, this threshold is used to choose
 	 * if a year belongs to the 19th or 20th century.
 	 * Example:
 	 * $input = 14
@@ -65,8 +65,9 @@ class DateTime extends \DateTime {
 	/**
 	 * Constructor for a new DateTime object
 	 *
-	 * @param	string|DateTime $dateTime
-	 * @return	\Iresults\Core\DateTime
+	 * @param string|DateTime $dateTime
+	 * @throws \Exception if the input could not be transformed
+	 * @return \Iresults\Core\DateTime
 	 */
 	public function __construct($dateTime = NULL) {
 		// If a argument is given try to parse it as a DateTime object
@@ -93,7 +94,7 @@ class DateTime extends \DateTime {
 				$dateTime = $this->_prepareInput($dateTime);
 				try {
 					parent::__construct($dateTime);
-				} catch (Exception $exception) {
+				} catch (\Exception $exception) {
 					if (self::THROW_EXCEPTION_ON_BAD_INPUT) {
 						throw $exception;
 					}

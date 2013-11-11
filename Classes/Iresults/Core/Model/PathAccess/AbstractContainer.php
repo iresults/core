@@ -23,10 +23,8 @@ namespace Iresults\Core\Model\PathAccess;
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-
-
-
-
+use Iresults\Core\Helpers\ObjectHelper;
+use Iresults\Core\Model\PathAccess\Exception\DuplicateEntry;
 
 
 /**
@@ -128,24 +126,23 @@ abstract class AbstractContainer extends \Iresults\Core\Model implements \Iresul
 	 *
 	 * The path 1.2.0 would point to the object in square brackets.
 	 *
-	 * @param	string	$path   The path to set
-	 * @param	object	$object The new object
-	 * @return	void
+	 * @param    string $path The path to set
+	 * @param    object $object The new object
+	 * @throws \InvalidArgumentException if the given value is not an object.
+	 * @throws Exception\DuplicateEntry
+	 * @return    void
 	 *
-	 * @throws InvalidArgumentException if the given value is not an object.
-	 * @throws \Iresults\Core\Model\PathAccess\Exception\DuplicateEntry if the object already exists in the tree.
 	 */
 	public function setObjectAtPath($path, $object) {
-		$pathToParent = '';
 		if (!is_object($object)) {
 			throw new \InvalidArgumentException('The given value is not an object, but of type ' . gettype($object) . '.', 1321375068);
 		}
 		if ($this->containsObject($object)) {
-			\Iresults\Core\Iresults::pd($object);
-			throw new \Iresults\Core\Model\PathAccess\Exception\DuplicateEntry('The object of class ' . get_class($object) . ' already exists in the tree.', 1321362340);
+			Iresults::pd($object);
+			throw new DuplicateEntry('The object of class ' . get_class($object) . ' already exists in the tree.', 1321362340);
 		}
 
-		$objectHash = \Iresults\Core\Helpers\ObjectHelper::createIdentfierForObject($object);
+		$objectHash = ObjectHelper::createIdentfierForObject($object);
 		$this->pathToObjectMap['' . $path] = $object;
 		$this->hashToPathMap[$objectHash] = '' . $path;
 	}
@@ -247,9 +244,31 @@ abstract class AbstractContainer extends \Iresults\Core\Model implements \Iresul
 
 		// Get all the paths and make sure they are strings.
 		$paths = array_keys($this->pathToObjectMap);
-		array_walk($paths, array(self,'arrayKeysToStringsInArrayWalk'));
+		array_walk($paths, function(&$element, $key) {
+			$element = '' . $element;
+		});
 		$foundPaths = preg_grep($pattern, $paths);
 		return $foundPaths;
+	}
+
+	/**
+	 * Returns all the paths that begin with the given prefix
+	 *
+	 * @param    string $prefix The prefix to search for
+	 * @return    array<string>    The matching paths or an empty array if none was found
+	 */
+	public function findAllPathsWithPrefix($prefix) {
+		$prefixLength = strlen($prefix);
+
+		// Get all the paths and make sure they are strings.
+		$paths = array_keys($this->pathToObjectMap);
+		array_walk($paths, function(&$element, $key) {
+			$element = '' . $element;
+		});
+
+		return array_filter($paths, function($currentPath) use ($prefix, $prefixLength) {
+			return substr($currentPath, 0, $prefixLength) === $prefix;
+		});
 	}
 
 	/**
