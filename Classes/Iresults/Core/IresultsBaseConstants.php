@@ -73,7 +73,6 @@ interface IresultsBaseConstants {
 	 */
 	const RENDERER_KINT = 5;
 
-
 	/**
 	 * The different environment constants for web and shell or CLI.
 	 */

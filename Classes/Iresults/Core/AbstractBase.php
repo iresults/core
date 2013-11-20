@@ -493,6 +493,7 @@ abstract class AbstractBase implements IresultsBaseInterface {
 			}
 			fwrite(STDOUT, $message);
 		} else if ($this->getOutputFormat() === self::OUTPUT_FORMAT_JSON) {
+//			echo json_encode(array('output' => $message)) . PHP_EOL;
 			echo '[{ "output": "' . $message . '"},';
 		} else {
 			echo $message;
@@ -633,6 +634,7 @@ abstract class AbstractBase implements IresultsBaseInterface {
 		if ($outputFormat === '') {
 			if (isset($_SERVER['HTTP_ACCEPT']) && $_SERVER['HTTP_ACCEPT']) {
 				$outputFormat = $_SERVER['HTTP_ACCEPT'];
+				$outputFormat = strtok($outputFormat, ',');
 			}
 
 			if (isset($_GET['format']) && htmlspecialchars($_GET['format'])) {
@@ -654,43 +656,43 @@ abstract class AbstractBase implements IresultsBaseInterface {
 
 				case $outputFormat == 'xml':
 				case $outputFormat == 'html':
-				case strpos($outputFormat, 'text/html'):
-				case strpos($outputFormat, 'application/xhtml+xml'):
-				case strpos($outputFormat, 'application/xml'):
-				case strpos($outputFormat, 'text/xml'):
-				case strpos($outputFormat, 'application/atom+xml'):
-				case strpos($outputFormat, 'application/rdf+xml'):
-				case strpos($outputFormat, 'application/rss+xml'):
-				case strpos($outputFormat, 'application/soap+xml'):
-				case strpos($outputFormat, 'application/font-woff'):
-				case strpos($outputFormat, 'application/xml-dtd'):
-				case strpos($outputFormat, 'application/xop+xml'):
+				case $outputFormat == 'text/html':
+				case $outputFormat == 'application/xhtml+xml':
+				case $outputFormat == 'application/xml':
+				case $outputFormat == 'text/xml':
+				case $outputFormat == 'application/atom+xml':
+				case $outputFormat == 'application/rdf+xml':
+				case $outputFormat == 'application/rss+xml':
+				case $outputFormat == 'application/soap+xml':
+				case $outputFormat == 'application/font-woff':
+				case $outputFormat == 'application/xml-dtd':
+				case $outputFormat == 'application/xop+xml':
 					$outputFormat = self::OUTPUT_FORMAT_XML;
 					break;
 
 				case $outputFormat == 'csv':
-				case strpos($outputFormat, 'text/plain'):
-				case strpos($outputFormat, 'text/csv'):
-				case strpos($outputFormat, 'text/css'):
+				case $outputFormat == 'text/plain':
+				case $outputFormat == 'text/csv':
+				case $outputFormat == 'text/css':
 					$outputFormat = self::OUTPUT_FORMAT_PLAIN;
 					break;
 
 				case $outputFormat == 'json':
-				case strpos($outputFormat, 'application/json'):
-				case strpos($outputFormat, 'application/javascript'):
-				case strpos($outputFormat, 'application/ecmascript'):
-				case strpos($outputFormat, 'text/javascript'):
+				case $outputFormat == 'application/json':
+				case $outputFormat == 'application/javascript':
+				case $outputFormat == 'application/ecmascript':
+				case $outputFormat == 'text/javascript':
 					$outputFormat = self::OUTPUT_FORMAT_JSON;
 					break;
 
-				case strpos($outputFormat, 'application/pdf'):
-				case strpos($outputFormat, 'application/zip'):
-				case strpos($outputFormat, 'application/gzip'):
-				case strpos($outputFormat, 'application/postscript'):
-				case strpos($outputFormat, 'application/octet-stream'):
-				case strpos($outputFormat, 'audio/'):
-				case strpos($outputFormat, 'image/'):
-				case strpos($outputFormat, 'video/'):
+				case $outputFormat == 'application/pdf':
+				case $outputFormat == 'application/zip':
+				case $outputFormat == 'application/gzip':
+				case $outputFormat == 'application/postscript':
+				case $outputFormat == 'application/octet-stream':
+				case strpos($outputFormat, 'audio/') !== FALSE:
+				case strpos($outputFormat, 'image/') !== FALSE:
+				case strpos($outputFormat, 'video/') !== FALSE:
 				default:
 					$outputFormat = self::OUTPUT_FORMAT_BINARY;
 					break;

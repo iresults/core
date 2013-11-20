@@ -124,12 +124,11 @@ class Debug {
 			if ($printHash) {
 				$objectId = '#' . $hash . ' ';
 			}
-
 		}
 
 		// Check the environment
 		if ($this->_isWebEnvironment === -1) {
-			$this->_isWebEnvironment = (\Iresults\Core\Iresults::getEnvironment() === \Iresults\Core\Iresults::ENVIRONMENT_WEB);
+			$this->getIsWebEnvironment();
 		}
 		if ($tempIsWebEnvironment !== -1) {
 			$oldIsWebEnvironment = $this->_isWebEnvironment;
@@ -286,7 +285,7 @@ class Debug {
 	protected function _add($text, $break = TRUE) {
 		// Check the environment and print &nbsp; for web and \t for a shell
 		if ($this->_isWebEnvironment === -1) {
-			$this->_isWebEnvironment = (\Iresults\Core\Iresults::getEnvironment() === \Iresults\Core\Iresults::ENVIRONMENT_WEB);
+			$this->getIsWebEnvironment();
 		}
 		for($i = 1; $i < $this->_currentLevel; $i++) {
 			if ($this->_isWebEnvironment) {
@@ -326,6 +325,12 @@ class Debug {
 	 * @return boolean
 	 */
 	public function getIsWebEnvironment() {
+		if ($this->_isWebEnvironment === -1) {
+			$this->_isWebEnvironment = (
+				Iresults::getEnvironment() === Iresults::ENVIRONMENT_WEB
+				&& Iresults::getOutputFormat() !== Iresults::OUTPUT_FORMAT_JSON
+			);
+		}
 	    return $this->_isWebEnvironment;
 	}
 
