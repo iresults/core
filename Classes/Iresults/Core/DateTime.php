@@ -1,36 +1,36 @@
 <?php
 namespace Iresults\Core;
 
-/*
- * The MIT License (MIT)
- * Copyright (c) 2013 Andreas Thurnheer-Meier <tma@iresults.li>, iresults
- *
- * Permission is hereby granted, free of charge, to any person obtaining a copy
- * of this software and associated documentation files (the "Software"), to deal
- * in the Software without restriction, including without limitation the rights
- * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
- * copies of the Software, and to permit persons to whom the Software is
- * furnished to do so, subject to the following conditions:
- *
- * The above copyright notice and this permission notice shall be included in
- * all copies or substantial portions of the Software.
- *
- * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
- * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
- * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
- * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
- * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
- * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
- * SOFTWARE.
- */
+	/*
+	 * The MIT License (MIT)
+	 * Copyright (c) 2013 Andreas Thurnheer-Meier <tma@iresults.li>, iresults
+	 *
+	 * Permission is hereby granted, free of charge, to any person obtaining a copy
+	 * of this software and associated documentation files (the "Software"), to deal
+	 * in the Software without restriction, including without limitation the rights
+	 * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+	 * copies of the Software, and to permit persons to whom the Software is
+	 * furnished to do so, subject to the following conditions:
+	 *
+	 * The above copyright notice and this permission notice shall be included in
+	 * all copies or substantial portions of the Software.
+	 *
+	 * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+	 * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+	 * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+	 * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+	 * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+	 * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+	 * SOFTWARE.
+	 */
 
 
 /**
  * A wrapper for the DateTime object.
  *
- * @package	Iresults
+ * @package    Iresults
  * @subpackage Core
- * @version 1.2.2
+ * @version    1.2.2
  */
 class DateTime extends \DateTime {
 	/**
@@ -65,49 +65,54 @@ class DateTime extends \DateTime {
 	/**
 	 * Constructor for a new DateTime object
 	 *
-	 * @param string|DateTime $dateTime
+	 * @param string|\DateTime $time
+	 * @param \DateTimeZone    $timezone
 	 * @throws \Exception if the input could not be transformed
-	 * @return \Iresults\Core\DateTime
 	 */
-	public function __construct($dateTime = NULL) {
+	public function __construct($time = 'now', \DateTimeZone $timezone = NULL) {
+		if ($timezone === NULL) {
+			$timezone = new \DateTimeZone(date_default_timezone_get());
+		}
+		if ($time === NULL) {
+			$time = 'now';
+		}
+
 		// If a argument is given try to parse it as a DateTime object
-		if ($dateTime !== NULL) {
+		if ($time !== 'now') {
 			/*
 			 * If it is an object of type \Iresults\Core\DateTime get the raw property
 			 * from the passed object and release the given object.
 			 */
-			if (is_object($dateTime) && is_a($dateTime, '\DateTime')) {
-				parent::__construct($dateTime->format('r'));
-				$dateTime = NULL;
+			if (is_object($time) && is_a($time, '\DateTime')) {
+				parent::__construct($time->format('r'), $timezone);
+				$time = NULL;
 			} else
-			/*
-			 * Else try to create a new DateTime object from the argument.
-			 */
-			if (is_int($dateTime) || (is_numeric($dateTime) && intval($dateTime) == $dateTime * 1 )) {
-				$dateTime = '@' . $dateTime;
-				parent::__construct($dateTime);
-			} else
-			/*
-			 * Else try to create a new DateTime object from the argument.
-			 */
-			if (strtotime($dateTime) !== FALSE || strtotime($this->_prepareInput($dateTime)) !== FALSE) {
-				$dateTime = $this->_prepareInput($dateTime);
-				try {
-					parent::__construct($dateTime);
-				} catch (\Exception $exception) {
-					if (self::THROW_EXCEPTION_ON_BAD_INPUT) {
-						throw $exception;
-					}
-				}
-			} else
-			/*
+				/*
+				 * Else try to create a new DateTime object from the argument.
+				 */
+				if (is_int($time) || (is_numeric($time) && intval($time) == $time * 1)) {
+					$time = '@' . $time;
+					parent::__construct($time, $timezone);
+				} else
+					/*
+					 * Else try to create a new DateTime object from the argument.
+					 */
+					if (strtotime($time) !== FALSE || strtotime($this->_prepareInput($time)) !== FALSE) {
+						$time = $this->_prepareInput($time);
+						try {
+							parent::__construct($time, $timezone);
+						} catch (\Exception $exception) {
+							if (self::THROW_EXCEPTION_ON_BAD_INPUT) {
+								throw $exception;
+							}
+						}
+					} else /*
 			 * Else bad input
-			 */
-			{
-				return NULL;
-			}
+			 */ {
+						return NULL;
+					}
 		} else {
-			parent::__construct();
+			parent::__construct($time, $timezone);
 		}
 		return $this;
 	}
@@ -119,7 +124,8 @@ class DateTime extends \DateTime {
 	/**
 	 * Returns the raw DateTime object or NULL if parsing the input didn't
 	 * succeed.
-	 * @return	DateTime|NULL Returns a DateTime object on success, otherwise NULL
+	 *
+	 * @return    DateTime|NULL Returns a DateTime object on success, otherwise NULL
 	 * @deprecated
 	 */
 	public function getRaw() {
@@ -148,7 +154,10 @@ class DateTime extends \DateTime {
 	/* PREPARATION OF STRING INPUTS          MWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWM */
 	/* MWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWM */
 	/**
-	 * @param	string	$dateTime
+	 * Prepares the date input string
+	 *
+	 * @param    string $dateTime
+	 * @return string
 	 */
 	protected function _prepareInput($dateTime) {
 		if ($this->_preparedInput) {
@@ -200,8 +209,8 @@ class DateTime extends \DateTime {
 		 * Fix a bug where 11/04/2011 is even in the UK interpreted as Nov. 4th.
 		 */
 		if (count(explode('/', $dateTime)) >= 3
-			&& (self::getDateHelper()->getCountryCode() == 'en_GB' || self::getDateHelper()->getCountryCode() == 'en_UK')
-		  ) {
+			&& (Iresults::getLocale() == 'en_GB' || Iresults::getLocale() == 'en_UK')
+		) {
 			$dateParts = explode('/', $dateTime);
 			if (count($dateParts) !== 3) {
 				trigger_error('Wanted to swap date parts of ' . $dateTime . ' in an UK environment. But the number of date parts (separated by "/"") is not 3.', E_WARNING);
@@ -222,7 +231,7 @@ class DateTime extends \DateTime {
 	/**
 	 * Returns the date helper instance.
 	 *
-	 * @return	\Iresults\Core\Helpers\Locale\Date
+	 * @return    \Iresults\Core\Helpers\Locale\Date
 	 */
 	static public function getDateHelper() {
 		if (!self::$dateHelper && class_exists('\Iresults\Core\Helpers\Locale\Date', FALSE)) {
@@ -234,7 +243,7 @@ class DateTime extends \DateTime {
 	/**
 	 * Returns a string representation of the object.
 	 *
-	 * @return	string    A string describing this object
+	 * @return    string    A string describing this object
 	 */
 	public function description() {
 		static $useDateHelper = -1;
@@ -243,11 +252,11 @@ class DateTime extends \DateTime {
 		if ($useDateHelper === -1) {
 			if (self::getDateHelper()) {
 				// Test if the localization is installed correctly
-				try{
+				try {
 					$description = self::getDateHelper()->format($this, \Iresults\Core\Helpers\Locale\Date::FORMAT_DATE_LONG);
 					$useDateHelper = TRUE;
 					return $description;
-				} catch(Exception $e) {
+				} catch (\Exception $e) {
 					$useDateHelper = FALSE;
 				}
 			} else {
@@ -259,12 +268,8 @@ class DateTime extends \DateTime {
 		}
 		return '' . $this->format('Y-m-d');
 	}
+
 	public function __toString() {
 		return $this->description();
 	}
-
-
-	/* MWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWM */
-	/* FACTORY METHODS                       MWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWM */
-	/* MWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWM */
 }
