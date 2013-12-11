@@ -26,6 +26,7 @@
 
 namespace Iresults\Core\Ui;
 use Iresults\Core\Command\ColorInterface;
+use Iresults\Core\Core;
 use Iresults\Core\Iresults;
 use Iresults\Core\Tools\StringTool;
 
@@ -34,7 +35,7 @@ use Iresults\Core\Tools\StringTool;
  *
  * @package Iresults\Core\Ui
  */
-class Table {
+class Table extends Core {
 	/**
 	 * The (prepared) table data that will be displayed
 	 * @var array
@@ -69,7 +70,23 @@ class Table {
 	}
 
 	/**
-	 * Returns the rendered table.
+	 * Displays the rendered table
+	 *
+	 * @param	array 	$data The data to output
+	 * @param	string	$tableClass	 The class of the table
+	 * @param	string	$rowClass	 The class of the rows (TR-tags)
+	 * @param	string	$cellClass	 The class of the cells (TD-tags)
+	 * @param	string	$headClass	 The class of the header cells (TH-tags)
+	 * @return	string The rendered table
+	 */
+	public function display($data = NULL, $tableClass = 'list', $rowClass = '', $cellClass = '', $headClass = '') {
+		$output = $this->render($data, $tableClass, $rowClass, $cellClass, $headClass);
+		Iresults::say($output);
+		return $output;
+	}
+
+	/**
+	 * Returns the rendered table
 	 *
 	 * @param	array 	$data The data to output
 	 * @param	string	$tableClass	 The class of the table
@@ -177,6 +194,7 @@ class Table {
 			$maxColumnWidth = PHP_INT_MAX;
 		}
 
+		$maxColumnWidth = 100;
 		if ($data === NULL) {
 			$data = $this->getData();
 		}
@@ -250,6 +268,7 @@ class Table {
 				// Add spaces to fill the cell to the needed length
 				if (strlen($col) > $columnWidth) {
 					$col = substr($col, 0, $columnWidth - 1) . '…';
+					//$col = implode(PHP_EOL . ' ', str_split($col, $columnWidth));
 				}
 				$list .= $separator . ' ' . StringTool::pad($col, $columnWidth, ' ') . ' ';
 			}
