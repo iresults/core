@@ -239,10 +239,13 @@ class Table extends Core {
 				$col = $head[$i];
 				$columnWidth = $columnWidths[$i];
 
+				if (is_array($col)) {
+					$col = reset($col);
+				}
+
 				if (strlen(utf8_decode($col)) > $columnWidth) {
 					$col = substr($col, 0, $columnWidth);
 				}
-
 				// Add spaces to fill the cell to the needed length
 				$list .= $separator . ' ' . StringTool::pad($col, $columnWidth, ' ') . ' ';
 			}
@@ -264,6 +267,10 @@ class Table extends Core {
 			for ($i = 0; $i < $columnCount; $i++) {
 				$col = $indexedRow[$i];
 				$columnWidth = $columnWidths[$i];
+
+				if (is_array($col)) {
+					$col = reset($col);
+				}
 
 				// Add spaces to fill the cell to the needed length
 				if (strlen($col) > $columnWidth) {

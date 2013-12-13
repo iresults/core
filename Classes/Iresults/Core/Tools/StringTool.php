@@ -187,7 +187,7 @@ class StringTool {
 	 * @param	string	$input		The input string
 	 * @param	integer	$length		The length to pad to
 	 * @param	string	$padString	The string to add
-	 * @param	STR_PAD	$padType	Optional pad type
+	 * @param	STR_PAD_BOTH|STR_PAD_LEFT|STR_PAD_RIGHT	$padType	Optional pad type
 	 * @return	string				The padded string
 	 */
 	static public function pad($input, $length, $padString = ' ', $padType = STR_PAD_RIGHT) {
