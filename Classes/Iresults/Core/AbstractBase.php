@@ -481,23 +481,33 @@ abstract class AbstractBase implements IresultsBaseInterface {
 	 * @return    void
 	 */
 	public function say($message, $color = NULL, $insertBreak = TRUE) {
-		/*
-		 * If the current environment is a shell, read the captured output.
-		 */
-		if (self::$environment == self::ENVIRONMENT_SHELL) {
-			if ($color) {
-				$message = "\033" . $color . $message . "\033[0m";
-			}
-			if ($insertBreak) {
-				$message .= PHP_EOL;
-			}
-			fwrite(STDOUT, $message);
-		} else if ($this->getOutputFormat() === self::OUTPUT_FORMAT_JSON) {
-//			echo json_encode(array('output' => $message)) . PHP_EOL;
-			echo '[{ "output": "' . $message . '"},';
-		} else {
-			echo $message;
+		switch (TRUE) {
+			case self::$environment == self::ENVIRONMENT_SHELL:
+				if ($color) {
+					$message = "\033" . $color . $message . "\033[0m";
+				}
+				if ($insertBreak) {
+					$message .= PHP_EOL;
+				}
+				fwrite(STDOUT, $message); // Use fwrite and return
+				return;
+			case $this->getOutputFormat() === self::OUTPUT_FORMAT_JSON:
+//				$message = json_encode(array('output' => $message)) . PHP_EOL;
+				$message = '[{ "output": "' . $message . '"},';
+				break;
+
+			case $this->getOutputFormat() === self::OUTPUT_FORMAT_XML:
+				if ($insertBreak) {
+					$message .= '<br />' . PHP_EOL;
+				}
+				break;
+
+			default:
+				if ($insertBreak) {
+					$message .= PHP_EOL;
+				}
 		}
+		echo $message;
 	}
 
 	/**

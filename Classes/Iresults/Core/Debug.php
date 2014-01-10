@@ -52,8 +52,9 @@ class Debug {
 	 * @var string The output.
 	 */
 	private $_output = '';
+
 	/**
-	 * Indicates the environment
+	 * Defines if the output should be passed through htmlspecialchars()
 	 *
 	 * @var boolean
 	 */
@@ -328,7 +329,7 @@ class Debug {
 		if ($this->_isWebEnvironment === -1) {
 			$this->_isWebEnvironment = (
 				Iresults::getEnvironment() === Iresults::ENVIRONMENT_WEB
-				&& Iresults::getOutputFormat() !== Iresults::OUTPUT_FORMAT_JSON
+				&& Iresults::getOutputFormat() === Iresults::OUTPUT_FORMAT_XML
 			);
 		}
 	    return $this->_isWebEnvironment;

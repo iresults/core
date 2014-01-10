@@ -426,12 +426,17 @@ abstract class Iresults implements IresultsBaseConstants {
 	}
 
 	/**
-	 * Set the static $willDebug to the given flag.
+	 * Sets the static $willDebug to TRUE
 	 *
-	 * @param    boolean $flag
+	 * If an argument is passed the value will be set to it's value
+	 *
 	 * @return    boolean    Returns the former setting
 	 */
-	static public function forceDebug($flag = TRUE) {
+	static public function forceDebug() {
+		$flag = TRUE;
+		if (func_num_args() > 0) {
+			$flag = func_get_arg(0);
+		}
 		return static::getSharedInstance()->forceDebug($flag);
 	}
 
