@@ -357,4 +357,14 @@ class Table extends Core {
 
 		return $data;
 	}
+
+	/**
+	 * Returns a new instance with the given data
+	 *
+	 * @param array $data
+	 * @return static
+	 */
+	static public function tableWithData($data) {
+		return new static($data);
+	}
 }
