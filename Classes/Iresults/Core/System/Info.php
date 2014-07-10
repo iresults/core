@@ -32,7 +32,7 @@ if (realpath($_SERVER["SCRIPT_FILENAME"]) === '' . realpath(__FILE__)) {
 	die();
 }
 
-
+use Iresults\Core\Iresults;
 
 /**
  * The iresults backtrace enables you to display a backtrace.
@@ -55,6 +55,11 @@ class Info {
 	static protected $shutdownRun = FALSE;
 
 	/**
+	* @var array
+	*/
+	static protected $informationToList = array();
+
+	/**
 	 * Displays the output of the builtin phpinfo() function.
 	 *
 	 * @return	void
@@ -64,26 +69,49 @@ class Info {
 	}
 
 	/**
+	 * Registers the shutdown() method to be called
+	 *
+	 * @param array $informationToList list of informations to display at the end
+	 */
+	static public function registerShutdownFunction($informationToList = NULL) {
+		if ($informationToList === NULL) {
+			$informationToList = array(
+				'callStack',
+				'classList',
+				'functionList',
+				'variableList',
+				'fileList',
+				'memoryUsage',
+			);
+		}
+		self::$informationToList = $informationToList;
+
+		/*
+		* Register the shutdown handler.
+		*/
+		register_shutdown_function(array(__CLASS__, 'shutdown'));
+	}
+
+	/**
 	 * Displays information how the script got to this point.
 	 *
 	 * @param	mixed	$here	 An optional parameter to debug
 	 * @return	void
 	 */
 	static public function howDidIGetHere($here = NULL) {
-		/*
-		 * Register the shutdown handler.
-		 */
-		register_shutdown_function(array('\Iresults\Core\System\Info', 'shutdown'));
+		$isShell = Iresults::getEnvironment() === Iresults::ENVIRONMENT_SHELL;
 
 		/*
 		 * Display basic PHP information.
 		 */
-		echo "<h1>Server Info</h1>";
-		$info = "Server: " . $_SERVER["SERVER_SOFTWARE"] . "\n" .
-		"PHP: " . PHP_VERSION . "\n" .
-		$_SERVER["SERVER_NAME"] . " (" . $_SERVER["SERVER_ADDR"] . ":" . $_SERVER["SERVER_PORT"] . ")\n";
+		self::_printHeadline('Server Info');
+
+		$info = "Server: " . $_SERVER["SERVER_SOFTWARE"] . PHP_EOL
+				. "PHP: " . PHP_VERSION . PHP_EOL;
+
+		if (!$isShell) $info .= $_SERVER["SERVER_NAME"] . ' (' . $_SERVER["SERVER_ADDR"] . ':' . $_SERVER["SERVER_PORT"] . ')' . PHP_EOL;
 		if (zend_version()) {
-			$info .= "Zend Engine v" . zend_version();
+			$info .= 'Zend Engine v' . zend_version();
 		}
 		echo self::_wrapIntoPre($info);
 
@@ -103,19 +131,22 @@ class Info {
 	 * @return	void
 	 */
 	static public function showCallStack() {
+		$isShell = Iresults::getEnvironment() === Iresults::ENVIRONMENT_SHELL;
+
 		/*
 		 * Display the call stack.
 		 */
-		echo '<div class="ir_debug_container" style="text-align:left;">';
-		echo '<h1>Call stack</h1>';
-		echo '<pre class="ir_debug">';
-		if (class_exists("\Iresults\Core\System\Backtrace")) {
+		if (!$isShell) echo '<div class="ir_debug_container" style="text-align:left;">';
+
+		self::_printHeadline('Call stack');
+		if (!$isShell) echo '<pre class="ir_debug">';
+		if (class_exists('\\Iresults\\Core\\System\\Backtrace')) {
 			$bt = new \Iresults\Core\System\Backtrace(2);
 			echo $bt->render();
 		} else {
 			debug_print_backtrace();
 		}
-		echo '</pre></div>';
+		if (!$isShell) echo '</pre></div>';
 	}
 
 	/**
@@ -124,9 +155,11 @@ class Info {
 	 * @return	void
 	 */
 	static public function showClassList() {
+		$isShell = Iresults::getEnvironment() === Iresults::ENVIRONMENT_SHELL;
+
 		$list = get_declared_classes();
-		$output = '<div class="ir_debug_container" style="text-align:left;">';
-		$output .= "<h1>List of available classes</h1>";
+		$output = !$isShell ? '<div class="ir_debug_container" style="text-align:left;">' : '';
+		self::_printHeadline('List of available classes');
 
 		$classList = array();
 		foreach ($list as $class) {
@@ -134,14 +167,19 @@ class Info {
 
 			$classFile = self::getClassFileOfClass($class);
 			if ($classFile) {
-				$classListEntry .= " \t\t(<a href='file://$classFile'>$classFile</a>')";
+				if ($isShell) {
+					$classListEntry .= " \t\t" . $classFile;
+				} else {
+					$classListEntry .= " \t\t(<a href='file://$classFile'>$classFile</a>')";
+				}
+
 			}
 			$classList[] = $classListEntry;
 		}
 
 		$output .= self::createTableFromList($classList);
 
-		$output .= '</div>';
+		$output .= !$isShell ? '</div>' : PHP_EOL;
 		echo $output;
 	}
 
@@ -151,24 +189,32 @@ class Info {
 	 * @return	void
 	 */
 	static public function showFunctionList() {
-		$functions = get_defined_functions();
-		$output = '<div class="ir_debug_container" style="text-align:left;">';
-		$output .= "<h1>List of available functions</h1>";
+		$isShell = Iresults::getEnvironment() === Iresults::ENVIRONMENT_SHELL;
 
-		$output .= "<h2>User functions</h2>";
+		$functions = get_defined_functions();
+		$output = !$isShell ? '<div class="ir_debug_container" style="text-align:left;">' : '';
+		self::_printHeadline('List of available functions');
+
+		self::_printHeadline('User functions', 2);
+
 		$output .= self::createTableFromList($functions["user"]);
 
-		$output .= "<h2>Internal functions</h2>";
+		self::_printHeadline('Internal functions', 2);
+
 		$functionList = array();
 		foreach ($functions["internal"] as $function) {
-			$help = "http://li.php.net/manual/en/function." . str_replace("_","-",$function);
-			$functionList[] = "<a href='$help'>$function</a>\n";
+			if ($isShell) {
+				$functionList[] = $function;
+			} else {
+				$help = "http://li.php.net/manual/en/function." . str_replace("_","-",$function);
+				$functionList[] = "<a href='$help'>$function</a>\n";
+			}
 		}
 		$output .= self::createTableFromList($functionList);
 
 
 
-		$output .= '</div>';
+		$output .= !$isShell ? '</div>' : PHP_EOL;
 		echo $output;
 	}
 
@@ -178,9 +224,11 @@ class Info {
 	 * @return	void
 	 */
 	static public function showVariableList() {
+		$isShell = Iresults::getEnvironment() === Iresults::ENVIRONMENT_SHELL;
+
 		$list = get_defined_vars();
-		$output = '<div class="ir_debug_container" style="text-align:left;">';
-		$output .= "<h1>List of all variables in the current symbol table</h1>";
+		$output = !$isShell ? '<div class="ir_debug_container" style="text-align:left;">' : '';
+		self::_printHeadline('List of all variables in the current symbol table');
 
 		$varsList = array();
 		foreach ($list as $key => $value) {
@@ -190,7 +238,7 @@ class Info {
 		$output .= self::createTableFromList($varsList);
 		$output .= self::_wrapIntoPre(implode("\n",$varsList));
 
-		$output .= '</div>';
+		$output .= !$isShell ? '</div>' : PHP_EOL;
 		echo $output;
 	}
 
@@ -200,6 +248,8 @@ class Info {
 	 * @return	void
 	 */
 	static public function showFileList() {
+		$isShell = Iresults::getEnvironment() === Iresults::ENVIRONMENT_SHELL;
+
 		/*
 		 * Display the file inclusion list.
 		 */
@@ -217,10 +267,14 @@ class Info {
 		$inclusionList = get_included_files();
 		$includedFile = current($inclusionList);
 		$j = 1;
-		echo '<div class="ir_debug_container" style="text-align:left;">';
-		echo "<h1>List of included files</h1>";
+
+		if (!$isShell) echo '<div class="ir_debug_container" style="text-align:left;">';
+
+		self::_printHeadline('List of included files');
 		while ($includedFile != $fileAbs) {
-			echo "#$j: $includedFile<br />";
+			echo "#$j: $includedFile";
+			if (!$isShell) echo '<br />';
+			echo PHP_EOL;
 
 			next($inclusionList);
 			$includedFile = current($inclusionList);
@@ -231,9 +285,25 @@ class Info {
 			$fileAbs = $_SERVER['SCRIPT_FILENAME'];
 		}
 		if (!self::$shutdownRun) {
-			echo "<span style='color:#f00'>You are here: $fileAbs @ $callLine</span>";
+			if (!$isShell) echo "<span style='color:#f00'>";
+			Iresults::say("You are here: $fileAbs @ $callLine", \Iresults\Core\Command\ColorInterface::RED);
+			if (!$isShell) echo "</span>";
 		}
-		echo '</div>';
+		if (!$isShell) echo '</div>';
+	}
+
+
+
+	/**
+	* Displays information about the memory usage
+	*
+	* @return void
+	*/
+	static public function showMemoryUsage() {
+		self::_printHeadline('Memory');
+		Iresults::say('Currently allocated: ' . self::_formatMemory(memory_get_usage(TRUE)));
+		Iresults::say('Peak allocated:      ' . self::_formatMemory(memory_get_peak_usage(TRUE)));
+		Iresults::say(PHP_EOL);
 	}
 
 
@@ -264,7 +334,7 @@ class Info {
 		$classFile = "";
 
 		if (version_compare(PHP_VERSION, "5.0.0") >= 0) {
-			$reflectionClass = new ReflectionClass($class);
+			$reflectionClass = new \ReflectionClass($class);
 			$classFile = $reflectionClass->getFileName();
 		} else {
 			$pattern = sprintf(self::CLASS_DEFINITION_PATTERN,$class);
@@ -294,7 +364,12 @@ class Info {
 	 * @return	string    The HTML code
 	 */
 	static public function createTableFromList(&$list) {
-		$code = "";
+		$isShell = Iresults::getEnvironment() === Iresults::ENVIRONMENT_SHELL;
+		// $table = \Iresults\Core\Ui\Table::tableWithData($list);
+		// $table->setUseFirstRowAsHeaderRow(FALSE);
+		// return $table->render();
+
+		$code = '';
 		$entries = count($list);
 		$maxColumns = 4;
 		while ($maxColumns && ($entries / $maxColumns) < 1) {
@@ -304,25 +379,54 @@ class Info {
 			$maxColumns = 1;
 		}
 
-		$code .= "<table style='font-size:11px; width=100%;'>";
-		$code .= "<tr>";
+		if (!$isShell) {
+			$code .= '<table style="font-size:11px; width=100%;">';
+			$code .= '<tr>';
+		}
 
 		$maxRows = ceil($entries / $maxColumns);
 		$currentColumn = 0;
 		for($i = 0; $i < $entries; $i++) {
 			$element = $list[$i];
 			if ($currentColumn >= $maxColumns) {
-				$code .= "</tr><tr>";
+				if (!$isShell) $code .= '</tr><tr>';
 				$currentColumn = 0;
 			}
 
-			$code .= "<td>$element</td>";
+			if (!$isShell) {
+				$code .= "<td>$element</td>";
+			} else {
+				$code .= $element . PHP_EOL;
+			}
 			$currentColumn++;
 		}
 
-		$code .= "</tr>";
-		$code .= "</table>";
+		if (!$isShell) {
+			$code .= '</tr>';
+			$code .= '</table>';
+		}
 		return $code;
+	}
+
+	/**
+	 * Outputs the given headline
+	 *
+	 * @param string $headline
+	 * @param int $importance
+	 */
+	static protected function _printHeadline($headline, $importance = 1) {
+		$isShell = Iresults::getEnvironment() === Iresults::ENVIRONMENT_SHELL;
+		if (!$isShell) {
+			Iresults::say("<h$importance>" . $headline . "</h$importance>");
+		} else {
+			$color = \Iresults\Core\Command\ColorInterface::CYAN;
+			$spaceBefore = 2;
+			if ($importance == 2) {
+				$color = \Iresults\Core\Command\ColorInterface::BLUE;
+				$spaceBefore = 1;
+			}
+			Iresults::say(str_repeat(PHP_EOL, $spaceBefore) . $headline . PHP_EOL, $color);
+		}
 	}
 
 	/**
@@ -332,7 +436,18 @@ class Info {
 	 * @return	string    The wrapped output
 	 */
 	static protected function _wrapIntoPre($output) {
-		return '<pre class="ir_debug">' . $output . '</pre>';
+		return Iresults::getEnvironment() === Iresults::ENVIRONMENT_SHELL ? $output : '<pre class="ir_debug">' . $output . '</pre>';
+	}
+
+	/**
+	 * Formats the given memory size
+	 *
+	 * @param int $size
+	 * @return string
+	 */
+	static protected function _formatMemory($size) {
+		$unit=array('b','kb','mb','gb','tb','pb');
+    	return @round($size/pow(1024,($i=floor(log($size,1024)))),2).' '.$unit[$i];
 	}
 
 	/**
@@ -342,6 +457,10 @@ class Info {
 	 */
 	static public function shutdown() {
 		self::$shutdownRun = TRUE;
-		self::howDidIGetHere();
+
+		foreach (self::$informationToList as $informationName) {
+			$method = 'show' . ucfirst($informationName);
+			call_user_func(array(__CLASS__, $method));
+		}
 	}
 }
