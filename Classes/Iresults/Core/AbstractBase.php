@@ -335,6 +335,8 @@ abstract class AbstractBase implements IresultsBaseInterface {
 			$printAnchor = FALSE;
 			$printTags = FALSE;
 			ob_start();
+		} else {
+			$this->sendDebugHeaders();
 		}
 
 
@@ -591,6 +593,40 @@ abstract class AbstractBase implements IresultsBaseInterface {
 		$oldValue = self::$willDebug;
 		self::$willDebug = ($flag) ? TRUE : FALSE;
 		return $oldValue;
+	}
+
+	/**
+	 * Send the headers to enable UTF-8 output after debugging
+	 *
+	 * @param bool $graceful
+	 * @throws \UnexpectedValueException if the headers already have been sent
+	 * @return boolean
+	 */
+	public function sendDebugHeaders($graceful = TRUE) {
+		$file = '';
+		$line = '';
+		if (!headers_sent($file, $line)) {
+			switch ($this->getOutputFormat()) {
+				case self::OUTPUT_FORMAT_XML:
+					header('Content-Type: text/html; charset=utf-8');
+					break;
+
+				case self::OUTPUT_FORMAT_JSON:
+					header('Content-Type: application/json; charset=utf-8');
+					break;
+
+				case self::OUTPUT_FORMAT_PLAIN:
+					header('Content-Type: text/plain; charset=utf-8');
+					break;
+
+				case self::OUTPUT_FORMAT_BINARY:
+				default:
+					break;
+			}
+		} else if (!$graceful) {
+			throw new \UnexpectedValueException("Headers already sent in $file @ $line", 1405001760);
+		}
+
 	}
 
 
