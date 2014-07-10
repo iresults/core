@@ -44,7 +44,7 @@ class Autoloader {
      * Registers the class to use for autoloading
      */
     static public function register() {
-        spl_autoload_register(array(__CLASS__, 'autoload'));
+        spl_autoload_register(array(__CLASS__, 'autoload'), TRUE, TRUE);
     }
 
     /**
@@ -63,7 +63,7 @@ class Autoloader {
         if ($className[0] !== '\\') {
             $className = '\\' . $className;
         }
-        if (substr($className, 0, 10) !== '\\Iresults\\') {
+        if (substr($className, 0, 15) !== '\\Iresults\\Core\\') {
             return;
         }
         $classFile = str_replace('\\', DIRECTORY_SEPARATOR, $className) . '.php';
