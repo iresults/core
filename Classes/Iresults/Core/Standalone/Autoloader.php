@@ -40,13 +40,22 @@ namespace Iresults\Core\Standalone;
  * \Iresults\Core\Standalone\Autoloader::register();
  */
 class Autoloader {
+	/**
+	 * Defines if the Autoloader has been registered
+	 * @var bool
+	 */
+	static protected $isRegistered = FALSE;
+
     /**
      * Registers the class to use for autoloading
 	 *
 	 * @param bool $prepend If TRUE, the Autoloader will be prepended on the autoload stack instead of being appended
 	 */
 	static public function register($prepend = FALSE) {
-        spl_autoload_register(array(__CLASS__, 'autoload'), TRUE, $prepend);
+		if (self::$isRegistered) {
+			return;
+		}
+		self::$isRegistered = spl_autoload_register(array(__CLASS__, 'autoload'), TRUE, $prepend);
     }
 
     /**
