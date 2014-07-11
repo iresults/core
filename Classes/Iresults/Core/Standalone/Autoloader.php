@@ -42,9 +42,11 @@ namespace Iresults\Core\Standalone;
 class Autoloader {
     /**
      * Registers the class to use for autoloading
-     */
-    static public function register() {
-        spl_autoload_register(array(__CLASS__, 'autoload'), TRUE, TRUE);
+	 *
+	 * @param bool $prepend If TRUE, the Autoloader will be prepended on the autoload stack instead of being appended
+	 */
+	static public function register($prepend = FALSE) {
+        spl_autoload_register(array(__CLASS__, 'autoload'), TRUE, $prepend);
     }
 
     /**
