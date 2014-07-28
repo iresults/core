@@ -65,6 +65,68 @@ class Math {
 		return self::$_precision;
 	}
 
+	/**
+	 * Perform an addition
+	 */
+	const ADD = '+';
+
+	/**
+	 * Perform a subtraction
+	 */
+	const SUBTRACT = '-';
+
+	/**
+	 * Perform a multiplication
+	 */
+	const MULTIPLY = '*';
+
+	/**
+	 * Perform a division
+	 */
+	const DIVIDE = '/';
+
+	/**
+	 * Perform the given calculations in the order they are given
+	 *
+	 * @param int|float|string|bool $operand1
+	 * @param string                $operation
+	 * @param int|float|string|bool $operand2
+	 * @throws \UnexpectedValueException if an invalid operation is detected
+	 * @return float
+	 * @internal
+	 */
+	static public function calculate($operand1, $operation, $operand2) {
+		$arguments = func_get_args();
+		$argumentsCount = func_num_args();
+
+		$operand1 = $arguments[0];
+		for ($i = 1; $i < $argumentsCount; $i += 2) {
+			$operation = $arguments[$i];
+			$operand2 = $arguments[$i + 1];
+
+			switch ($operation) {
+				case self::ADD:
+					$operand1 = static::add($operand1, $operand2, FALSE);
+					break;
+
+				case self::SUBTRACT:
+					$operand1 = static::subtract($operand1, $operand2, FALSE);
+					break;
+
+				case self::MULTIPLY:
+					$operand1 = static::multiply($operand1, $operand2, FALSE);
+					break;
+
+				case self::DIVIDE:
+					$operand1 = static::divide($operand1, $operand2, FALSE);
+					break;
+
+				default:
+					throw new \UnexpectedValueException('Invalid operation ' . $operation, 1406299265);
+			}
+		}
+		return $operand1;
+	}
 
 	/**
 	 * Add two arbitrary precision numbers
@@ -85,6 +147,24 @@ class Math {
 			return $result;
 		}
 		return -1;
+	}
+
+	/**
+	 * Adds all given arbitrary precision numbers
+	 *
+	 * @param array<int|float|string|bool> $values If no array is given all arguments will be multiplied
+	 * @param bool|float $returnString If TRUE the string representation will be returned (BC Math uses strings)
+	 * @return float|string
+	 */
+	static public function addAll($values, $returnString = FALSE) {
+		if (!is_array($values)) {
+			$values = func_get_args();
+		}
+		$augend = current($values);
+		while ($addend = next($values)) {
+			$augend = static::add($augend, $addend, $returnString);
+		}
+		return $augend;
 	}
 
 	/**
@@ -109,6 +189,24 @@ class Math {
 	}
 
 	/**
+	 * Subtracts all given arbitrary precision numbers
+	 *
+	 * @param array<int|float|string|bool> $values If no array is given all arguments will be multiplied
+	 * @param bool|float $returnString If TRUE the string representation will be returned (BC Math uses strings)
+	 * @return float|string
+	 */
+	static public function subtractAll($values, $returnString = FALSE) {
+		if (!is_array($values)) {
+			$values = func_get_args();
+		}
+		$minuend = current($values);
+		while ($subtrahend = next($values)) {
+			$minuend = static::subtract($minuend, $subtrahend, $returnString);
+		}
+		return $minuend;
+	}
+
+	/**
 	 * Multiply two arbitrary precision numbers
 	 *
 	 * @param int|float|string|bool $multiplicand
@@ -130,6 +228,24 @@ class Math {
 	}
 
 	/**
+	 * Multiplies all given arbitrary precision numbers
+	 *
+	 * @param array<int|float|string|bool> $values If no array is given all arguments will be multiplied
+	 * @param bool|float $returnString If TRUE the string representation will be returned (BC Math uses strings)
+	 * @return float|string
+	 */
+	static public function multiplyAll($values, $returnString = FALSE) {
+		if (!is_array($values)) {
+			$values = func_get_args();
+		}
+		$multiplicand = current($values);
+		while ($multiplier = next($values)) {
+			$multiplicand = static::multiply($multiplicand, $multiplier, $returnString);
+		}
+		return $multiplicand;
+	}
+
+	/**
 	 * Divide two arbitrary precision numbers
 	 *
 	 * @param int|float|string|bool $dividend
@@ -148,6 +264,24 @@ class Math {
 			return $result;
 		}
 		return -1;
+	}
+
+	/**
+	 * Divide all given arbitrary precision numbers
+	 *
+	 * @param array<int|float|string|bool> $values If no array is given all arguments will be multiplied
+	 * @param bool|float $returnString If TRUE the string representation will be returned (BC Math uses strings)
+	 * @return float|string
+	 */
+	static public function divideAll($values, $returnString = FALSE) {
+		if (!is_array($values)) {
+			$values = func_get_args();
+		}
+		$dividend = current($values);
+		while ($divisor = next($values)) {
+			$dividend = static::divide($dividend, $divisor, $returnString);
+		}
+		return $dividend;
 	}
 
 	/**

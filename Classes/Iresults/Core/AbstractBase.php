@@ -911,10 +911,20 @@ abstract class AbstractBase implements IresultsBaseInterface {
 	 * @return        void
 	 */
 	public function handleException($exception, $graceful = FALSE) {
+		$isCliEnvironment = self::$environment === self::ENVIRONMENT_CLI;
 		$output = 'Uncaught exception #' . $exception->getCode() . ': ' . $exception->getMessage();
 		if (self::$willDebug === TRUE) {
-			$output = PHP_EOL . "\033[7;31m" . $output . "\033[0m";
+			if (!$isCliEnvironment) {
+				$output = '<pre>' . $output . PHP_EOL;
+			} else {
+				$output = PHP_EOL . "\033[7;31m" . $output . "\033[0m";
+			}
+
 			$output .= PHP_EOL . $exception->getTraceAsString() . PHP_EOL;
+
+			if (!$isCliEnvironment) {
+				$output .= '</pre>';
+			}
 		} else {
 			$output .= PHP_EOL;
 		}
