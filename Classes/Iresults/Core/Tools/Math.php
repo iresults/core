@@ -138,8 +138,8 @@ class Math {
 	 */
 	static public function add($augend, $addend, $returnString = FALSE) {
 		if (static::_useBCMath()) {
-			$augend = static::_prepareValueForBCMath($augend);
-			$addend = static::_prepareValueForBCMath($addend);
+			$augend = static::_prepareValueForBCMath($augend, 'augend');
+			$addend = static::_prepareValueForBCMath($addend, 'addend');
 			$result = bcadd($augend, $addend, self::$_precision);
 			if (!$returnString) {
 				return floatval($result);
@@ -177,8 +177,8 @@ class Math {
 	 */
 	static public function subtract($minuend, $subtrahend, $returnString = FALSE) {
 		if (static::_useBCMath()) {
-			$minuend = static::_prepareValueForBCMath($minuend);
-			$subtrahend = static::_prepareValueForBCMath($subtrahend);
+			$minuend = static::_prepareValueForBCMath($minuend, 'minuend');
+			$subtrahend = static::_prepareValueForBCMath($subtrahend, 'subtrahend');
 			$result = bcsub($minuend, $subtrahend, self::$_precision);
 			if (!$returnString) {
 				return floatval($result);
@@ -216,8 +216,8 @@ class Math {
 	 */
 	static public function multiply($multiplicand, $multiplier, $returnString = FALSE) {
 		if (static::_useBCMath()) {
-			$multiplicand = static::_prepareValueForBCMath($multiplicand);
-			$multiplier = static::_prepareValueForBCMath($multiplier);
+			$multiplicand = static::_prepareValueForBCMath($multiplicand, 'multiplicand');
+			$multiplier = static::_prepareValueForBCMath($multiplier, 'multiplier');
 			$result = bcmul($multiplicand, $multiplier, self::$_precision);
 			if (!$returnString) {
 				return floatval($result);
@@ -255,8 +255,8 @@ class Math {
 	 */
 	static public function divide($dividend, $divisor, $returnString = FALSE) {
 		if (static::_useBCMath()) {
-			$dividend = static::_prepareValueForBCMath($dividend);
-			$divisor = static::_prepareValueForBCMath($divisor);
+			$dividend = static::_prepareValueForBCMath($dividend, 'dividend');
+			$divisor = static::_prepareValueForBCMath($divisor, 'divisor');
 			$result = bcdiv($dividend, $divisor, self::$_precision);
 			if (!$returnString && $result !== NULL) {
 				return floatval($result);
@@ -304,11 +304,12 @@ class Math {
 	/**
 	 * Prepares the given value for BC Math functions
 	 *
-	 * @param mixed $value
-	 * @throws Exception\MathException if the value could not be prepared
+	 * @param mixed  $value
+	 * @param string $operandName Name of the operand to mention it in the exception
+	 * @throws Exception\MathException
 	 * @return string
 	 */
-	static protected function _prepareValueForBCMath($value) {
+	static protected function _prepareValueForBCMath($value, $operandName = '') {
 		switch (TRUE) {
 			case is_float($value):
 				return number_format($value, self::$_precision, '.', '');
@@ -326,7 +327,12 @@ class Math {
 			case is_array($value):
 			case is_object($value):
 			default:
-				throw new MathException('Could not prepare value of type ' . gettype($value) . ' for BC Math', 1405066983);
+				if ($operandName) {
+					$exceptionMessage = 'Could not prepare ' . $operandName . ' of type ' . gettype($value) . ' for BC Math';
+				} else {
+					$exceptionMessage = 'Could not prepare value of type ' . gettype($value) . ' for BC Math';
+				}
+				throw new MathException($exceptionMessage, 1405066983);
 		}
 	}
 
