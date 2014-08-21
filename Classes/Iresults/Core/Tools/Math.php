@@ -152,7 +152,7 @@ class Math {
 	/**
 	 * Adds all given arbitrary precision numbers
 	 *
-	 * @param array<int|float|string|bool> $values If no array is given all arguments will be multiplied
+	 * @param            array         <int|float|string|bool> $values If no array is given all arguments will be multiplied
 	 * @param bool|float $returnString If TRUE the string representation will be returned (BC Math uses strings)
 	 * @return float|string
 	 */
@@ -191,7 +191,7 @@ class Math {
 	/**
 	 * Subtracts all given arbitrary precision numbers
 	 *
-	 * @param array<int|float|string|bool> $values If no array is given all arguments will be multiplied
+	 * @param            array         <int|float|string|bool> $values If no array is given all arguments will be multiplied
 	 * @param bool|float $returnString If TRUE the string representation will be returned (BC Math uses strings)
 	 * @return float|string
 	 */
@@ -230,7 +230,7 @@ class Math {
 	/**
 	 * Multiplies all given arbitrary precision numbers
 	 *
-	 * @param array<int|float|string|bool> $values If no array is given all arguments will be multiplied
+	 * @param            array         <int|float|string|bool> $values If no array is given all arguments will be multiplied
 	 * @param bool|float $returnString If TRUE the string representation will be returned (BC Math uses strings)
 	 * @return float|string
 	 */
@@ -269,7 +269,7 @@ class Math {
 	/**
 	 * Divide all given arbitrary precision numbers
 	 *
-	 * @param array<int|float|string|bool> $values If no array is given all arguments will be multiplied
+	 * @param            array         <int|float|string|bool> $values If no array is given all arguments will be multiplied
 	 * @param bool|float $returnString If TRUE the string representation will be returned (BC Math uses strings)
 	 * @return float|string
 	 */
@@ -299,6 +299,25 @@ class Math {
 			return bccomp($a, $b, self::$_precision) === 0;
 		}
 		return -1;
+	}
+
+	/**
+	 * Returns if the value is nearly zero (0)
+	 *
+	 * @param int|float|string|bool $value
+	 * @param int                   $precision
+	 * @throws Exception\MathException if the given precision is smaller than one (1)
+	 * @return bool
+	 */
+	static public function nearlyZero($value, $precision = NULL) {
+		if ($precision === NULL) {
+			$precision = self::$_precision;
+		}
+		if ($precision < 1) {
+			throw new MathException('Precision can not be lower than 1', 1408631275);
+		}
+		$epsilon = floatval('0.' . str_repeat('0', $precision - 1) . '1');
+		return abs($value) < $epsilon;
 	}
 
 	/**

@@ -602,5 +602,30 @@ class MathTest extends \PHPUnit_Framework_TestCase {
 
 
 	}
+
+	/**
+	 * @test
+	 */
+	public function nearlyZeroTest() {
+		$this->assertTrue(Math::nearlyZero(0.0000000001));
+		$this->assertTrue(Math::nearlyZero(0.000000001, 8));
+		$this->assertTrue(Math::nearlyZero(0.00000001, 7));
+		$this->assertTrue(Math::nearlyZero(0.0000001, 6));
+		$this->assertTrue(Math::nearlyZero(0.000001, 5));
+		$this->assertTrue(Math::nearlyZero(0.00001, 4));
+		$this->assertTrue(Math::nearlyZero(0.0001, 3));
+		$this->assertTrue(Math::nearlyZero(0.001, 2));
+		$this->assertTrue(Math::nearlyZero(0.01, 1));
+
+		$this->assertFalse(Math::nearlyZero(0.000000001));
+		$this->assertFalse(Math::nearlyZero(0.00000001, 8));
+		$this->assertFalse(Math::nearlyZero(0.0000001, 7));
+		$this->assertFalse(Math::nearlyZero(0.000001, 6));
+		$this->assertFalse(Math::nearlyZero(0.00001, 5));
+		$this->assertFalse(Math::nearlyZero(0.0001, 4));
+		$this->assertFalse(Math::nearlyZero(0.001, 3));
+		$this->assertFalse(Math::nearlyZero(0.01, 2));
+		$this->assertFalse(Math::nearlyZero(0.1, 1));
+	}
 }
 ?>
