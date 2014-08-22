@@ -26,7 +26,7 @@ namespace Iresults\Core;
 
 
 /**
- * Prints a debug output.
+ * Prints a debug output
  *
  * @author        Daniel Corn <cod@iresults.li>
  * @package       Iresults
@@ -46,7 +46,7 @@ class Debug {
 	/**
 	 * @var array<mixed> A storage for objects that already have been processed.
 	 */
-	protected $_storage = NULL;
+	protected $_storage = array();
 
 	/**
 	 * @var string The output.
@@ -67,7 +67,7 @@ class Debug {
 
 
 	/**
-	 * The constructor takes the object to debug as it's argument.
+	 * The constructor takes the object to debug as it's argument
 	 *
 	 * @param    mixed $object
 	 * @return    \Iresults\Core\Debug
@@ -77,27 +77,38 @@ class Debug {
 		 * @Info: The object argument must be optional because Flow throws an
 		 * exception if isset(arguments[0]) evaluates to FALSE.
 		 */
-
-		$this->_storage = array();
-		$this->_output = '';
-
 		if (func_num_args() > 0) {
 			$this->debug($object);
-
-			unset($this->_storage);
-			$this->_storage = NULL;
 		}
 		return $this;
 	}
 
 	/**
-	 * Debugs a variable.
+	 * Debugs a variable
 	 *
 	 * @param    mixed   $object               The object/variable to debug
 	 * @param    boolean $tempIsWebEnvironment Temporarily overwrite the isWebEnvironment configuration
 	 * @return    $this
 	 */
 	public function debug($object, $tempIsWebEnvironment = -1) {
+		$this->_storage = array();
+		$this->_output = '';
+		$this->_debug($object, $tempIsWebEnvironment);
+
+		unset($this->_storage);
+		$this->_storage = NULL;
+
+		return $this;
+	}
+
+	/**
+	 * Debugs a variable
+	 *
+	 * @param    mixed   $object               The object/variable to debug
+	 * @param    boolean $tempIsWebEnvironment Temporarily overwrite the isWebEnvironment configuration
+	 * @return    $this
+	 */
+	protected function _debug($object, $tempIsWebEnvironment = -1) {
 		$hash = '';
 		$objectId = '';
 		$oldIsWebEnvironment = -1;
@@ -112,7 +123,7 @@ class Debug {
 
 
 		/*
-		 * Check the storage if the object does already exist.
+		 * Check the storage if the object does already exist
 		 */
 		if (is_object($object)) {
 			$hash = spl_object_hash($object);
@@ -166,7 +177,7 @@ class Debug {
 			$this->_currentLevel = $this->_currentLevel + 1;
 			foreach ($object as $key => $element) {
 				$this->_add("$key => ");
-				$this->debug($element);
+				$this->_debug($element);
 			}
 			$this->_currentLevel = $this->_currentLevel - 1;
 			$this->_add('}');
@@ -179,7 +190,7 @@ class Debug {
 			$this->_currentLevel = $this->_currentLevel + 1;
 			foreach ($object as $key => $element) {
 				$this->_add("$key => ", FALSE);
-				$this->debug($element);
+				$this->_debug($element);
 			}
 			$this->_currentLevel = $this->_currentLevel - 1;
 			$this->_add('}');
@@ -204,7 +215,7 @@ class Debug {
 			$this->_currentLevel = $this->_currentLevel + 1;
 			foreach ($properties as $key => $element) {
 				$this->_add("$key => ", FALSE);
-				$this->debug($element);
+				$this->_debug($element);
 			}
 			$this->_currentLevel = $this->_currentLevel - 1;
 			$this->_add('}');
@@ -215,7 +226,7 @@ class Debug {
 			$this->_currentLevel = $this->_currentLevel + 1;
 			foreach ($properties as $key => $element) {
 				$this->_add("$key => ", FALSE);
-				$this->debug($element);
+				$this->_debug($element);
 			}
 			$this->_currentLevel = $this->_currentLevel - 1;
 			$this->_add('}');
@@ -226,7 +237,7 @@ class Debug {
 			$this->_currentLevel = $this->_currentLevel + 1;
 			foreach ($properties as $key => $element) {
 				$this->_add("$key => ", FALSE);
-				$this->debug($element);
+				$this->_debug($element);
 			}
 			$this->_currentLevel = $this->_currentLevel - 1;
 			$this->_add('}');
@@ -235,7 +246,7 @@ class Debug {
 			$property = $object->getValue();
 			$this->_add(get_class($object) . $objectId . ' => {');
 			$this->_currentLevel = $this->_currentLevel + 1;
-			$this->debug($property);
+			$this->_debug($property);
 			$this->_currentLevel = $this->_currentLevel - 1;
 			$this->_add('}');
 			/* MWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWM */
@@ -262,7 +273,7 @@ class Debug {
 			$this->_currentLevel = $this->_currentLevel + 1;
 			foreach ($properties as $key => $element) {
 				$this->_add("$key => ", FALSE);
-				$this->debug($element);
+				$this->_debug($element);
 			}
 			$this->_currentLevel = $this->_currentLevel - 1;
 			$this->_add('}');
@@ -277,7 +288,7 @@ class Debug {
 	}
 
 	/**
-	 * Adds a text to the output.
+	 * Adds a text to the output
 	 *
 	 * @param    string  $text
 	 * @param    boolean $break
@@ -300,7 +311,7 @@ class Debug {
 	}
 
 	/**
-	 * Returns the output.
+	 * Returns the output
 	 *
 	 * @return    string
 	 */
@@ -309,12 +320,12 @@ class Debug {
 	}
 
 	/**
-	 * Returns the debug output.
+	 * Returns the debug output
 	 *
 	 * @return    string
 	 */
 	public function get() {
-		return $this->_get();
+		return $this->_output;
 	}
 
 	public function __toString() {
