@@ -1,36 +1,36 @@
 <?php
 namespace Iresults\Core;
 
-/*
- * The MIT License (MIT)
- * Copyright (c) 2013 Andreas Thurnheer-Meier <tma@iresults.li>, iresults
- *
- * Permission is hereby granted, free of charge, to any person obtaining a copy
- * of this software and associated documentation files (the "Software"), to deal
- * in the Software without restriction, including without limitation the rights
- * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
- * copies of the Software, and to permit persons to whom the Software is
- * furnished to do so, subject to the following conditions:
- *
- * The above copyright notice and this permission notice shall be included in
- * all copies or substantial portions of the Software.
- *
- * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
- * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
- * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
- * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
- * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
- * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
- * SOFTWARE.
- */
+	/*
+	 * The MIT License (MIT)
+	 * Copyright (c) 2013 Andreas Thurnheer-Meier <tma@iresults.li>, iresults
+	 *
+	 * Permission is hereby granted, free of charge, to any person obtaining a copy
+	 * of this software and associated documentation files (the "Software"), to deal
+	 * in the Software without restriction, including without limitation the rights
+	 * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+	 * copies of the Software, and to permit persons to whom the Software is
+	 * furnished to do so, subject to the following conditions:
+	 *
+	 * The above copyright notice and this permission notice shall be included in
+	 * all copies or substantial portions of the Software.
+	 *
+	 * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+	 * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+	 * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+	 * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+	 * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+	 * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+	 * SOFTWARE.
+	 */
 
 
 /**
  * Prints a debug output.
  *
- * @author	Daniel Corn <cod@iresults.li>
- * @package	Iresults
- * @subpackage	Iresults
+ * @author        Daniel Corn <cod@iresults.li>
+ * @package       Iresults
+ * @subpackage    Iresults
  */
 class Debug {
 	/**
@@ -69,8 +69,8 @@ class Debug {
 	/**
 	 * The constructor takes the object to debug as it's argument.
 	 *
-	 * @param	mixed	$object
-	 * @return	\Iresults\Core\Debug
+	 * @param    mixed $object
+	 * @return    \Iresults\Core\Debug
 	 */
 	public function __construct($object = NULL) {
 		/*
@@ -80,20 +80,22 @@ class Debug {
 
 		$this->_storage = array();
 		$this->_output = '';
-		$this->debug($object);
 
-		unset($this->_storage);
-		$this->_storage = NULL;
+		if (func_num_args() > 0) {
+			$this->debug($object);
 
+			unset($this->_storage);
+			$this->_storage = NULL;
+		}
 		return $this;
 	}
 
 	/**
 	 * Debugs a variable.
 	 *
-	 * @param	mixed	$object 				The object/variable to debug
-	 * @param 	boolean	$tempIsWebEnvironment 	Temporarily overwrite the isWebEnvironment configuration
-	 * @return	void
+	 * @param    mixed   $object               The object/variable to debug
+	 * @param    boolean $tempIsWebEnvironment Temporarily overwrite the isWebEnvironment configuration
+	 * @return    $this
 	 */
 	public function debug($object, $tempIsWebEnvironment = -1) {
 		$hash = '';
@@ -104,7 +106,7 @@ class Debug {
 		// Check if the deepest level is reached.
 		if ($this->_currentLevel >= $this->_maxLevel) {
 			$this->_add(self::MAX_LEVEL_REACHED_MESSAGE);
-			return;
+			return $this;
 		}
 		$this->_currentLevel = $this->_currentLevel + 1;
 
@@ -116,9 +118,9 @@ class Debug {
 			$hash = spl_object_hash($object);
 
 			if (isset($this->_storage[$hash])) {
-				$this->_add('Recursion for object '. get_class($object) . ' #' . $hash);
+				$this->_add('Recursion for object ' . get_class($object) . ' #' . $hash);
 				$this->_currentLevel = $this->_currentLevel - 1;
-				return;
+				return $this;
 			}
 
 			$this->_storage[$hash] = $object;
@@ -147,7 +149,7 @@ class Debug {
 			/* MWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWM */
 		} else if (is_string($object)) {
 			if ($this->_isWebEnvironment) {
-				$this->_add('(string) "' . htmlspecialchars( $object ) . '"');
+				$this->_add('(string) "' . htmlspecialchars($object) . '"');
 			} else {
 				$this->_add('(string) "' . $object . '"');
 			}
@@ -176,36 +178,32 @@ class Debug {
 			$this->_add(get_class($object) . ' (' . $objectId . count($object) . ') => {');
 			$this->_currentLevel = $this->_currentLevel + 1;
 			foreach ($object as $key => $element) {
-				$this->_add("$key => ",false);
+				$this->_add("$key => ", FALSE);
 				$this->debug($element);
 			}
 			$this->_currentLevel = $this->_currentLevel - 1;
 			$this->_add('}');
 			/* MWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWM */
 		} else if ($object instanceof \DateTime) {
-			$dateTime = var_export($object,TRUE);
-			$dateTime = str_replace('::__set_state(array(',' => {',$dateTime);
-			$dateTime = str_replace('))','}',$dateTime);
-			$dateTime = str_replace(array(",\n",",\r",",\r\n"), PHP_EOL, $dateTime);
 			$dateTime = get_class($object) . ' => {' . $object->format('r') . '}';
 			$this->_add($dateTime);
 			/* MWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWM */
 		} else if ($object instanceof \Iresults\Core\DateTime) {
-			$dateTime = var_export($object->getRaw(),TRUE);
-			$dateTime = str_replace('::__set_state(array(',' => {',$dateTime);
-			$dateTime = str_replace('))','}',$dateTime);
-			$dateTime = str_replace(array(",\n",",\r",",\r\n"), PHP_EOL, $dateTime);
+			$dateTime = var_export($object, TRUE);
+			$dateTime = str_replace('::__set_state(array(', ' => {', $dateTime);
+			$dateTime = str_replace('))', '}', $dateTime);
+			$dateTime = str_replace(array(",\n", ",\r", ",\r\n"), PHP_EOL, $dateTime);
 			$this->_add($dateTime);
 			/* MWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWM */
-		} else if (is_a($object,'Tx_Extbase_Error_Message')) {
+		} else if (is_a($object, 'Tx_Extbase_Error_Message')) {
 			$this->_add(get_class($object) . " => $object");
 			/* MWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWM */
-		} else if (method_exists($object,'_getProperties')) {
+		} else if (method_exists($object, '_getProperties')) {
 			$properties = $object->_getProperties();
 			$this->_add(get_class($object) . $objectId . ' => {');
 			$this->_currentLevel = $this->_currentLevel + 1;
 			foreach ($properties as $key => $element) {
-				$this->_add("$key => ",false);
+				$this->_add("$key => ", FALSE);
 				$this->debug($element);
 			}
 			$this->_currentLevel = $this->_currentLevel - 1;
@@ -216,24 +214,24 @@ class Debug {
 			$this->_add(get_class($object) . $objectId . ' => {');
 			$this->_currentLevel = $this->_currentLevel + 1;
 			foreach ($properties as $key => $element) {
-				$this->_add("$key => ",false);
+				$this->_add("$key => ", FALSE);
 				$this->debug($element);
 			}
 			$this->_currentLevel = $this->_currentLevel - 1;
 			$this->_add('}');
 			/* MWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWM */
-		} else if (method_exists($object,'getData')) {
+		} else if (method_exists($object, 'getData')) {
 			$properties = $object->getData();
 			$this->_add(get_class($object) . $objectId . ' => {');
 			$this->_currentLevel = $this->_currentLevel + 1;
 			foreach ($properties as $key => $element) {
-				$this->_add("$key => ",false);
+				$this->_add("$key => ", FALSE);
 				$this->debug($element);
 			}
 			$this->_currentLevel = $this->_currentLevel - 1;
 			$this->_add('}');
 			/* MWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWM */
-		} else if (is_a($object,'\Iresults\Core\Value')) {
+		} else if (is_a($object, '\Iresults\Core\Value')) {
 			$property = $object->getValue();
 			$this->_add(get_class($object) . $objectId . ' => {');
 			$this->_currentLevel = $this->_currentLevel + 1;
@@ -263,7 +261,7 @@ class Debug {
 			$this->_add(get_class($object) . $objectId . ' => {');
 			$this->_currentLevel = $this->_currentLevel + 1;
 			foreach ($properties as $key => $element) {
-				$this->_add("$key => ",false);
+				$this->_add("$key => ", FALSE);
 				$this->debug($element);
 			}
 			$this->_currentLevel = $this->_currentLevel - 1;
@@ -274,21 +272,23 @@ class Debug {
 		if ($tempIsWebEnvironment !== -1) {
 			$this->_isWebEnvironment = $oldIsWebEnvironment;
 		}
+
+		return $this;
 	}
 
 	/**
 	 * Adds a text to the output.
 	 *
-	 * @param	string	$text
-	 * @param	boolean	$break
-	 * @return	void
+	 * @param    string  $text
+	 * @param    boolean $break
+	 * @return    void
 	 */
 	protected function _add($text, $break = TRUE) {
 		// Check the environment and print &nbsp; for web and \t for a shell
 		if ($this->_isWebEnvironment === -1) {
 			$this->getIsWebEnvironment();
 		}
-		for($i = 1; $i < $this->_currentLevel; $i++) {
+		for ($i = 1; $i < $this->_currentLevel; $i++) {
 			if ($this->_isWebEnvironment) {
 				$this->_output .= '&nbsp;&nbsp;&nbsp;&nbsp;';
 			} else {
@@ -302,7 +302,7 @@ class Debug {
 	/**
 	 * Returns the output.
 	 *
-	 * @return	string
+	 * @return    string
 	 */
 	protected function _get() {
 		return $this->_output;
@@ -311,11 +311,12 @@ class Debug {
 	/**
 	 * Returns the debug output.
 	 *
-	 * @return	string
+	 * @return    string
 	 */
 	public function get() {
 		return $this->_get();
 	}
+
 	public function __toString() {
 		return $this->_get();
 	}
@@ -332,19 +333,19 @@ class Debug {
 				&& Iresults::getOutputFormat() === Iresults::OUTPUT_FORMAT_XML
 			);
 		}
-	    return $this->_isWebEnvironment;
+		return $this->_isWebEnvironment;
 	}
 
 	/**
 	 * Overwrite the environment setting
 	 *
 	 * @param  boolean $isWebEnvironment
-	 * @return boolean						Returns the original value
+	 * @return boolean                        Returns the original value
 	 */
 	public function setIsWebEnvironment($isWebEnvironment) {
 		$oldIsWebEnvironment = $this->_isWebEnvironment;
-	    $this->_isWebEnvironment = $isWebEnvironment;
-	    return $oldIsWebEnvironment;
+		$this->_isWebEnvironment = $isWebEnvironment;
+		return $oldIsWebEnvironment;
 	}
 
 	/* MWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWM */
