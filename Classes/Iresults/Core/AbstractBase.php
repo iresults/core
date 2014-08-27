@@ -912,7 +912,12 @@ abstract class AbstractBase implements IresultsBaseInterface {
 	 */
 	public function handleException($exception, $graceful = FALSE) {
 		$isCliEnvironment = self::$environment === self::ENVIRONMENT_CLI;
-		$output = 'Uncaught exception #' . $exception->getCode() . ': ' . $exception->getMessage();
+
+		if ($exception instanceof \Exception) {
+			$output = 'Uncaught exception #' . $exception->getCode() . ': ' . $exception->getMessage();
+		} else {
+			$output = 'Uncaught error of type ' . (is_object($exception) ? get_class($exception) : gettype($exception));
+		}
 		if (self::$willDebug === TRUE) {
 			if (!$isCliEnvironment) {
 				$output = '<pre>' . $output . PHP_EOL;
@@ -920,7 +925,9 @@ abstract class AbstractBase implements IresultsBaseInterface {
 				$output = PHP_EOL . "\033[7;31m" . $output . "\033[0m";
 			}
 
-			$output .= PHP_EOL . $exception->getTraceAsString() . PHP_EOL;
+			if ($exception instanceof \Exception) {
+				$output .= PHP_EOL . $exception->getTraceAsString() . PHP_EOL;
+			}
 
 			if (!$isCliEnvironment) {
 				$output .= '</pre>';
