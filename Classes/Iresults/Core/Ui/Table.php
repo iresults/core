@@ -3,7 +3,7 @@
  * Copyright notice
  *
  * (c) 2010 Andreas Thurnheer-Meier <tma@iresults.li>, iresults
- *  			Daniel Corn <cod@iresults.li>, iresults
+ *            Daniel Corn <cod@iresults.li>, iresults
  *
  *  All rights reserved
  *
@@ -25,6 +25,7 @@
  */
 
 namespace Iresults\Core\Ui;
+
 use Iresults\Core\Command\ColorInterface;
 use Iresults\Core\Core;
 use Iresults\Core\Iresults;
@@ -38,24 +39,35 @@ use Iresults\Core\Tools\StringTool;
 class Table extends Core {
 	/**
 	 * The (prepared) table data that will be displayed
+	 *
 	 * @var array
 	 */
 	protected $data = array();
 
 	/**
 	 * The table header row
+	 *
 	 * @var array
 	 */
 	protected $headerRow;
 
 	/**
 	 * Defines if the first row contains the column headers
+	 *
 	 * @var bool
 	 */
 	protected $useFirstRowAsHeaderRow = FALSE;
 
 	/**
+	 * Defines if the table should be colored
+	 *
+	 * @var bool
+	 */
+	protected $useColors = TRUE;
+
+	/**
 	 * Saves the number of tables the view helper rendered
+	 *
 	 * @var integer
 	 */
 	static protected $tableCounter = 0;
@@ -72,12 +84,12 @@ class Table extends Core {
 	/**
 	 * Displays the rendered table
 	 *
-	 * @param	array 	$data The data to output
-	 * @param	string	$tableClass	 The class of the table
-	 * @param	string	$rowClass	 The class of the rows (TR-tags)
-	 * @param	string	$cellClass	 The class of the cells (TD-tags)
-	 * @param	string	$headClass	 The class of the header cells (TH-tags)
-	 * @return	string The rendered table
+	 * @param    array  $data       The data to output
+	 * @param    string $tableClass The class of the table
+	 * @param    string $rowClass   The class of the rows (TR-tags)
+	 * @param    string $cellClass  The class of the cells (TD-tags)
+	 * @param    string $headClass  The class of the header cells (TH-tags)
+	 * @return    string The rendered table
 	 */
 	public function display($data = NULL, $tableClass = 'list', $rowClass = '', $cellClass = '', $headClass = '') {
 		$output = $this->render($data, $tableClass, $rowClass, $cellClass, $headClass);
@@ -88,12 +100,12 @@ class Table extends Core {
 	/**
 	 * Returns the rendered table
 	 *
-	 * @param	array 	$data The data to output
-	 * @param	string	$tableClass	 The class of the table
-	 * @param	string	$rowClass	 The class of the rows (TR-tags)
-	 * @param	string	$cellClass	 The class of the cells (TD-tags)
-	 * @param	string	$headClass	 The class of the header cells (TH-tags)
-	 * @return	string The rendered table
+	 * @param    array  $data       The data to output
+	 * @param    string $tableClass The class of the table
+	 * @param    string $rowClass   The class of the rows (TR-tags)
+	 * @param    string $cellClass  The class of the cells (TD-tags)
+	 * @param    string $headClass  The class of the header cells (TH-tags)
+	 * @return    string The rendered table
 	 */
 	public function render($data = NULL, $tableClass = 'list', $rowClass = '', $cellClass = '', $headClass = '') {
 		if (Iresults::getEnvironment() === Iresults::ENVIRONMENT_SHELL) {
@@ -105,15 +117,14 @@ class Table extends Core {
 	/**
 	 * Returns the rendered HTML table.
 	 *
-	 * @param	array 	$data The data to output
-	 * @param	string	$tableClass	 The class of the table
-	 * @param	string	$rowClass	 The class of the rows (TR-tags)
-	 * @param	string	$cellClass	 The class of the cells (TD-tags)
-	 * @param	string	$headClass	 The class of the header cells (TH-tags)
-	 * @return	string The rendered table
+	 * @param    array  $data       The data to output
+	 * @param    string $tableClass The class of the table
+	 * @param    string $rowClass   The class of the rows (TR-tags)
+	 * @param    string $cellClass  The class of the cells (TD-tags)
+	 * @param    string $headClass  The class of the header cells (TH-tags)
+	 * @return    string The rendered table
 	 */
 	public function renderHtml($data = NULL, $tableClass = 'list', $rowClass = '', $cellClass = '', $headClass = '') {
-		$useDefaultStyles = FALSE;
 		$list = '';
 
 		if ($data === NULL) {
@@ -127,9 +138,8 @@ class Table extends Core {
 		$tableId = 'iresults_table_id' . self::$tableCounter;
 
 		// Check whether to use the default styles
-		if ($tableClass === 'list' && !$rowClass && !$cellClass && !$headClass) {
-			$useDefaultStyles = 1;
-			$list .= "<style type='text/css'>
+		if ($this->getUseColors() && $tableClass === 'list' && !$rowClass && !$cellClass && !$headClass) {
+				$list .= "<style type='text/css'>
 			#$tableId td,
 			#$tableId th{
 				border:solid 1px #ccc;
@@ -178,29 +188,25 @@ class Table extends Core {
 	/**
 	 * Returns the rendered table for terminal output.
 	 *
-	 * @param	array 	$data 				The data to output
-	 * @param	integer	$maxColumnWidth		Maximum column width
-	 * @param	boolean	$disableHead		Indicates if the head row should be rendered
-	 * @param 	string	$separator			The column separator
-	 * @return	string 						The rendered table
+	 * @param    array   $data           The data to output
+	 * @param    integer $maxColumnWidth Maximum column width
+	 * @param    boolean $disableHead    Indicates if the head row should be rendered
+	 * @param    string  $separator      The column separator
+	 * @return    string                        The rendered table
 	 */
 	public function renderShell($data = NULL, $maxColumnWidth = PHP_INT_MAX, $disableHead = FALSE, $separator = '|') {
 		$list = '';
-		$columnCount = 0;
-		$useDefaultStyles = FALSE;
 
 		// If renderShell() is invoked from render() with the default arguments
 		if ($maxColumnWidth === 'list') {
 			$maxColumnWidth = PHP_INT_MAX;
 		}
 
-		$maxColumnWidth = 100;
 		if ($data === NULL) {
 			$data = $this->getData();
 		}
 		$data = $this->prepareData($data);
 		$head = $this->getHeaderRow($data);
-
 
 
 		// Calculate the column widths
@@ -221,7 +227,7 @@ class Table extends Core {
 		foreach ($data as $row) {
 			$indexedRow = array_values($row);
 			$columnCount = count($indexedRow);
-			for($i = 0; $i < $columnCount; $i++) {
+			for ($i = 0; $i < $columnCount; $i++) {
 				if ($columnWidths[$i] < strlen(utf8_decode($indexedRow[$i]))) {
 					$currentColumnWidth = strlen(utf8_decode($indexedRow[$i]));
 					if ($currentColumnWidth > $maxColumnWidth) {
@@ -232,8 +238,13 @@ class Table extends Core {
 			}
 		}
 
+		$useColors = $this->getUseColors();
 		if (!$disableHead) {
-			$list .= PHP_EOL . ColorInterface::ESCAPE . ColorInterface::REVERSE;
+			$list .= PHP_EOL;
+			if ($useColors) {
+				$list .= ColorInterface::ESCAPE . ColorInterface::REVERSE;
+			}
+
 			$columnCount = count($head);
 			for ($i = 0; $i < $columnCount; $i++) {
 				$col = $head[$i];
@@ -242,6 +253,7 @@ class Table extends Core {
 				if (is_array($col)) {
 					$col = reset($col);
 				}
+				$col = (string)$col;
 
 				if (strlen(utf8_decode($col)) > $columnWidth) {
 					$col = substr($col, 0, $columnWidth);
@@ -249,7 +261,11 @@ class Table extends Core {
 				// Add spaces to fill the cell to the needed length
 				$list .= $separator . ' ' . StringTool::pad($col, $columnWidth, ' ') . ' ';
 			}
-			$list .= $separator . ColorInterface::SIGNAL_ATTRIBUTES_OFF . PHP_EOL;
+			if ($useColors) {
+				$list .= $separator . ColorInterface::SIGNAL_ATTRIBUTES_OFF . PHP_EOL;
+			} else {
+				$list .= $separator . PHP_EOL;
+			}
 		}
 
 		$even = TRUE;
@@ -259,7 +275,9 @@ class Table extends Core {
 				$even = FALSE;
 			} else {
 				$even = TRUE;
-				$list .= ColorInterface::ESCAPE . ColorInterface::GRAY . ColorInterface::ESCAPE . ColorInterface::REVERSE;
+				if ($useColors) {
+					$list .= ColorInterface::ESCAPE . ColorInterface::GRAY . ColorInterface::ESCAPE . ColorInterface::REVERSE;
+				}
 			}
 
 			$indexedRow = array_values($row);
@@ -271,6 +289,7 @@ class Table extends Core {
 				if (is_array($col)) {
 					$col = reset($col);
 				}
+				$col = (string)$col;
 
 				// Add spaces to fill the cell to the needed length
 				if (strlen($col) > $columnWidth) {
@@ -279,13 +298,18 @@ class Table extends Core {
 				}
 				$list .= $separator . ' ' . StringTool::pad($col, $columnWidth, ' ') . ' ';
 			}
-			$list .= $separator . ColorInterface::SIGNAL_ATTRIBUTES_OFF . PHP_EOL;
+			if ($useColors) {
+				$list .= $separator . ColorInterface::SIGNAL_ATTRIBUTES_OFF . PHP_EOL;
+			} else {
+				$list .= $separator . PHP_EOL;
+			}
 		}
 		return $list;
 	}
 
 	/**
 	 * Sets if the first row contains the column headers
+	 *
 	 * @param boolean $useFirstRowAsHeaderRow
 	 */
 	public function setUseFirstRowAsHeaderRow($useFirstRowAsHeaderRow) {
@@ -294,10 +318,29 @@ class Table extends Core {
 
 	/**
 	 * Returns if the first row contains the column headers
+	 *
 	 * @return boolean
 	 */
 	public function getUseFirstRowAsHeaderRow() {
 		return $this->useFirstRowAsHeaderRow;
+	}
+
+	/**
+	 * Returns if the table should be colored
+	 *
+	 * @return boolean
+	 */
+	public function getUseColors() {
+		return $this->useColors;
+	}
+
+	/**
+	 * Set if the table should be colored
+	 *
+	 * @param boolean $useColors
+	 */
+	public function setUseColors($useColors) {
+		$this->useColors = $useColors;
 	}
 
 	/**
@@ -322,6 +365,7 @@ class Table extends Core {
 
 	/**
 	 * Returns the data
+	 *
 	 * @return array
 	 */
 	public function getData() {
@@ -351,7 +395,6 @@ class Table extends Core {
 
 		$firstRow = reset($data);
 		if (!is_array($firstRow) && !($firstRow instanceof \Traversable)) {
-			$firstRow = $data;
 			$data = array($data);
 		}
 
