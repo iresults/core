@@ -58,6 +58,7 @@ class CsvParser extends AbstractParser {
 		}
 
 		$firstTwoLines = fgets($fileHandle) . fgets($fileHandle);
+		rewind($fileHandle);
 		list($delimiter, $enclosure, $escape) = $this->autoDetectMissingParserConfiguration($firstTwoLines);	rewind($fileHandle);
 
 		/*
