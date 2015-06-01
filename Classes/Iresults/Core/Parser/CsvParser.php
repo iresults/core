@@ -57,7 +57,7 @@ class CsvParser extends AbstractParser {
 			throw new ParserInvalidInputException('Could not load CSV file from "' . $input . '".', 1315232117);
 		}
 
-		$firstTwoLines = fgets($fileHandle) . fgets($fileHandle);
+        $firstTwoLines = fgets($fileHandle) . fgets($fileHandle);
 		rewind($fileHandle);
 		list($delimiter, $enclosure, $escape) = $this->autoDetectMissingParserConfiguration($firstTwoLines);	rewind($fileHandle);
 
@@ -66,7 +66,7 @@ class CsvParser extends AbstractParser {
 		 * enclosure
 		 */
 		if ($enclosure) {
-			while (($data = fgetcsv($fileHandle, 10000, $delimiter, $enclosure, $escape)) !== FALSE) {
+			while (($data = fgetcsv($fileHandle, 0, $delimiter, $enclosure, $escape)) !== FALSE) {
 				$parsedData[] = $data;
 			}
 		} else {
