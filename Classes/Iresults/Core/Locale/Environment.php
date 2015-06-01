@@ -34,6 +34,7 @@ namespace Iresults\Core\Locale;
 
 
 use Iresults\Core\Iresults;
+use Iresults\Core\Locale\Exception\LocaleException;
 
 /**
  * Manager for the locale environment
@@ -62,6 +63,9 @@ class Environment {
 		if ($locale === 'C') {
 			$locale = Iresults::getLocale();
 		}
+        if ($locale === 'UTF-8') {
+            $locale = Iresults::getLocale() . '.UTF-8';
+        }
 		$this->setLocale($locale);
 	}
 
@@ -72,9 +76,11 @@ class Environment {
 	 * @param string $locale
 	 */
 	public function setLocale($locale) {
-		$this->locale = $locale;
-		putenv('LC_ALL=' . $locale);
-		setlocale(LC_ALL, $locale);
+        if (setlocale(LC_ALL, $locale) === FALSE) {
+            throw new LocaleException(sprintf('Locale "%s" not found', $locale), 1433151580);
+        }
+        $this->locale = $locale;
+        putenv('LC_ALL=' . $locale);
 	}
 
 	/**

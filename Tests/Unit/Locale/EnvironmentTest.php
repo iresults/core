@@ -58,10 +58,14 @@ class EnvironmentTest extends \PHPUnit_Framework_TestCase {
 	 * @test
 	 */
 	public function getInitialLocaleTest(){
-		$locale = setlocale(LC_CTYPE, '0');
-		if ($locale === 'C') {
-			$locale = Iresults::getLocale();
-		}
+        $locale = setlocale(LC_CTYPE, '0');
+        if ($locale === 'C') {
+            $locale = Iresults::getLocale();
+        }
+        if ($locale === 'UTF-8') {
+            $locale = Iresults::getLocale() . '.UTF-8';
+        }
+
 		$this->assertEquals($locale, Environment::getSharedInstance()->getLocale());
 	}
 
@@ -79,17 +83,41 @@ class EnvironmentTest extends \PHPUnit_Framework_TestCase {
 
 	/**
 	 * @test
+     * @expectedException \Iresults\Core\Locale\Exception\LocaleException
+	 */
+	public function executeWithInvalidLocaleTest(){
+		$newLocale = 'ir_ES.UTF-8';
+		Environment::getSharedInstance()->executeWithLocale($newLocale, 'time');
+	}
+
+	/**
+	 * @test
 	 */
 	public function executeWithLocaleAndCallableTest(){
-//		$newLocale = 'ne_NP.UTF-8';
-		$newLocale = 'de_DE.UTF-8';
+        $newLocale = 'de_DE.UTF-8';
 
 		$result = Environment::getSharedInstance()->executeWithLocale($newLocale,
 			function () {
 				return setlocale(LC_CTYPE, '0');
 			}
 		);
-		$this->assertEquals($newLocale, $result);
+        $this->assertEquals($newLocale, $result);
+        $this->assertEquals(self::$systemLocale, Environment::getSharedInstance()->getLocale());
+		$this->assertEquals(self::$systemLocale, setlocale(LC_CTYPE, '0'));
+	}
+
+	/**
+	 * @test
+	 */
+	public function executeWithLocaleAndCallableTimeFormatTest(){
+        $newLocale = 'nl_NL.UTF-8';
+
+		$result = Environment::getSharedInstance()->executeWithLocale($newLocale,
+			function () {
+                return strftime ("%A %e %B %Y", mktime (0, 0, 0, 12, 22, 1978));
+			}
+		);
+        $this->assertEquals('vrijdag 22 december 1978', $result);
 		$this->assertEquals(self::$systemLocale, Environment::getSharedInstance()->getLocale());
 		$this->assertEquals(self::$systemLocale, setlocale(LC_CTYPE, '0'));
 	}
@@ -98,7 +126,6 @@ class EnvironmentTest extends \PHPUnit_Framework_TestCase {
 	 * @test
 	 */
 	public function executeWithLocaleAndArrayWithoutArgumentsTest(){
-//		$newLocale = 'ne_NP.UTF-8';
 		$newLocale = 'de_DE.UTF-8';
 
 		$result = Environment::getSharedInstance()->executeWithLocale($newLocale,
@@ -115,7 +142,6 @@ class EnvironmentTest extends \PHPUnit_Framework_TestCase {
 	 * @test
 	 */
 	public function executeWithLocaleAndArrayWithArgumentsTest(){
-//		$newLocale = 'ne_NP.UTF-8';
 		$newLocale = 'de_DE.UTF-8';
 
 		$result = Environment::getSharedInstance()->executeWithLocale($newLocale,
