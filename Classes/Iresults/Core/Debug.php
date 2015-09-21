@@ -208,11 +208,9 @@ class Debug
             $properties = $object->_ir_debug();
             $this->_add(get_class($object).$objectId.' => {');
             $this->_currentLevel = $this->_currentLevel + 1;
-            if ($properties) {
-                foreach ($properties as $key => $element) {
-                    $this->_add("$key => ", false);
-                    $this->debug($element);
-                }
+            foreach ($properties as $key => $element) {
+                $this->_add("$key => ", false);
+                $this->_debug($element);
             }
             $this->_currentLevel = $this->_currentLevel - 1;
             $this->_add('}');
