@@ -76,6 +76,17 @@ class MathTest extends \PHPUnit_Framework_TestCase {
 		$this->assertEquals('2901.189010000', $result);
 		$this->assertNotSame('2901.189010000', $result);
 		$this->assertSame('2901.18901', '' . $result);
+
+
+		$augend = 2900.099;
+		$addend = 1.09001;
+		$result = Math::addAll(array($augend, 0, $addend), TRUE);
+		$this->assertSame('2901.189010000', $result);
+
+		$result = Math::addAll(array($augend, 0, $addend), FALSE);
+		$this->assertEquals('2901.189010000', $result);
+		$this->assertNotSame('2901.189010000', $result);
+		$this->assertSame('2901.18901', '' . $result);
 	}
 
 	/**
@@ -86,6 +97,11 @@ class MathTest extends \PHPUnit_Framework_TestCase {
 		$addend = 1.09001;
 		$result = Math::addAll($augend, $addend);
 		$this->assertSame('2901.189010000', $result);
+
+		$augend = 2900.099;
+		$addend = 1.09001;
+		$result = Math::addAll($augend, 0, $addend);
+		$this->assertSame(2901.18901, $result);
 	}
 
 	/**
@@ -252,6 +268,18 @@ class MathTest extends \PHPUnit_Framework_TestCase {
 		$this->assertEquals('0.000000001', $result);
 		$this->assertNotSame('0.000000001', $result);
 		$this->assertSame('1.0E-9', '' . $result);
+
+
+		Math::setPrecision(9);
+		$minuend = 2900.099000001;
+		$subtrahend = 2900.09900000;
+		$result = Math::subtractAll(array($minuend, 0, $subtrahend), TRUE);
+		$this->assertSame('0.000000001', $result);
+
+		$result = Math::subtractAll(array($minuend, 0, $subtrahend), FALSE);
+		$this->assertEquals('0.000000001', $result);
+		$this->assertNotSame('0.000000001', $result);
+		$this->assertSame('1.0E-9', '' . $result);
 	}
 
 	/**
@@ -300,6 +328,13 @@ class MathTest extends \PHPUnit_Framework_TestCase {
 		$subtrahend = 2900.09900000;
 		$result = Math::subtractAll($minuend, $subtrahend);
 		$this->assertSame('0.000000001', $result);
+
+
+		Math::setPrecision(9);
+		$minuend = 2900.099000001;
+		$subtrahend = 2900.09900000;
+		$result = Math::subtractAll($minuend, 0, $subtrahend);
+		$this->assertSame(0.000000001, $result);
 	}
 
 	/**
@@ -337,6 +372,17 @@ class MathTest extends \PHPUnit_Framework_TestCase {
 		$this->assertEquals('2900.099000000', $result);
 		$this->assertNotSame('2900.099000000', $result);
 		$this->assertSame('2900.099', '' . $result);
+
+
+		$multiplicand = 2900.099;
+		$multiplier = 0;
+		$result = Math::multiply($multiplicand, $multiplier, TRUE);
+		$this->assertSame('0.000000000', $result);
+
+		$result = Math::multiply($multiplicand, $multiplier, FALSE);
+		$this->assertEquals('0.000000000', $result);
+		$this->assertNotSame('0.000000000', $result);
+		$this->assertSame('0', '' . $result);
 	}
 
 	/**
@@ -374,6 +420,17 @@ class MathTest extends \PHPUnit_Framework_TestCase {
 		$this->assertEquals('2900.099000000', $result);
 		$this->assertNotSame('2900.099000000', $result);
 		$this->assertSame('2900.099', '' . $result);
+
+
+		$multiplicand = 2900.099;
+		$multiplier = 0;
+		$result = Math::multiplyAll(array($multiplicand, $multiplier), TRUE);
+		$this->assertSame('0.000000000', $result);
+
+		$result = Math::multiplyAll(array($multiplicand, $multiplier), FALSE);
+		$this->assertEquals('0.000000000', $result);
+		$this->assertNotSame('0.000000000', $result);
+		$this->assertSame('0', '' . $result);
 	}
 
 	/**
@@ -394,6 +451,11 @@ class MathTest extends \PHPUnit_Framework_TestCase {
 		$multiplier = 1;
 		$result = Math::multiplyAll($multiplicand, $multiplier);
 		$this->assertSame('2900.099000000', $result);
+
+		$multiplicand = 2900.099;
+		$multiplier = 1;
+		$result = Math::multiplyAll($multiplicand, 0, $multiplier);
+		$this->assertSame(0.0, $result);
 	}
 
 	/**
@@ -471,6 +533,21 @@ class MathTest extends \PHPUnit_Framework_TestCase {
 	}
 
 	/**
+	 * @expectedException \Iresults\Core\Tools\Exception\DivisionByZeroException
+	 */
+	public function divideAllArrayDivisionByZeroTest() {
+		$dividend = 2900.00;
+		$divisor = 2900;
+		$result = Math::divideAll(array($dividend, 0, $divisor), TRUE);
+		$this->assertSame('1.000000000', $result);
+
+		$result = Math::divideAll(array($dividend, 0, $divisor), FALSE);
+		$this->assertEquals('1.000000000', $result);
+		$this->assertNotSame('1.000000000', $result);
+		$this->assertSame('1', '' . $result);
+	}
+
+	/**
 	 * @test
 	 */
 	public function divideAllTest() {
@@ -492,6 +569,7 @@ class MathTest extends \PHPUnit_Framework_TestCase {
 		$result = Math::divideAll($dividend, $divisor);
 		$this->assertEquals('1.000000000', $result);
 
+
 		$dividend = 2900.00;
 		$divisor = 2900;
 		$result = Math::divideAll($dividend, $divisor);
@@ -499,6 +577,15 @@ class MathTest extends \PHPUnit_Framework_TestCase {
 
 		$result = Math::divideAll($dividend, $divisor);
 		$this->assertEquals('1.000000000', $result);
+	}
+
+	/**
+	 * @expectedException \Iresults\Core\Tools\Exception\DivisionByZeroException
+	 */
+	public function divideAllDivisionByZeroTestTest() {
+		$dividend = 2900.00;
+		$divisor = 2900;
+		Math::divideAll($dividend, 0, $divisor);
 	}
 
 	/**

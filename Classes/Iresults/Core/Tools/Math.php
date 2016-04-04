@@ -32,6 +32,7 @@
 
 namespace Iresults\Core\Tools;
 
+use Iresults\Core\Tools\Exception\DivisionByZeroException;
 use Iresults\Core\Tools\Exception\MathException;
 
 /**
@@ -160,8 +161,8 @@ class Math {
 		if (!is_array($values)) {
 			$values = func_get_args();
 		}
-		$augend = current($values);
-		while ($addend = next($values)) {
+		$augend = array_shift($values);
+		foreach ($values as $addend) {
 			$augend = static::add($augend, $addend, $returnString);
 		}
 		return $augend;
@@ -199,8 +200,9 @@ class Math {
 		if (!is_array($values)) {
 			$values = func_get_args();
 		}
-		$minuend = current($values);
-		while ($subtrahend = next($values)) {
+
+		$minuend = array_shift($values);
+		foreach ($values as $subtrahend) {
 			$minuend = static::subtract($minuend, $subtrahend, $returnString);
 		}
 		return $minuend;
@@ -238,8 +240,8 @@ class Math {
 		if (!is_array($values)) {
 			$values = func_get_args();
 		}
-		$multiplicand = current($values);
-		while ($multiplier = next($values)) {
+		$multiplicand = array_shift($values);
+		foreach ($values as $multiplier) {
 			$multiplicand = static::multiply($multiplicand, $multiplier, $returnString);
 		}
 		return $multiplicand;
@@ -277,8 +279,11 @@ class Math {
 		if (!is_array($values)) {
 			$values = func_get_args();
 		}
-		$dividend = current($values);
-		while ($divisor = next($values)) {
+		$dividend = array_shift($values);
+		foreach ($values as $divisor) {
+			if ($dividend == 0) {
+				throw new DivisionByZeroException('Division by zero');
+			}
 			$dividend = static::divide($dividend, $divisor, $returnString);
 		}
 		return $dividend;
