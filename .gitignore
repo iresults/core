@@ -4,6 +4,8 @@ Resources/Public/Library/
 Resources/Private/Templates/Page/*
 Resources/Public/Stylesheets/Css/*
 
+.idea/magicento.xml
+.idea/workspace.xml
 
 #################################
 ### GENERAL SETTINGS
