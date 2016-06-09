@@ -199,4 +199,3 @@ class MutableTest extends \PHPUnit_Framework_TestCase {
 		$this->assertEquals('29°C', $mutable->getObjectForKeyPath('weather.temperature'));
 	}
 }
-?>

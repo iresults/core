@@ -599,5 +599,3 @@ abstract class Iresults implements IresultsBaseConstants {
 		static::getSharedInstance()->handleException($exception, $graceful);
 	}
 }
-
-?>

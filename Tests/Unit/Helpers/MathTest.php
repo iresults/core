@@ -715,4 +715,3 @@ class MathTest extends \PHPUnit_Framework_TestCase {
 		$this->assertFalse(Math::nearlyZero(0.1, 1));
 	}
 }
-?>

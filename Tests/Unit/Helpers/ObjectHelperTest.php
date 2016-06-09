@@ -153,4 +153,3 @@ class ObjectHelperTest extends \PHPUnit_Framework_TestCase {
 
 
 }
-?>

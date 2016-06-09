@@ -247,4 +247,3 @@ interface ColorInterface {
 	 */
 	const SIGNAL_ATTRIBUTES_OFF = "\033[0m";
 }
-?>

@@ -424,4 +424,3 @@ class Browser extends \Iresults\Core\Model {
 		return $_SERVER['HTTP_USER_AGENT'];
 	}
 }
-?>

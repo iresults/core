@@ -76,5 +76,3 @@ class UndefinedMethod extends \Iresults\Core\Error {
 		return $error;
 	}
 }
-
-?>

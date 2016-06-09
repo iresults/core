@@ -279,6 +279,4 @@ class StringTool {
 		}
 		return $width / 100;
 	}
-
 }
-?>
