@@ -23,6 +23,12 @@ namespace Iresults\Core\Mutable;
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
+use DOMDocument;
+use Iresults\Core\Error;
+use Iresults\Core\Iresults;
+use Iresults\Core\Tools\StringTool;
+use SimpleXMLElement;
+use Traversable;
 
 
 /**
@@ -63,9 +69,9 @@ class Xml extends \Iresults\Core\Mutable {
 	 * The format in which the property keys will be converted to.
 	 * Defaults to \Iresults\Core\Tools\StringTool::FORMAT_UNDERSCORED.
 	 *
-	 * @var integer|\Iresults\Core\Tools\StringTool::FORMAT
+	 * @var integer|StringTool::FORMAT
 	 */
-	static protected $keyTransformFormat = \Iresults\Core\Tools\StringTool::FORMAT_UNDERSCORED;
+	static protected $keyTransformFormat = StringTool::FORMAT_UNDERSCORED;
 
 	/**
 	 * If set to TRUE nodes of type string will be trimmed.
@@ -82,55 +88,41 @@ class Xml extends \Iresults\Core\Mutable {
 	 */
 	static protected $automaticFeaturesEnabled = FALSE;
 
-	/**
-	 * Indicates if the environment is not UTF-8
-	 *
-	 * @var boolean
-	 */
-	static protected $noUTF8 = FALSE;
-
-
 
 	/* MWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWM */
 	/* INITIALIZATION        MWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWM */
 	/* MWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWM */
-	/**
-	 * Initialize the instance with the contents of the given URL.
-	 *
-	 * @param	string	$url Path to the XML file
-	 * @return	\Iresults\Core\Mutable\Xml
-	 */
+    /**
+     * Initialize the instance with the contents of the given URL.
+     *
+     * @param string $url Path to the XML file
+     * @return Xml
+     * @throws Error if the XML could not be loaded
+     */
 	public function initWithContentsOfUrl($url) {
 		$xmlString = '';
 
 		/*
 		 * Check if the environment is UTF-8
 		 */
-		if (!self::$noUTF8 && (!isset($GLOBALS['TYPO3_CONF_VARS']) || $GLOBALS['TYPO3_CONF_VARS']['SYS']['UTF8filesystem'])) {
-			$xmlDoc = simplexml_load_file($url);
-		} else {
-			self::$noUTF8 = TRUE;
-			$file = \Iresults\Core\System\FileManager::sharedFileManager()->getResourceAtUrl($url);
-			$xmlString = $this->_prepareXmlString($file->contents());
-			$xmlDoc = simplexml_load_string($xmlString);
-		}
+		$xmlDoc = simplexml_load_file($url);
 
 		if (!$xmlDoc) {
 			$xmlError = libxml_get_last_error();
-			if ($xmlString) {# && strpos($xmlError->message, 'line ') !== FALSE) {
+			if ($xmlString) {
 				$xmlDebugString = '';
 				$xmlString = str_replace(array("\r", "\r\n", "\n"), PHP_EOL, $xmlString);
 				$xmlStringParts = explode(PHP_EOL, $xmlString);
 				foreach ($xmlStringParts as $lineNumber => $xmlLine) {
 					$xmlDebugString .= '#' . ($lineNumber + 1) . ": \t $xmlLine" . PHP_EOL;
 				}
-				\Iresults\Core\Iresults::pd($xmlDebugString);
+				Iresults::pd($xmlDebugString);
 			}
 			if ($xmlError === FALSE) {
-				$xmlError = 'Couldn\'t detect the XML error (This may be because of a timeout or a firewall)';
-				throw \Iresults\Core\Error::errorWithMessageCodeAndUserInfo($xmlError, 1337692752, array($xmlError));
+				$xmlError = "Couldn't detect the XML error (This may be because of a timeout or a firewall)";
+				throw Error::errorWithMessageCodeAndUserInfo($xmlError, 1337692752, array($xmlError));
 			}
-			throw \Iresults\Core\Error::errorWithMessageCodeAndUserInfo($xmlError->message, $xmlError->code, array($xmlError));
+			throw Error::errorWithMessageCodeAndUserInfo($xmlError->message, $xmlError->code, array($xmlError));
 		}
 
 		$this->_addXmlDataToObject($xmlDoc, $this, $xmlDoc->getName());
@@ -151,14 +143,11 @@ class Xml extends \Iresults\Core\Mutable {
 		$xmlString = '';
 
 		$encodingString = ' encoding="UTF-8"';
-		if (self::$noUTF8) {
-			$encodingString = ' encoding="ISO-8859-1"';
-		}
 
 		foreach ($this as $name => $data) {
 			$currentDataString = $data;
 			if (is_object($data) && $data instanceof \Iresults\Core\Mutable\Xml) {
-				$currentDataString = $data->asXml();
+				$currentDataString = $data->asXML();
 			} else if (is_array($data)) {
 				$currentDataString = '';
 				foreach ($data as $key => $value) {
@@ -169,26 +158,26 @@ class Xml extends \Iresults\Core\Mutable {
 					}
 				}
 			}
-			$currentDataString = str_replace(array('<?xml version=\'1.0\'' . $encodingString . '?>', '<?xml version="1.0"' . $encodingString . '?>', '<ir_tx_iresults_mutable_xml_root>', '</ir_tx_iresults_mutable_xml_root>'), '', $currentDataString);
+			$currentDataString = str_replace(array('<?xml version=\'1.0\'' . $encodingString . '?>', '<?xml version="1.0"' . $encodingString . '?>', '<iresults_mutable_xml_root>', '</iresults_mutable_xml_root>'), '', $currentDataString);
 			$xmlString .= '<' . $name . '>' . $currentDataString . '</' . $name . '>' . PHP_EOL;
 		}
 
 		// Format the XML string
 		$xmlString = trim($xmlString);
 		if (class_exists('DOMDocument')) {
-			$xmlString = '<?xml version=\'1.0\'' . $encodingString . '?><ir_tx_iresults_mutable_xml_root>'  . $xmlString . '</ir_tx_iresults_mutable_xml_root>';
+			$xmlString = '<?xml version=\'1.0\'' . $encodingString . '?><iresults_mutable_xml_root>'  . $xmlString . '</iresults_mutable_xml_root>';
 			$dom = new DOMDocument('1.0');
 			$dom->preserveWhiteSpace = FALSE;
 			$dom->formatOutput = TRUE;
 			$dom->loadXML($xmlString);
 			$xmlString = $dom->saveXML();
 		} else {
-			$xmlObject = simplexml_load_string('<?xml version=\'1.0\'' . $encodingString . '?><ir_tx_iresults_mutable_xml_root>'  . $xmlString . '</ir_tx_iresults_mutable_xml_root>');
+			$xmlObject = simplexml_load_string('<?xml version=\'1.0\'' . $encodingString . '?><iresults_mutable_xml_root>'  . $xmlString . '</iresults_mutable_xml_root>');
 			if (is_object($xmlObject)) {
 				$xmlString = $xmlObject->asXML();
 			}
 		}
-		$xmlString = str_replace(array('<?xml version=\'1.0\'' . $encodingString . '?>', '<?xml version="1.0"' . $encodingString . '?>', '<ir_tx_iresults_mutable_xml_root>', '</ir_tx_iresults_mutable_xml_root>'), '', $xmlString);
+		$xmlString = str_replace(array('<?xml version=\'1.0\'' . $encodingString . '?>', '<?xml version="1.0"' . $encodingString . '?>', '<iresults_mutable_xml_root>', '</iresults_mutable_xml_root>'), '', $xmlString);
 		return $xmlString;
 	}
 
@@ -213,7 +202,7 @@ class Xml extends \Iresults\Core\Mutable {
 		 * Loop through all children of the data node.
 		 */
 		foreach ($data as $key => $currentChild) {
-			$key = $this->_prepareKeyOfNode($key, $currentChild);
+			$key = $this->_prepareKeyOfNode($key);
 
 			/*
 			 * Check if the key is already set.
@@ -259,7 +248,7 @@ class Xml extends \Iresults\Core\Mutable {
 		if ($attributesXml->count()) {
 			$attributes = array();
 			foreach ($attributesXml as $key => $attribute) {
-				$key = $this->_prepareKeyOfNode($key, $node);
+				$key = $this->_prepareKeyOfNode($key);
 				if (self::$useAtNotationForAttributes) { // Set the value directly
 					$object->setObjectForKey('@' . $key, $this->_getRepresentationForNode($attribute));
 				} else { // Store it in the attributes array
@@ -308,7 +297,7 @@ class Xml extends \Iresults\Core\Mutable {
 		 */
 		if ($node->count() > 0) {
 			$newNodeObject = $this->_createSubObjectForNode($node);
-			$nodeName = $this->_prepareKeyOfNode($node->getName(), $node);
+			$nodeName = $this->_prepareKeyOfNode($node->getName());
 			$this->_addXmlDataToObject($node, $newNodeObject, $nodeName);
 			$this->_addXmlAttributesToObject($node, $newNodeObject);
 			$node = $newNodeObject;
@@ -318,28 +307,26 @@ class Xml extends \Iresults\Core\Mutable {
 		return $node;
 	}
 
-	/**
-	 * Prepares the key.
-	 *
-	 * The method converts the key according to the configuration in
-	 * makeKeysUpperCamelCase. If it is TRUE and the key contains an underscore
-	 * ("_"), the key will be converted to lowerCamelCase.
-	 * If this is FALSE only the first character will be made lower case.
-	 *
-	 * The node which is identified by the given key is passed too, this may be
-	 * used in subclasses.
-	 *
-	 * @param	string	$key The key to prepare
-	 * @param	SimpleXMLElement	$node The node of the given key
-	 * @return	string
-	 */
-	protected function _prepareKeyOfNode($key, $node) {
+    /**
+     * Prepares the key.
+     *
+     * The method converts the key according to the configuration in
+     * makeKeysUpperCamelCase. If it is TRUE and the key contains an underscore
+     * ("_"), the key will be converted to lowerCamelCase.
+     * If this is FALSE only the first character will be made lower case.
+     *
+     * The node which is identified by the given key is passed too, this may be
+     * used in subclasses.
+     *
+     * @param    string $key The key to prepare
+     * @return string
+     */
+	protected function _prepareKeyOfNode($key) {
 		$key = str_replace(array('/',',','|','\\'),'_',$key);
-		$key = t3lib_div::makeInstance('t3lib_cs')->specCharsToASCII('utf-8', $key);
-		if (self::$keyTransformFormat !== \Iresults\Core\Tools\StringTool::FORMAT_KEEP) {
-			return \Iresults\Core\Tools\StringTool::transformStringToFormat($key, self::$keyTransformFormat);
+		if (self::$keyTransformFormat !== StringTool::FORMAT_KEEP) {
+			return StringTool::transformStringToFormat($key, self::$keyTransformFormat);
 		}
-		return \Iresults\Core\Tools\StringTool::lcfirst($key);
+		return lcfirst($key);
 	}
 
 	/**
@@ -349,10 +336,6 @@ class Xml extends \Iresults\Core\Mutable {
 	 * @return	string
 	 */
 	protected function _prepareXmlString($xmlString) {
-		if (self::$noUTF8) {
-			$xmlString = t3lib_div::makeInstance('t3lib_cs')->specCharsToASCII('utf-8', $xmlString);
-			$xmlString = str_replace(array('encoding="UTF-8"?', 'encoding=\'UTF-8\'?'), 'encoding="ISO-8859-1"?', $xmlString);
-		}
 		$xmlString = str_replace('<<', '&#171;;', $xmlString);
 		$xmlString = str_replace('>>', '&#187;', $xmlString);
 		return $xmlString;
@@ -370,35 +353,26 @@ class Xml extends \Iresults\Core\Mutable {
 	protected function _createEndPointOfNode($node) {
 		if ("$node" === '0') {
 			$node = 0.0;
-		} else
-		if (!("$node")) { // Handle self closing tags without arguments.
+		} elseif (!("$node")) { // Handle self closing tags without arguments.
 			if (self::$useEmptyMutableForSelfClosingTags) {
 				$node = $this->_createSubObjectForNode($node);
 			} else {
 				$node = TRUE;
 			}
-		} else
-		if (substr("$node",0,1) !== '0' && is_numeric("$node")) {
+		} elseif (substr("$node",0,1) !== '0' && is_numeric("$node")) {
 			$node = (float)$node;
-		} else if (self::$trimStringInputs) {
+		} elseif (self::$trimStringInputs) {
 			$node = trim($node);
-			if (self::$noUTF8) {
-				$node = t3lib_div::makeInstance('t3lib_cs')->specCharsToASCII('utf-8', $node);
-			}
 		} else {
 			$node = "$node";
-			if (self::$noUTF8) {
-				$node = t3lib_div::makeInstance('t3lib_cs')->specCharsToASCII('utf-8', $node);
-			}
 		}
 		return $node;
 	}
 
 	/**
-	 * Creates and returns a new sub object.
+	 * Creates and returns a new sub object
 	 *
-	 * @param	SimpleXMLElement	$node The corresponding XML node is passed for
-	 * handling in subclasses.
+	 * @param	SimpleXMLElement	$node The corresponding XML node is passed for handling in subclasses
 	 *
 	 * @return	\Iresults\Core\Mutable\Xml|object
 	 */
@@ -434,7 +408,7 @@ class Xml extends \Iresults\Core\Mutable {
 		/*
 		 * Check if the automatic features should be applied.
 		 */
-		} else if (self::$automaticFeaturesEnabled && $this->_checkIfNamesIndicateThatTheChildIsACollection()) {
+		} elseif (self::$automaticFeaturesEnabled && $this->_checkIfNamesIndicateThatTheChildIsACollection($parentName, $childName)) {
 			return TRUE;
 		}
 		return FALSE;
@@ -494,7 +468,7 @@ class Xml extends \Iresults\Core\Mutable {
 	public function __get($name) {
 		$value = parent::__get($name);
 		if (is_null($value) && preg_match('!^[^A-Z].*[A-Z]!', $name)) {
-			$name = \Iresults\Core\Tools\StringTool::camelCaseToLowerCaseUnderscored($name);
+			$name = StringTool::camelCaseToLowerCaseUnderscored($name);
 			$value = parent::__get($name);
 		}
 		return $value;
@@ -538,7 +512,7 @@ class Xml extends \Iresults\Core\Mutable {
 	/**
 	 * Returns the configuration of keyTransformFormat.
 	 *
-	 * @return	integer|\Iresults\Core\Tools\StringTool::FORMAT The current configuration
+	 * @return	integer|StringTool::FORMAT The current configuration
 	 */
 	static public function getKeyTransformFormat() {
 		return self::$keyTransformFormat;
@@ -616,12 +590,12 @@ class Xml extends \Iresults\Core\Mutable {
 	 * to latin1 (ISO-8859-1).
 	 * The node names will be converted to latin1 anyway.
 	 *
-	 * @param	boolean	$flag
 	 * @return	boolean    The current value of self::$noUTF8
+     * @deprecated
 	 */
-	static public function setNoUTF8($flag) {
-		self::$noUTF8 = $flag;
-}
+	static public function setNoUTF8() {
+        return false;
+    }
 
 	/**
 	 * Returns the configuration of 'noUTF8'.
@@ -633,6 +607,6 @@ class Xml extends \Iresults\Core\Mutable {
 	 * @return	boolean    The current value of self::$noUTF8
 	 */
 	static public function getNoUTF8() {
-		return self::$noUTF8;
+		return false;
 	}
 }

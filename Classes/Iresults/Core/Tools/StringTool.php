@@ -94,10 +94,7 @@ class StringTool {
 	 * @return	string	The converted string
 	 */
 	static public function camelCaseToLowerCaseUnderscored($string) {
-		if (defined('TYPO3_MODE')) {
-			return \t3lib_div::camelCaseToLowerCaseUnderscored($string);
-		}
-		return self::strtolower(preg_replace('/(?<=\w)([A-Z])/', '_\\1', $string));
+		return strtolower(preg_replace('/(?<=\w)([A-Z])/', '_\\1', $string));
 	}
 
 	/**
@@ -107,11 +104,7 @@ class StringTool {
 	 * @return	string	The converted string
 	 */
 	static public function underscoredToUpperCamelCase($string) {
-		if (defined('TYPO3_MODE')) {
-			return \t3lib_div::underscoredToUpperCamelCase($string);
-		}
-		$upperCamelCase = str_replace(' ', '', ucwords(str_replace('_', ' ', self::strtolower($string))));
-		return $upperCamelCase;
+		return str_replace(' ', '', ucwords(str_replace('_', ' ', strtolower($string))));
 	}
 
 	/**
@@ -121,11 +114,8 @@ class StringTool {
 	 * @return	string	The converted string
 	 */
 	static public function underscoredToLowerCamelCase($string) {
-		if (defined('TYPO3_MODE')) {
-			return \t3lib_div::underscoredToLowerCamelCase($string);
-		}
-		$upperCamelCase = str_replace(' ', '', ucwords(str_replace('_', ' ', self::strtolower($string))));
-		$lowerCamelCase = self::lcfirst($upperCamelCase);
+		$upperCamelCase = str_replace(' ', '', ucwords(str_replace('_', ' ', strtolower($string))));
+		$lowerCamelCase = lcfirst($upperCamelCase);
 		return $lowerCamelCase;
 	}
 
@@ -136,9 +126,6 @@ class StringTool {
 	 * @return	string    The transformed string
 	 */
 	static public function strtolower($string) {
-		if (defined('TYPO3_MODE')) {
-			return \t3lib_div::strtolower($string);
-		}
 		return strtolower($string);
 	}
 
@@ -149,9 +136,6 @@ class StringTool {
 	 * @return	string    The transformed string
 	 */
 	static public function strtoupper($string) {
-		if (defined('TYPO3_MODE')) {
-			return \t3lib_div::strtoupper($string);
-		}
 		return strtoupper($string);
 	}
 
@@ -162,9 +146,6 @@ class StringTool {
 	 * @return	string    The transformed string
 	 */
 	static public function lcfirst($string) {
-		if (defined('TYPO3_MODE')) {
-			return \t3lib_div::lcfirst($string);
-		}
 		return lcfirst($string);
 	}
 
@@ -205,7 +186,7 @@ class StringTool {
 		$accessor = substr($methodName, 0, 3);
 		$propertyKey = substr($methodName, 3);
 		if ($accessor === 'get' || $accessor === 'set') {
-			return self::lcfirst($propertyKey);
+			return lcfirst($propertyKey);
 		}
 		return FALSE;
 	}

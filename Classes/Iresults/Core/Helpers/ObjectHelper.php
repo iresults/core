@@ -98,7 +98,7 @@ class ObjectHelper {
 				} else {
 					break;
 				}
-			} else if ($path === '') {
+			} elseif ($path === '') {
 				break;
 			}
 
@@ -118,23 +118,23 @@ class ObjectHelper {
 				} else {
 					$currentObject = NULL;
 				}
-			} else if ($parentObject instanceof \Iresults\Core\KVCInterface) { // \Iresults\Core\KVCInterface
+			} elseif ($parentObject instanceof \Iresults\Core\KVCInterface) { // \Iresults\Core\KVCInterface
 				$currentObject = $parentObject->getObjectForKey($path);
-			} else if (is_a($parentObject, 'Tx_Extbase_DomainObject_DomainObjectInterface')) { // Tx_Extbase_DomainObject_DomainObjectInterface
+			} elseif (is_a($parentObject, 'Tx_Extbase_DomainObject_DomainObjectInterface')) { // Tx_Extbase_DomainObject_DomainObjectInterface
 				$currentObject = $parentObject->_getProperty($path);
-			} else if (is_a($parentObject, '\Iresults\Core\Value')) { // \Iresults\Core\Value
+			} elseif (is_a($parentObject, '\Iresults\Core\Value')) { // \Iresults\Core\Value
 				if ($path === 'value') {
 					$currentObject = $parentObject->getValue();
 				} else {
 					$currentObject = NULL;
 				}
-			} else if (is_object($parentObject) && method_exists($parentObject, 'getData')) { // getData()
+			} elseif (is_object($parentObject) && method_exists($parentObject, 'getData')) { // getData()
 				$currentObject = $parentObject->getData($path);
-			} else if (is_object($parentObject) && property_exists($parentObject, $path)) { // Direct access
+			} elseif (is_object($parentObject) && property_exists($parentObject, $path)) { // Direct access
 				$currentObject = $parentObject->$path;
-			} else if (self::$treatStdClassAsMutable && get_class($parentObject) === 'stdClass') { // Mutable stdClass
+			} elseif (self::$treatStdClassAsMutable && get_class($parentObject) === 'stdClass') { // Mutable stdClass
 				@$currentObject = $parentObject->$path;
-			} else if (is_object($parentObject) && method_exists($parentObject, 'execute')) { // execute()
+			} elseif (is_object($parentObject) && method_exists($parentObject, 'execute')) { // execute()
 				$currentObject = $parentObject->execute($path);
 				trigger_error('The accessor method execute is deprecated and will not be used in ObjectHelper in future versions.', E_USER_DEPRECATED);
 			} else {
@@ -243,15 +243,15 @@ class ObjectHelper {
 				return $setObject;
 			}
 			self::setObjectForKeyPathOfObject(substr($propertyPathTillSetObject, 0, -1), $setObject, $targetObject);
-		} else if ($setObject instanceof \Iresults\Core\KVCInterface) { // \Iresults\Core\KVCInterface
+		} elseif ($setObject instanceof \Iresults\Core\KVCInterface) { // \Iresults\Core\KVCInterface
 			$setObject->setObjectForKey($setKey, $object);
-		} else if (is_a($setObject, 'Tx_Extbase_DomainObject_DomainObjectInterface')) { // Tx_Extbase_DomainObject_DomainObjectInterface
+		} elseif (is_a($setObject, 'Tx_Extbase_DomainObject_DomainObjectInterface')) { // Tx_Extbase_DomainObject_DomainObjectInterface
 			$setObject->_setProperty($setKey, $object);
-		} else if (method_exists($setObject, 'setData')) { // setData()
+		} elseif (method_exists($setObject, 'setData')) { // setData()
 			$setObject->setData($setKey, $object);
-		} else if (is_object($setObject) && property_exists($setObject, $setKey)) { // Direct access
+		} elseif (is_object($setObject) && property_exists($setObject, $setKey)) { // Direct access
 			$setObject->$setKey = $object;
-		} else if (self::$treatStdClassAsMutable && get_class($setObject) === 'stdClass') { // Mutable stdClass
+		} elseif (self::$treatStdClassAsMutable && get_class($setObject) === 'stdClass') { // Mutable stdClass
 			@$setObject->$setKey = $object;
 		} else {
 			$type = '';
@@ -317,10 +317,10 @@ class ObjectHelper {
 		$newValue = NULL;
 		if (is_array($value)) {
 			$newValue = \Iresults\Core\Mutable::mutableWithArray($value);
-		} else if (is_string($value) && file_exists($value)) {
+		} elseif (is_string($value) && file_exists($value)) {
 			$newValue = \Iresults\Core\System\FileManager::getResourceAtUrl($value);
-		} else if (is_resource($value)) {
-		} else if (is_object($value) && self::$treatStdClassAsMutable && get_class($value) === 'stdClass') {
+		} elseif (is_resource($value)) {
+		} elseif (is_object($value) && self::$treatStdClassAsMutable && get_class($value) === 'stdClass') {
 			$newValue = \Iresults\Core\Mutable::mutableWithStdClass($value);
 		} else {
 			$newValue = new \Iresults\Core\Value($value);
@@ -370,7 +370,7 @@ class ObjectHelper {
 		$hash = '';
 		if (is_resource($object)) {
 			$hash = get_resource_type($object) . $object;
-		} else if (!is_object($object)) {
+		} elseif (!is_object($object)) {
 			if (is_array($object)) {
 				sort($object);
 			}
@@ -382,9 +382,9 @@ class ObjectHelper {
 			 */
 			if (is_a($object, 'Tx_Extbase_DomainObject_DomainObjectInterface')) { // Tx_Extbase_DomainObject_DomainObjectInterface
 				$uid = $object->getUid();
-			} else if (is_a($object, '\Iresults\Core\Value')) { // \Iresults\Core\Value
+			} elseif (is_a($object, '\Iresults\Core\Value')) { // \Iresults\Core\Value
 				$uid = $object->getValue();
-			} else if (is_a($object, '\Iresults\Core\Mutable')) { // \Iresults\Core\Mutable
+			} elseif (is_a($object, '\Iresults\Core\Mutable')) { // \Iresults\Core\Mutable
 				$uid = md5( serialize( array_keys($object->getData()) ) );
 			} else {
 				$properties = get_object_vars($object); // object

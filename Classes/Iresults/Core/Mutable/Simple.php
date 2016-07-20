@@ -26,12 +26,7 @@ namespace Iresults\Core\Mutable;
 
 
 /**
- * The concrete implementation class for mutable objects that implement
- * Tx_Extbase_DomainObject_DomainObjectInterface.
- *
- * @author	Daniel Corn <cod@iresults.li>
- * @package	Iresults
- * @subpackage	Iresults_Mutable
+ * @deprecated use \Iresults\Core\Mutable instead
  */
 class Simple extends \Iresults\Core\Mutable {
 }
