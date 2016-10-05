@@ -24,6 +24,9 @@ namespace Iresults\Core\Tests\Unit\Core;
  * SOFTWARE.
  */
 
+use Iresults\Core\Mutable;
+use Iresults\Core\Mutable\AutoExpanding;
+
 require_once __DIR__ . '/../Autoloader.php';
 
 /**
@@ -33,15 +36,12 @@ require_once __DIR__ . '/../Autoloader.php';
  * @copyright   Copyright belongs to the respective authors
  * @license     http://www.gnu.org/licenses/gpl.html GNU General Public License, version 3 or later
  *
- * @packname    TYPO3
- * @subpackname Iresults
- *
  * @author      Daniel Corn <cod@iresults.li>
  */
 class MutableTest extends \PHPUnit_Framework_TestCase
 {
     /**
-     * @var \Iresults\Core\Mutable
+     * @var Mutable
      */
     protected $fixture;
 
@@ -59,7 +59,7 @@ class MutableTest extends \PHPUnit_Framework_TestCase
                 'relative humidity' => '89%',
             ),
         );
-        $this->fixture = \Iresults\Core\Mutable::mutableWithArray($testArray);
+        $this->fixture = Mutable::mutableWithArray($testArray);
     }
 
     public function tearDown()
@@ -209,7 +209,7 @@ class MutableTest extends \PHPUnit_Framework_TestCase
                 'country' => 'USA',
             ),
         );
-        $mutable = \Iresults\Core\Mutable\AutoExpanding::mutableWithArray($testArray);
+        $mutable = AutoExpanding::mutableWithArray($testArray);
         $mutable->setObjectForKeyPath('weather.temperature', '29°C');
         $this->assertInstanceOf('Iresults\Core\Mutable\AutoExpanding', $mutable->getObjectForKeyPath('weather'));
         $this->assertEquals('29°C', $mutable->getObjectForKeyPath('weather.temperature'));
