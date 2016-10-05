@@ -36,7 +36,7 @@ use Iterator;
  * @package       Iresults
  * @subpackage    Iresults
  */
-class Mutable extends \Iresults\Core\Model implements \Countable, \Iterator, \ArrayAccess, JsonSerializable
+class Mutable extends \Iresults\Core\Model implements \Countable, \Iterator, \ArrayAccess, \JsonSerializable
 {
     /**
      * The virtual class name
