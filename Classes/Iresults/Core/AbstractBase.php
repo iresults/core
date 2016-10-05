@@ -120,14 +120,8 @@ abstract class AbstractBase implements IresultsBaseInterface {
 		/*
 		 * Check the environment.
 		 */
-		if (
-			(isset($_SERVER['TERM']) && $_SERVER['TERM'])
-			|| php_sapi_name() === 'cli'
-		) {
+		if (php_sapi_name() === 'cli') {
 			self::$environment = self::ENVIRONMENT_SHELL;
-			ini_set('display_errors', 1);
-			#error_reporting(E_ALL);
-
 			set_exception_handler(array($this, 'handleException'));
 		}
 
