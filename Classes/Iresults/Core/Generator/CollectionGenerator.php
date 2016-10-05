@@ -26,33 +26,51 @@
 
 /**
  * @author COD
- * Created 05.10.16 14:20
+ * Created 05.10.16 17:19
  */
 
 
-namespace Iresults\Core\DataObject;
+namespace Iresults\Core\Generator;
 
 
-use Iresults\Core\DataObject;
 use Iresults\Core\Parser\CsvFileParser;
 
-class Factory
+/**
+ *
+ */
+class CollectionGenerator
 {
     /**
-     * Create a collection of Data Objects with each entry in the given CSV file
+     * Create a collection of object with each entry in the given CSV file
      *
-     * The first row in the file will be used as keys for each DataObject
+     * The callback will be invoked for each row from row two. The first row in the file will be used as keys for entry
      *
-     * @param string $url
-     * @return DataObject[]
+     * @param string   $url
+     * @param callable $callback
+     * @return array
      */
-    public static function collectionFromCsvUrl($url)
+    public static function collectionFromCsvUrlWithCallback($url, callable $callback)
     {
-        return \Iresults\Core\Generator\CollectionGenerator::collectionFromCsvUrlWithCallback(
-            $url,
-            function ($data) {
-                return new DataObject($data);
-            }
-        );
+        $parser = new CsvFileParser();
+        $data = $parser->parse($url);
+        if (!$data) {
+            return [];
+        }
+        if (count($data) < 2) { // File only contains the header
+            return [];
+        }
+
+        $header = array_shift($data);
+        $collection = [];
+        foreach ($data as $row) {
+            $collection[] = $callback(
+                array_combine(
+                    $header,
+                    $row
+                )
+            );
+        }
+
+        return $collection;
     }
 }
