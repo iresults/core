@@ -30,7 +30,7 @@
  */
 
 
-namespace Iresults\Core\Tests\Parser;
+namespace Iresults\Core\Tests\Unit\Parser;
 
 
 require_once __DIR__ . '/../Autoloader.php';

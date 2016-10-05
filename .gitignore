@@ -1,8 +1,6 @@
 #################################
 ### PROJECT SETTINGS
-Resources/Public/Library/
-Resources/Private/Templates/Page/*
-Resources/Public/Stylesheets/Css/*
+vendor
 
 .idea/magicento.xml
 .idea/workspace.xml

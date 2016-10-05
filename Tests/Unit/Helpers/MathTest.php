@@ -1,5 +1,5 @@
 <?php
-namespace Iresults\Core\Tests\Helpers;
+namespace Iresults\Core\Tests\Unit\Helpers;
 
 /*
  * The MIT License (MIT)

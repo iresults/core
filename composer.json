@@ -7,5 +7,10 @@
         "psr-0": {
             "Iresults\\Core": "Classes"
         }
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "Iresults\\Core\\Tests\\": "Tests/"
+        }
     }
 }

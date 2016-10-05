@@ -1,5 +1,5 @@
 <?php
-namespace Iresults\Core\Tests\Locale;
+namespace Iresults\Core\Tests\Unit\Locale;
 
 /*
  * The MIT License (MIT)

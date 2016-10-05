@@ -1,5 +1,5 @@
 <?php
-namespace Iresults\Core\Tests\Core;
+namespace Iresults\Core\Tests\Unit\Core;
 
 /*
  * The MIT License (MIT)
@@ -24,56 +24,9 @@ namespace Iresults\Core\Tests\Core;
  * SOFTWARE.
  */
 
+use Iresults\Core\Tests\Fixture\Person;
+
 require_once __DIR__ . '/../Autoloader.php';
-
-class Person extends \Iresults\Core\Model {
-	/**
-	 * The name
-	 *
-	 * @var string
-	 */
-	protected $name = 'Daniel';
-
-	/**
-	 * The age
-	 *
-	 * @var int
-	 */
-	protected $age = 26;
-
-	/**
-	 * The address
-	 *
-	 * @var array<string>
-	 */
-	protected $address = array(
-		'street' 	=> 'Bingstreet 14',
-		'city'		=> 'NYC',
-		'country'	=> 'USA'
-	);
-
-	/**
-	 * Returns the name.
-	 * @return	string
-	 */
-	public function getName(){
-		return $this->name;
-	}
-
-	/**
-	 * Sets the name.
-	 *
-	 * @param	string	$newValue The new value to set
-	 * @return	void
-	 */
-	public function setName($newValue){
-		$this->name = $newValue;
-	}
-
-	public function gar() {
-		return $this->address;
-	}
-}
 
 /**
  * Test case for Iresults_Model

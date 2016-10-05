@@ -1,5 +1,5 @@
 <?php
-namespace Iresults\Core\Tests\Locale;
+namespace Iresults\Core\Tests\Unit\Locale;
 
 /*
  * The MIT License (MIT)
@@ -59,7 +59,7 @@ class TranslatorTest extends \PHPUnit_Framework_TestCase {
 	 */
 	public function getOriginalMessageTest(){
 		$message = 'A simple translated string';
-		$translator = TranslatorFactory::translatorWithSource(__DIR__ . '/');
+		$translator = TranslatorFactory::translatorWithSource(__DIR__ . '/../SampleData/');
 		$this->assertEquals($message, $translator->translate($message));
 	}
 
@@ -69,7 +69,7 @@ class TranslatorTest extends \PHPUnit_Framework_TestCase {
 	public function getTranslatedMessageTest(){
 		$originalMessage = 'A simple translated string';
 		$translatedMessage = 'Ein einfacher übersetzter Text';
-		$translator = TranslatorFactory::translatorWithSource(__DIR__ . '/');
+		$translator = TranslatorFactory::translatorWithSource(__DIR__ . '/../SampleData/');
 		$this->assertEquals($translatedMessage, $translator->translate($originalMessage, NULL, 'de_DE'));
 
 		$this->assertEquals($originalMessage, $translator->translate($originalMessage));
@@ -80,7 +80,7 @@ class TranslatorTest extends \PHPUnit_Framework_TestCase {
 	 */
 	public function getOriginalMessageWithArgumentTest(){
 		$message = 'My name is %s';
-		$translator = TranslatorFactory::translatorWithSource(__DIR__ . '/');
+		$translator = TranslatorFactory::translatorWithSource(__DIR__ . '/../SampleData/');
 		$this->assertEquals('My name is Daniel', $translator->translate($message, array('Daniel')));
 	}
 
@@ -90,7 +90,7 @@ class TranslatorTest extends \PHPUnit_Framework_TestCase {
 	public function getTranslatedMessageWithArgumentTest(){
 		$originalMessage = 'My name is %s';
 		$translatedMessage = 'Mein Name ist Daniel';
-		$translator = TranslatorFactory::translatorWithSource(__DIR__ . '/');
+		$translator = TranslatorFactory::translatorWithSource(__DIR__ . '/../SampleData/');
 		$this->assertEquals($translatedMessage, $translator->translate($originalMessage, array('Daniel'), 'de_DE'));
 	}
 
@@ -100,7 +100,7 @@ class TranslatorTest extends \PHPUnit_Framework_TestCase {
 	public function getTranslatedMessageWithUtf8LocaleTest(){
 		$originalMessage = 'My name is %s';
 		$translatedMessage = 'Mein Name ist Daniel';
-		$translator = TranslatorFactory::translatorWithSource(__DIR__ . '/');
+		$translator = TranslatorFactory::translatorWithSource(__DIR__ . '/../SampleData/');
 		$this->assertEquals($translatedMessage, $translator->translate($originalMessage, array('Daniel'), 'de_DE.UTF-8'));
 	}
 
@@ -110,7 +110,7 @@ class TranslatorTest extends \PHPUnit_Framework_TestCase {
 	public function getTranslatedMessageWithEnvironmentLocaleTest(){
 		$originalMessage = 'A simple translated string';
 		$translatedMessage = 'Ein einfacher übersetzter Text';
-		$translator = TranslatorFactory::translatorWithSource(__DIR__ . '/');
+		$translator = TranslatorFactory::translatorWithSource(__DIR__ . '/../SampleData/');
 		$this->assertEquals($originalMessage, $translator->translate($originalMessage));
 
 		Environment::getSharedInstance()->setLocale('de_DE.UTF-8');
@@ -123,7 +123,7 @@ class TranslatorTest extends \PHPUnit_Framework_TestCase {
 	public function localeBindingTest(){
 		$originalMessage = 'A simple translated string';
 		$translatedMessage = 'Ein einfacher übersetzter Text';
-		$translator = TranslatorFactory::translatorWithSource(__DIR__ . '/');
+		$translator = TranslatorFactory::translatorWithSource(__DIR__ . '/../SampleData/');
 		$this->assertEquals($originalMessage, $translator->translate($originalMessage));
 
 		// Set de_DE

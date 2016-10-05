@@ -30,25 +30,13 @@
  */
 
 
-namespace Iresults\Core\Tests\Core;
+namespace Iresults\Core\Tests\Unit\Core;
 
 require_once __DIR__ . '/../Autoloader.php';
 
-use Iresults\Core\Base;
 use Iresults\Core\Exception\UndefinedMethod;
 use Iresults\Core\Iresults;
-use Iresults\Core\IresultsBaseInterface;
-
-class IresultsTestImplementation extends Base implements IresultsBaseInterface{
-	public function isFullRequest() {
-		return FALSE;
-	}
-
-	public function dynamicFunction() {
-		return TRUE;
-	}
-
-}
+use Iresults\Core\Tests\Fixture\IresultsTestImplementation;
 
 class IresultsTest extends \PHPUnit_Framework_TestCase {
 	protected function setUp() {
@@ -71,10 +59,12 @@ class IresultsTest extends \PHPUnit_Framework_TestCase {
 	 * @test
 	 */
 	public function overrideImplementationTest() {
-		Iresults::_registerImplementationClassName('\\Iresults\\Core\\Tests\\Core\\IresultsTestImplementation');
+        Iresults::_destroySharedInstance();
+
+        Iresults::_registerImplementationClassName(IresultsTestImplementation::class);
 
 		$this->assertInstanceOf('\\Iresults\\Core\\IresultsBaseInterface', 						Iresults::getSharedInstance());
-		$this->assertInstanceOf('\\Iresults\\Core\\Tests\\Core\\IresultsTestImplementation', 	Iresults::getSharedInstance());
+		$this->assertInstanceOf(IresultsTestImplementation::class, 	Iresults::getSharedInstance());
 
 		$this->assertFalse(Iresults::isFullRequest());
 	}
@@ -86,10 +76,10 @@ class IresultsTest extends \PHPUnit_Framework_TestCase {
 		$this->assertInstanceOf('\\Iresults\\Core\\Base', 					Iresults::getSharedInstance());
 		Iresults::_destroySharedInstance();
 
-		$GLOBALS['IRESULTS_REGISTERED_IMPLEMENTATION_CLASS'] = '\\Iresults\\Core\\Tests\\Core\\IresultsTestImplementation';
+		$GLOBALS['IRESULTS_REGISTERED_IMPLEMENTATION_CLASS'] = IresultsTestImplementation::class;
 
 		$this->assertInstanceOf('\\Iresults\\Core\\IresultsBaseInterface', 						Iresults::getSharedInstance());
-		$this->assertInstanceOf('\\Iresults\\Core\\Tests\\Core\\IresultsTestImplementation', 	Iresults::getSharedInstance());
+		$this->assertInstanceOf(IresultsTestImplementation::class, 	Iresults::getSharedInstance());
 
 		$this->assertFalse(Iresults::isFullRequest());
 	}
@@ -98,7 +88,13 @@ class IresultsTest extends \PHPUnit_Framework_TestCase {
 	 * @test
 	 */
 	public function overrideImplementationAndCallMagicMethodTest() {
-		Iresults::_registerImplementationClassName('\\Iresults\\Core\\Tests\\Core\\IresultsTestImplementation');
+        $this->assertInstanceOf('\\Iresults\\Core\\Base', 					Iresults::getSharedInstance());
+        Iresults::_destroySharedInstance();
+
+		Iresults::_registerImplementationClassName(IresultsTestImplementation::class);
+
+        $this->assertInstanceOf('\\Iresults\\Core\\IresultsBaseInterface', 						Iresults::getSharedInstance());
+        $this->assertInstanceOf(IresultsTestImplementation::class, 	Iresults::getSharedInstance());
 
 		$this->assertTrue(Iresults::dynamicFunction());
 	}
@@ -108,7 +104,7 @@ class IresultsTest extends \PHPUnit_Framework_TestCase {
 	 * @expectedException \Iresults\Core\Exception\UndefinedMethod
 	 */
 	public function callInvalidMagicMethodTest() {
-		Iresults::dynamicFunction();
+        Iresults::dynamicFunction();
 	}
 
 
@@ -322,11 +318,7 @@ class IresultsTest extends \PHPUnit_Framework_TestCase {
 	 * @test
 	 */
 	public function getEnvironmentTest() {
-		$testEnvironment = Iresults::ENVIRONMENT_WEB;
-		if ((isset($_SERVER['TERM']) && $_SERVER['TERM'])
-			|| php_sapi_name() === 'cli') {
-			$testEnvironment = Iresults::ENVIRONMENT_CLI;
-		}
+		$testEnvironment = php_sapi_name() === 'cli' ? Iresults::ENVIRONMENT_CLI: Iresults::ENVIRONMENT_WEB;
 		$this->assertEquals($testEnvironment, Iresults::getEnvironment());
 	}
 
@@ -364,7 +356,7 @@ class IresultsTest extends \PHPUnit_Framework_TestCase {
 	 * @test
 	 */
 	public function getFrameworkTest() {
-		$this->assertEquals(Iresults::FRAMEWORK_STANDALONE, Iresults::getFramework());
+	    $this->markTestSkipped('PHPUnit uses Symfony components');
 	}
 
 	/**

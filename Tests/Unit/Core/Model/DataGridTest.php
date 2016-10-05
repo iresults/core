@@ -7,7 +7,7 @@
  * To change this template use File | Settings | File Templates.
  */
 
-namespace Iresults\Core\Tests\Core\Model;
+namespace Iresults\Core\Tests\Unit\Core\Model;
 
 require_once __DIR__ . '/../../Autoloader.php';
 

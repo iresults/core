@@ -1,5 +1,5 @@
 <?php
-namespace Iresults\Core\Tests\Core;
+namespace Iresults\Core\Tests\Unit\Core;
 
 /*
  * The MIT License (MIT)
@@ -24,14 +24,10 @@ namespace Iresults\Core\Tests\Core;
  * SOFTWARE.
  */
 
-require_once __DIR__ . '/../Autoloader.php';
+use Iresults\Core\Cache\AbstractCache;
+use Iresults\Core\Cache\Factory;
 
-/**
- * A subclass of Iresults_Core
- */
-class CacheTestObject extends \Iresults\Core\Core {
-	protected $name = 'mars';
-}
+require_once __DIR__ . '/../Autoloader.php';
 
 /**
  * Test case for functionality of the iresults Cache.
@@ -47,12 +43,12 @@ class CacheTestObject extends \Iresults\Core\Core {
  */
 class CacheTest extends \PHPUnit_Framework_TestCase {
 	/**
-	 * @var Iresults_Helpers_Fluid_Mail
+	 * @var AbstractCache
 	 */
 	protected $fixture;
 
 	public function setUp() {
-		$this->fixture = \Iresults\Core\Cache\Factory::getSharedInstance();
+		$this->fixture = Factory::getSharedInstance();
 	}
 
 	public function tearDown() {
@@ -62,8 +58,8 @@ class CacheTest extends \PHPUnit_Framework_TestCase {
 	 * @test
 	 */
 	public function isInstanceOfCacheAbstract() {
-		$this->assertTrue(is_a(\Iresults\Core\Cache\Factory::getSharedInstance(), 	'\Iresults\Core\Cache\AbstractCache'));
-		$this->assertTrue(is_a(\Iresults\Core\Cache\Factory::makeInstance(), 		'\Iresults\Core\Cache\AbstractCache'));
+		$this->assertTrue(is_a(Factory::getSharedInstance(), 	'\Iresults\Core\Cache\AbstractCache'));
+		$this->assertTrue(is_a(Factory::makeInstance(), 		'\Iresults\Core\Cache\AbstractCache'));
 	}
 
 	/**

@@ -1,5 +1,5 @@
 <?php
-namespace Iresults\Core\Tests\Core;
+namespace Iresults\Core\Tests\Unit\Core;
 
 /*
  * The MIT License (MIT)
@@ -24,21 +24,10 @@ namespace Iresults\Core\Tests\Core;
  * SOFTWARE.
  */
 
+use Iresults\Core\Tests\Fixture\ObjectTestObject;
+use Iresults\Core\Tests\Fixture\ObjectTestObject2;
+
 require_once __DIR__ . '/../Autoloader.php';
-
-/**
- * A subclass of Iresults_Core
- */
-class ObjectTestObject extends \Iresults\Core\Core {
-	protected $name = 'mars';
-}
-
-/**
- * A subclass of Iresults_Core
- */
-class ObjectTestObject2 extends \Iresults\Core\Core {
-	protected $name = 'pluto';
-}
 
 /**
  * Test case for functionality of the Core object.
@@ -54,7 +43,7 @@ class ObjectTestObject2 extends \Iresults\Core\Core {
  */
 class ObjectTest extends \PHPUnit_Framework_TestCase {
 	/**
-	 * @var Iresults\Core\Tests\Core\ObjectTestObject
+	 * @var ObjectTestObject
 	 */
 	protected $fixture;
 
@@ -99,7 +88,7 @@ class ObjectTest extends \PHPUnit_Framework_TestCase {
 	 * @test
 	 */
 	public function canAddInstanceMethodForSelector() {
-		\Iresults\Core\Tests\Core\ObjectTestObject::_instanceMethodForSelector('canAddInstanceMethodForSelector', function () {return 'hello world';});
+		ObjectTestObject::_instanceMethodForSelector('canAddInstanceMethodForSelector', function () {return 'hello world';});
 		$result = $this->fixture->canAddInstanceMethodForSelector();
 		$this->assertEquals('hello world', $result);
 	}
@@ -108,8 +97,8 @@ class ObjectTest extends \PHPUnit_Framework_TestCase {
 	 * @test
 	 */
 	public function canAddInstanceMethodForSelectorWithoutOverriding() {
-		\Iresults\Core\Tests\Core\ObjectTestObject::_instanceMethodForSelector('canAddInstanceMethodForSelectorWithoutOverriding', function () {return 'object 1';});
-		\Iresults\Core\Tests\Core\ObjectTestObject2::_instanceMethodForSelector('canAddInstanceMethodForSelectorWithoutOverriding', function () {return 'object 2';});
+		ObjectTestObject::_instanceMethodForSelector('canAddInstanceMethodForSelectorWithoutOverriding', function () {return 'object 1';});
+		ObjectTestObject2::_instanceMethodForSelector('canAddInstanceMethodForSelectorWithoutOverriding', function () {return 'object 2';});
 		$result = $this->fixture->canAddInstanceMethodForSelectorWithoutOverriding();
 		$this->assertEquals('object 1', $result);
 	}
