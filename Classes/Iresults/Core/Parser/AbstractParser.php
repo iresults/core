@@ -39,43 +39,50 @@ use Iresults\Core\Core;
  *
  * @package Iresults\Core\Parser
  */
-abstract class AbstractParser extends Core implements ParserInterface {
-	/**
-	 * Parser configuration
-	 *
-	 * @var array
-	 */
-	protected $configuration = array();
+abstract class AbstractParser extends Core implements ParserInterface
+{
+    /**
+     * Parser configuration
+     *
+     * @var array
+     */
+    protected $configuration = array();
 
-	/**
-	 * Set the configuration array
-	 *
-	 * @param array $configuration
-	 * @return $this
-	 */
-	public function setConfiguration($configuration) {
-		$this->configuration = $configuration;
-	}
+    /**
+     * Set the configuration array
+     *
+     * @param array $configuration
+     * @return $this
+     */
+    public function setConfiguration($configuration)
+    {
+        $this->configuration = $configuration;
 
-	/**
-	 * Returns the configuration array
-	 *
-	 * @return array
-	 */
-	public function getConfiguration() {
-		return $this->configuration;
-	}
+        return $this;
+    }
 
-	/**
-	 * Returns the configuration for the given key
-	 *
-	 * @param string $key Key of the configuration value
-	 * @return mixed
-	 */
-	public function getConfigurationForKey($key) {
-		if (isset($this->configuration[$key])) {
-			return $this->configuration[$key];
-		}
-		return NULL;
-	}
+    /**
+     * Returns the configuration array
+     *
+     * @return array
+     */
+    public function getConfiguration()
+    {
+        return $this->configuration;
+    }
+
+    /**
+     * Returns the configuration for the given key
+     *
+     * @param string $key Key of the configuration value
+     * @return mixed
+     */
+    public function getConfigurationForKey($key)
+    {
+        if (isset($this->configuration[$key])) {
+            return $this->configuration[$key];
+        }
+
+        return null;
+    }
 }

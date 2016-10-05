@@ -38,14 +38,15 @@ namespace Iresults\Core\Locale;
  *
  * @package Iresults\Core\Locale
  */
-interface TranslatorInterface extends BindingInterface {
-	/**
-	 * Translates the given message
-	 *
-	 * @param string $message         The message to translate
-	 * @param array  $arguments       Arguments to be used in the message
-	 * @param string $locale          Locale to use for this translation
-	 * @return string
-	 */
-	public function translate($message, $arguments = NULL, $locale = NULL);
+interface TranslatorInterface extends BindingInterface
+{
+    /**
+     * Translates the given message
+     *
+     * @param string $message   The message to translate
+     * @param array  $arguments Arguments to be used in the message
+     * @param string $locale    Locale to use for this translation
+     * @return string
+     */
+    public function translate($message, $arguments = null, $locale = null);
 }

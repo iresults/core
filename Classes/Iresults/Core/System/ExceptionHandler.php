@@ -24,34 +24,36 @@ namespace Iresults\Core\System;
  * SOFTWARE.
  */
 
+use Exception;
 
 /**
  * The iresults exception handler displays a backtrace in case of an exception.
  *
- * @author	Daniel Corn <cod@iresults.li>
- * @package	Iresults
- * @subpackage	Iresults_System
+ * @author        Daniel Corn <cod@iresults.li>
+ * @package       Iresults
+ * @subpackage    Iresults_System
  */
-class ExceptionHandler {
-	/**
-	 * Handle the given exception.
-	 *
-	 * @param	Exception	$exception
-	 * @return	void
-	 */
-	static public function handleException(Exception $exception = NULL) {
-		$bt = new \Iresults\Core\System\Backtrace(2);
-		if ($exception) {
-			echo "Exception thrown ".$exception->getMessage()." (".$exception->getCode().")<br>";
-		} else {
-			echo "Unnamed exception<br>";
-		}
+class ExceptionHandler
+{
+    /**
+     * Handle the given exception.
+     *
+     * @param    Exception $exception
+     * @return    void
+     */
+    static public function handleException(Exception $exception = null)
+    {
+        $bt = new Backtrace(2);
+        if ($exception) {
+            echo "Exception thrown " . $exception->getMessage() . " (" . $exception->getCode() . ")<br>";
+        } else {
+            echo "Unnamed exception<br>";
+        }
 
-		echo "
+        echo "
 			<pre>
-			".$bt->render()."
+			" . $bt->render() . "
 			</pre>
 		";
-
-	}
+    }
 }

@@ -25,9 +25,6 @@ namespace Iresults\Core;
  */
 
 
-
-
-
 use \Iresults\Core\Helpers\ObjectHelper;
 
 /**
@@ -38,217 +35,225 @@ use \Iresults\Core\Helpers\ObjectHelper;
  * provides the methods getObjectForKeyPath() and setObjectForKeyPath() which
  * enhances the KVC features with the resolution of property key paths.
  *
- * @author	Daniel Corn <cod@iresults.li>
- * @package	Iresults
- * @subpackage	Iresults
+ * @author        Daniel Corn <cod@iresults.li>
+ * @package       Iresults
+ * @subpackage    Iresults
  */
-abstract class Model extends \Iresults\Core\Core implements \Iresults\Core\KVCInterface {
-	//const IRUndefinedKeyExceptionValue;
-
-	/**
-	 * The constructor
-	 *
-	 * @param	array   $parameters	 Optional parameters to pass to the constructor
-	 * @return	Iresults_Model
-	 */
-	public function __construct(array $parameters = array()) {
-		return $this;
-	}
+abstract class Model extends \Iresults\Core\Core implements \Iresults\Core\KVCInterface
+{
+    /**
+     * The constructor
+     *
+     * @param    array $parameters Optional parameters to pass to the constructor
+     */
+    public function __construct(array $parameters = array())
+    {
+    }
 
 
-	/* MWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWM */
-	/* KEY VALUE CODING    MWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWM */
-	/* MWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWM */
-	/**
-	 * Set all properties from the array.
-	 * Traverses the given source and tries to handle each key-value-pair as a new
-	 * property value for that key.
-	 *
-	 * @param	array	$source            The input array
-	 * @param	boolean	$prepareSourceKeys	 Indicates if the _prepareSourceKeys method should be invoked for the source
-	 * @param	string	$prefix Optional prefix to add to the keys
-	 * @return	void
-	 */
-	public function setPropertiesFromArray($source, $prepareSourceKeys = false, $prefix = '') {
-		if ($prepareSourceKeys) {
-			$source = $this->_prepareSourceKeys($source);
-		}
-		foreach ($source as $key => $value) {
-			$key = $prefix . $key;
-			$this->setObjectForKeyPath($key, $value);
-		}
-	}
+    /* MWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWM */
+    /* KEY VALUE CODING    MWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWM */
+    /* MWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWM */
+    /**
+     * Set all properties from the array.
+     * Traverses the given source and tries to handle each key-value-pair as a new
+     * property value for that key.
+     *
+     * @param    array   $source            The input array
+     * @param    boolean $prepareSourceKeys Indicates if the _prepareSourceKeys method should be invoked for the source
+     * @param    string  $prefix            Optional prefix to add to the keys
+     * @return    void
+     */
+    public function setPropertiesFromArray($source, $prepareSourceKeys = false, $prefix = '')
+    {
+        if ($prepareSourceKeys) {
+            $source = $this->_prepareSourceKeys($source);
+        }
+        foreach ($source as $key => $value) {
+            $key = $prefix . $key;
+            $this->setObjectForKeyPath($key, $value);
+        }
+    }
 
-	/**
-	 * Sets an object/value for the given key.
-	 *
-	 * @param	string	$key   The key to set
-	 * @param	mixed	$value The new value
-	 * @return	void
-	 */
-	public function setObjectForKey($key,$value) {
-		$accessorName = 'set' . ucfirst($this->_toUpperCamel($key));
+    /**
+     * Sets an object/value for the given key.
+     *
+     * @param    string $key   The key to set
+     * @param    mixed  $value The new value
+     * @return    void
+     */
+    public function setObjectForKey($key, $value)
+    {
+        $accessorName = 'set' . ucfirst($this->_toUpperCamel($key));
 
-		if (method_exists($this, $accessorName)) { // Check if a accessor is implemented
-			call_user_func(array($this, $accessorName), $value);
-			return;
-		}
+        if (method_exists($this, $accessorName)) { // Check if a accessor is implemented
+            call_user_func(array($this, $accessorName), $value);
 
-		$classVars = get_object_vars($this);
-		if (array_key_exists($key, $classVars)) { // Check if a property exists
-			$this->$key = $value;
-		}
-	}
+            return;
+        }
 
-	/**
-	 * Returns an object/value for the given key.
-	 *
-	 * @param	string	$key The key/property name to fetch
-	 * @return	mixed
-	 */
-	public function getObjectForKey($key) {
-		$accessorName = 'get' . ucfirst($this->_toUpperCamel($key));
+        $classVars = get_object_vars($this);
+        if (array_key_exists($key, $classVars)) { // Check if a property exists
+            $this->$key = $value;
+        }
+    }
 
-		if (method_exists($this, $accessorName)) { // Check if a accessor is implemented
-			return call_user_func(array($this, $accessorName));
-		}
+    /**
+     * Returns an object/value for the given key.
+     *
+     * @param    string $key The key/property name to fetch
+     * @return    mixed
+     */
+    public function getObjectForKey($key)
+    {
+        $accessorName = 'get' . ucfirst($this->_toUpperCamel($key));
 
-		$classVars = get_object_vars($this);
-		if (isset($classVars[$key])) { // Check if a property exists
-			if (is_array($classVars[$key])) {
-				$result = &$this->$key;
-				return $result;
-			}
-			return $this->$key;
-		}
-		return NULL;
-	}
+        if (method_exists($this, $accessorName)) { // Check if a accessor is implemented
+            return call_user_func(array($this, $accessorName));
+        }
 
-	/**
-	 * Removes the object with the given key.
-	 *
-	 * @param	string	$key
-	 * @return	void
-	 */
-	public function removeObjectForKey($key) {
-		$accessorName = 'set' . ucfirst($this->_toUpperCamel($key));
+        $classVars = get_object_vars($this);
+        if (isset($classVars[$key])) { // Check if a property exists
+            if (is_array($classVars[$key])) {
+                $result = &$this->$key;
 
-		if (method_exists($this, $accessorName)) { // Check if a accessor is implemented
-			call_user_func(array($this, $accessorName), NULL);
-			return;
-		}
+                return $result;
+            }
 
-		$classVars = get_object_vars($this);
-		if (isset($classVars[$key])) { // Check if a property exists
-			unset($this->$key);
-		}
-	}
+            return $this->$key;
+        }
 
-	/**
-	 * @see getObjectForKeyPath()
-	 * @deprecated
-	 */
-	public function getValueForKeyPath($propertyPath) {
-		return $this->getObjectForKeyPath($propertyPath);
-	}
+        return null;
+    }
 
-	/**
-	 * Returns the value of the property at the given key path
-	 *
-	 * @param	string	$propertyPath The property key path to resolve in the format "object.property"
-	 * @return	mixed
-	 */
-	public function getObjectForKeyPath($propertyPath) {
-		return ObjectHelper::getObjectForKeyPathOfObject($propertyPath, $this);
-	}
+    /**
+     * Removes the object with the given key.
+     *
+     * @param    string $key
+     * @return    void
+     */
+    public function removeObjectForKey($key)
+    {
+        $accessorName = 'set' . ucfirst($this->_toUpperCamel($key));
 
-	/**
-	 * Called if no object was found for the given property key
-	 *
-	 * @param	string	$key The name of the undefined property
-	 * @return	mixed    Returns a substitue value
-	 * @throws \InvalidArgumentException on default.
-	 */
-	public function getObjectForUndefinedKey($key) {
-		throw new \InvalidArgumentException("No value found for undefined key '$key'.");
-	}
+        if (method_exists($this, $accessorName)) { // Check if a accessor is implemented
+            call_user_func(array($this, $accessorName), null);
 
-	/**
-	 * Returns the object for the given (undefined) key, of this instance, or
-	 * the given object (if specified)
-	 *
-	 * The default implementation only invokes getObjectForUndefinedKey() of the
-	 * this instance/the given object
-	 *
-	 * @param	string	$key		The name of the undefined property
-	 * @param	object	$object	The object to get the property from
-	 * @return	mixed	Returns the property's value
-	 */
-	protected function _getObjectForUndefinedKeyOfObject($key, $object) {
-		return $object->getObjectForUndefinedKey($key);
-	}
+            return;
+        }
 
-	/**
-	 * Sets the value for the property identified by a given key path.
-	 *
-	 * @param	string	$propertyPath The property key path in the form (object.property)
-	 * @param	mixed	$object       The new value to assign
-	 * @return	void
-	 */
-	public function setObjectForKeyPath($propertyPath, $object) {
-		return ObjectHelper::setObjectForKeyPathOfObject($propertyPath, $object, $this);
-	}
+        $classVars = get_object_vars($this);
+        if (isset($classVars[$key])) { // Check if a property exists
+            unset($this->$key);
+        }
+    }
 
-	/**
-	 * Returns if the property at the given key path, can be resolved.
-	 *
-	 * @param	string	$propertyPath 	The property key path to resolve in the format "object.property"
-	 * @return	boolean					Returns TRUE if the property key path can be resolved, otherwise FALSE
-	 */
-	public function hasObjectForKeyPath($propertyPath) {
-		try {
-			$value = ObjectHelper::getObjectForKeyPathOfObject($propertyPath, $this);
-		} catch (\InvalidArgumentException $e) {
-			$value = NULL;
-		}
-		if ($value) {
-			return TRUE;
-		}
-		return FALSE;
-	}
+    /**
+     * Returns the value of the property at the given key path
+     *
+     * @param    string $propertyPath The property key path to resolve in the format "object.property"
+     * @return    mixed
+     */
+    public function getObjectForKeyPath($propertyPath)
+    {
+        return ObjectHelper::getObjectForKeyPathOfObject($propertyPath, $this);
+    }
 
-	/**
-	 * Invoked bevore the source array is traversed to set properties from array.
-	 *
-	 * @param	array/dictionary $source
-	 *
-	 * @return	array/dictionary
-	 */
-	protected function _prepareSourceKeys(&$source) {
-		return $source;
-	}
+    /**
+     * Called if no object was found for the given property key
+     *
+     * @param string $key The name of the undefined property
+     * @return mixed    Returns a substitute value
+     * @throws \InvalidArgumentException on default.
+     */
+    public function getObjectForUndefinedKey($key)
+    {
+        throw new \InvalidArgumentException("No value found for undefined key '$key'.");
+    }
+
+    /**
+     * Returns the object for the given (undefined) key, of this instance, or
+     * the given object (if specified)
+     *
+     * The default implementation only invokes getObjectForUndefinedKey() of the
+     * this instance/the given object
+     *
+     * @param    string $key    The name of the undefined property
+     * @param    object $object The object to get the property from
+     * @return    mixed    Returns the property's value
+     */
+    protected function _getObjectForUndefinedKeyOfObject($key, $object)
+    {
+        return $object->getObjectForUndefinedKey($key);
+    }
+
+    /**
+     * Sets the value for the property identified by a given key path.
+     *
+     * @param    string $propertyPath The property key path in the form (object.property)
+     * @param    mixed  $object       The new value to assign
+     * @return    void
+     */
+    public function setObjectForKeyPath($propertyPath, $object)
+    {
+        ObjectHelper::setObjectForKeyPathOfObject($propertyPath, $object, $this);
+    }
+
+    /**
+     * Returns if the property at the given key path, can be resolved.
+     *
+     * @param    string $propertyPath The property key path to resolve in the format "object.property"
+     * @return    boolean                    Returns TRUE if the property key path can be resolved, otherwise FALSE
+     */
+    public function hasObjectForKeyPath($propertyPath)
+    {
+        try {
+            $value = ObjectHelper::getObjectForKeyPathOfObject($propertyPath, $this);
+        } catch (\InvalidArgumentException $e) {
+            $value = null;
+        }
+        if ($value) {
+            return true;
+        }
+
+        return false;
+    }
+
+    /**
+     * Invoked before the source array is traversed to set properties from array.
+     *
+     * @param    array /dictionary $source
+     *
+     * @return    array/dictionary
+     */
+    protected function _prepareSourceKeys(&$source)
+    {
+        return $source;
+    }
 
 
-	/* MWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWM */
-	/* HELPER FUNCTIONS    MWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWM */
-	/* MWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWM */
-	/**
-	 * Converts a string to upper-camel-case.
-	 *
-	 * @param	string	$string
-	 * @param	string	$delimiter Optional value by which the string will be split
-	 * @return	string
-	 */
-	protected function _toUpperCamel($string, $delimiter = '_') {
-		if (func_num_args() < 2) {
-			return \Iresults\Core\Tools\StringTool::underscoredToLowerCamelCase($string);
-		}
+    /* MWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWM */
+    /* HELPER FUNCTIONS    MWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWM */
+    /* MWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWM */
+    /**
+     * Converts a string to upper-camel-case.
+     *
+     * @param    string $string
+     * @param    string $delimiter Optional value by which the string will be split
+     * @return    string
+     */
+    protected function _toUpperCamel($string, $delimiter = '_')
+    {
+        if (func_num_args() < 2) {
+            return \Iresults\Core\Tools\StringTool::underscoredToLowerCamelCase($string);
+        }
 
-		$result = array();
-		$parts = explode($delimiter, $string);
-		foreach ($parts as $part) {
-			$result[] = ucfirst($part);
-		}
-		return implode('', $result);
-	}
+        $result = array();
+        $parts = explode($delimiter, $string);
+        foreach ($parts as $part) {
+            $result[] = ucfirst($part);
+        }
+
+        return implode('', $result);
+    }
 }

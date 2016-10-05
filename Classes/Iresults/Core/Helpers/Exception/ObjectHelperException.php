@@ -39,5 +39,6 @@ use Iresults\Core\Error;
  *
  * @package Iresults\Core\Helpers\Exception
  */
-class ObjectHelperException extends Error {
+class ObjectHelperException extends Error
+{
 }

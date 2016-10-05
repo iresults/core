@@ -32,73 +32,98 @@ require_once __DIR__ . '/../Autoloader.php';
 /**
  * Test case for functionality of the iresults Cache.
  *
- * @version $Id$
- * @copyright Copyright belongs to the respective authors
- * @license http://www.gnu.org/licenses/gpl.html GNU General Public License, version 3 or later
+ * @version    $Id$
+ * @copyright  Copyright belongs to the respective authors
+ * @license    http://www.gnu.org/licenses/gpl.html GNU General Public License, version 3 or later
  *
- * @package TYPO3
+ * @package    TYPO3
  * @subpackage Iresults_Helpers
  *
- * @author Daniel Corn <cod@iresults.li>
+ * @author     Daniel Corn <cod@iresults.li>
  */
-class CacheTest extends \PHPUnit_Framework_TestCase {
-	/**
-	 * @var AbstractCache
-	 */
-	protected $fixture;
+class CacheTest extends \PHPUnit_Framework_TestCase
+{
+    /**
+     * @var AbstractCache
+     */
+    protected $fixture;
 
-	public function setUp() {
-		$this->fixture = Factory::getSharedInstance();
-	}
+    public function setUp()
+    {
+        $this->fixture = Factory::getSharedInstance();
+    }
 
-	public function tearDown() {
-	}
+    public function tearDown()
+    {
+    }
 
-	/**
-	 * @test
-	 */
-	public function isInstanceOfCacheAbstract() {
-		$this->assertTrue(is_a(Factory::getSharedInstance(), 	'\Iresults\Core\Cache\AbstractCache'));
-		$this->assertTrue(is_a(Factory::makeInstance(), 		'\Iresults\Core\Cache\AbstractCache'));
-	}
+    /**
+     * @test
+     */
+    public function isInstanceOfCacheAbstract()
+    {
+        $this->assertTrue(is_a(Factory::getSharedInstance(), '\Iresults\Core\Cache\AbstractCache'));
+        $this->assertTrue(is_a(Factory::makeInstance(), '\Iresults\Core\Cache\AbstractCache'));
+    }
 
-	/**
-	 * @test
-	 */
-	public function setObjectForKey() {
-		$this->fixture->setObjectForKey('age', 34);
-		$age = $this->fixture->getObjectForKey('age');
-		$this->assertEquals(34, $age);
-	}
+    /**
+     * @test
+     */
+    public function setObjectForKey()
+    {
+        $this->fixture->setObjectForKey('age', 34);
+        $age = $this->fixture->getObjectForKey('age');
+        $this->assertEquals(34, $age);
+    }
 
-	/**
-	 * @test
-	 */
-	public function getObjectForKeyOrPerformClosure() {
-		$result = $this->fixture->getObjectForKeyOrPerformClosure('new_key_' . time(), function($key) {return 'new_value';});
-		$this->assertEquals('new_value', $result);
-	}
+    /**
+     * @test
+     */
+    public function getObjectForKeyOrPerformClosure()
+    {
+        $result = $this->fixture->getObjectForKeyOrPerformClosure(
+            'new_key_' . time(),
+            function () {
+                return 'new_value';
+            }
+        );
+        $this->assertEquals('new_value', $result);
+    }
 
-	/**
-	 * @test
-	 */
-	public function getObjectForKeyOrPerformClosureAndSetValue() {
-		$key = 'new_key_' . time();
-		$this->fixture->getObjectForKeyOrPerformClosure($key, function($key) {return 'new_value';}, TRUE);
+    /**
+     * @test
+     */
+    public function getObjectForKeyOrPerformClosureAndSetValue()
+    {
+        $key = 'new_key_' . time();
+        $this->fixture->getObjectForKeyOrPerformClosure(
+            $key,
+            function () {
+                return 'new_value';
+            },
+            true
+        );
 
-		$result = $this->fixture->getObjectForKey($key);
-		$this->assertEquals('new_value', $result);
-	}
+        $result = $this->fixture->getObjectForKey($key);
+        $this->assertEquals('new_value', $result);
+    }
 
-	/**
-	 * @test
-	 */
-	public function getObjectForKeyOrPerformClosureAndDontSetValue() {
-		$key = 'new_key_not_to_save_' . time();
-		$this->fixture->getObjectForKeyOrPerformClosure($key, function($key) {return 'new_value';}, FALSE);
+    /**
+     * @test
+     */
+    public function getObjectForKeyOrPerformClosureAndDontSetValue()
+    {
+        $key = 'new_key_not_to_save_' . time();
+        $this->fixture->getObjectForKeyOrPerformClosure(
+            $key,
+            function () {
+                return 'new_value';
+            },
+            false
+        );
 
-		$result = $this->fixture->getObjectForKey($key);
-		$this->assertNull($result);
-	}
+        $result = $this->fixture->getObjectForKey($key);
+        $this->assertNull($result);
+    }
 }
 

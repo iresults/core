@@ -38,19 +38,20 @@ namespace Iresults\Core\Locale;
  *
  * @package Iresults\Core\Locale
  */
-interface BindingInterface {
-	/**
-	 * Binds the instance to the given locale
-	 *
-	 * @param string $locale
-	 * @return $this
-	 */
-	public function bindToLocale($locale);
+interface BindingInterface
+{
+    /**
+     * Binds the instance to the given locale
+     *
+     * @param string $locale
+     * @return $this
+     */
+    public function bindToLocale($locale);
 
-	/**
-	 * Returns the locale this instance is bound to
-	 *
-	 * @return string
-	 */
-	public function getBoundLocale();
+    /**
+     * Returns the locale this instance is bound to
+     *
+     * @return string
+     */
+    public function getBoundLocale();
 }

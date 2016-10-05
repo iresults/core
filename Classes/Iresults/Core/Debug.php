@@ -114,7 +114,6 @@ class Debug
      */
     protected function _debug($object, $tempIsWebEnvironment = -1)
     {
-        $hash = '';
         $objectId = '';
         $oldIsWebEnvironment = -1;
         static $printHash = true;
@@ -135,7 +134,7 @@ class Debug
             $hash = spl_object_hash($object);
 
             if (isset($this->_storage[$hash])) {
-                $this->_add('Recursion for object '.get_class($object).' #'.$hash);
+                $this->_add('Recursion for object ' . get_class($object) . ' #' . $hash);
                 $this->_currentLevel = $this->_currentLevel - 1;
 
                 return $this;
@@ -143,7 +142,7 @@ class Debug
 
             $this->_storage[$hash] = $object;
             if ($printHash) {
-                $objectId = '#'.$hash.' ';
+                $objectId = '#' . $hash . ' ';
             }
         }
 
@@ -169,9 +168,9 @@ class Debug
             /* MWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWM */
         } elseif (is_string($object)) {
             if ($this->_isWebEnvironment) {
-                $this->_add('(string) "'.htmlspecialchars($object).'"');
+                $this->_add('(string) "' . htmlspecialchars($object) . '"');
             } else {
-                $this->_add('(string) "'.$object.'"');
+                $this->_add('(string) "' . $object . '"');
             }
 
             /* MWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWM */
@@ -182,7 +181,7 @@ class Debug
             $this->_add("(float) $object");
             /* MWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWM */
         } elseif (is_array($object)) {
-            $this->_add('array ('.count($object).') => {');
+            $this->_add('array (' . count($object) . ') => {');
             $this->_currentLevel = $this->_currentLevel + 1;
             foreach ($object as $key => $element) {
                 $this->_add("$key => ");
@@ -195,7 +194,7 @@ class Debug
             $this->_add('nil');
             /* MWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWM */
         } elseif ($object instanceof \Traversable) {
-            $this->_add(get_class($object).' ('.$objectId.count($object).') => {');
+            $this->_add(get_class($object) . ' (' . $objectId . count($object) . ') => {');
             $this->_currentLevel = $this->_currentLevel + 1;
             foreach ($object as $key => $element) {
                 $this->_add("$key => ", false);
@@ -206,7 +205,7 @@ class Debug
             /* MWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWM */
         } elseif (method_exists($object, '_ir_debug') && is_callable(array($object, '_ir_debug'))) {
             $properties = $object->_ir_debug();
-            $this->_add(get_class($object).$objectId.' => {');
+            $this->_add(get_class($object) . $objectId . ' => {');
             $this->_currentLevel = $this->_currentLevel + 1;
             foreach ($properties as $key => $element) {
                 $this->_add("$key => ", false);
@@ -216,7 +215,7 @@ class Debug
             $this->_add('}');
             /* MWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWM */
         } elseif ($object instanceof \DateTime) {
-            $dateTime = get_class($object).' => {'.$object->format('r').'}';
+            $dateTime = get_class($object) . ' => {' . $object->format('r') . '}';
             $this->_add($dateTime);
             /* MWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWM */
         } elseif ($object instanceof \Iresults\Core\DateTime) {
@@ -227,11 +226,11 @@ class Debug
             $this->_add($dateTime);
             /* MWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWM */
         } elseif (is_a($object, 'Tx_Extbase_Error_Message')) {
-            $this->_add(get_class($object)." => $object");
+            $this->_add(get_class($object) . " => $object");
             /* MWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWM */
         } elseif (method_exists($object, '_getProperties')) {
             $properties = $object->_getProperties();
-            $this->_add(get_class($object).$objectId.' => {');
+            $this->_add(get_class($object) . $objectId . ' => {');
             $this->_currentLevel = $this->_currentLevel + 1;
             foreach ($properties as $key => $element) {
                 $this->_add("$key => ", false);
@@ -242,7 +241,7 @@ class Debug
             /* MWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWM */
         } elseif (is_a($object, 'tslib_cObj')) {
             $properties = $object->data;
-            $this->_add(get_class($object).$objectId.' => {');
+            $this->_add(get_class($object) . $objectId . ' => {');
             $this->_currentLevel = $this->_currentLevel + 1;
             foreach ($properties as $key => $element) {
                 $this->_add("$key => ", false);
@@ -253,7 +252,7 @@ class Debug
             /* MWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWM */
         } elseif (method_exists($object, 'getData')) {
             $properties = $object->getData();
-            $this->_add(get_class($object).$objectId.' => {');
+            $this->_add(get_class($object) . $objectId . ' => {');
             $this->_currentLevel = $this->_currentLevel + 1;
             foreach ($properties as $key => $element) {
                 $this->_add("$key => ", false);
@@ -264,32 +263,32 @@ class Debug
             /* MWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWM */
         } elseif (is_a($object, '\Iresults\Core\Value')) {
             $property = $object->getValue();
-            $this->_add(get_class($object).$objectId.' => {');
+            $this->_add(get_class($object) . $objectId . ' => {');
             $this->_currentLevel = $this->_currentLevel + 1;
             $this->_debug($property);
             $this->_currentLevel = $this->_currentLevel - 1;
             $this->_add('}');
             /* MWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWM */
         } elseif (is_a($object, '\Iresults\FS\FilesystemInterface')) {
-            $this->_add(get_class($object).$objectId.' => {');
+            $this->_add(get_class($object) . $objectId . ' => {');
             $this->_currentLevel = $this->_currentLevel + 1;
-            $this->_add('path => "'.$object->getPath().'"');
+            $this->_add('path => "' . $object->getPath() . '"');
             $this->_currentLevel = $this->_currentLevel - 1;
             $this->_add('}');
             /* MWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWM */
         } elseif ($object instanceof \Exception) {
-            $this->_add(get_class($object).$objectId.' => {');
+            $this->_add(get_class($object) . $objectId . ' => {');
             $this->_currentLevel = $this->_currentLevel + 1;
-            $this->_add($object->getCode().': '.$object->getMessage());
+            $this->_add($object->getCode() . ': ' . $object->getMessage());
             $this->_currentLevel = $this->_currentLevel - 1;
             $this->_add('}');
             /* MWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWM */
         } elseif (is_resource($object)) {
-            $this->_add('(resource) '.get_resource_type($object).' '.substr(''.$object, 9));
+            $this->_add('(resource) ' . get_resource_type($object) . ' ' . substr('' . $object, 9));
             /* MWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWM */
         } elseif (is_object($object)) {
             $properties = get_object_vars($object);
-            $this->_add(get_class($object).$objectId.' => {');
+            $this->_add(get_class($object) . $objectId . ' => {');
             $this->_currentLevel = $this->_currentLevel + 1;
             foreach ($properties as $key => $element) {
                 $this->_add("$key => ", false);
@@ -311,10 +310,9 @@ class Debug
      * Adds a text to the output
      *
      * @param    string  $text
-     * @param    boolean $break
      * @return    void
      */
-    protected function _add($text, $break = true)
+    protected function _add($text)
     {
         // Check the environment and print &nbsp; for web and \t for a shell
         if ($this->_isWebEnvironment === -1) {
@@ -328,7 +326,7 @@ class Debug
                 $this->_output .= '   ';
             }
         }
-        $this->_output .= "$text".PHP_EOL;
+        $this->_output .= "$text" . PHP_EOL;
     }
 
     /**

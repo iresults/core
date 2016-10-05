@@ -36,12 +36,15 @@ namespace Iresults\Core\Tests\Fixture;
 use Iresults\Core\Base;
 use Iresults\Core\IresultsBaseInterface;
 
-class IresultsTestImplementation extends Base implements IresultsBaseInterface{
-    public function isFullRequest() {
-        return FALSE;
+class IresultsTestImplementation extends Base implements IresultsBaseInterface
+{
+    public function isFullRequest()
+    {
+        return false;
     }
 
-    public function dynamicFunction() {
-        return TRUE;
+    public function dynamicFunction()
+    {
+        return true;
     }
 }

@@ -36,5 +36,6 @@ namespace Iresults\Core\Locale\Exception;
  *
  * @package Iresults\Core\Locale
  */
-class LocaleException extends \RuntimeException {
+class LocaleException extends \RuntimeException
+{
 }

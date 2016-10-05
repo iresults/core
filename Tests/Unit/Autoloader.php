@@ -24,9 +24,15 @@ namespace Iresults\Core\Tests\Unit;
  * SOFTWARE.
  */
 
-spl_autoload_register(function ($className) {
-	$classFile = __DIR__ . '/../../Classes/' . str_replace(array('_', '\\'), DIRECTORY_SEPARATOR, $className) . '.php';
-	if (file_exists($classFile)) {
-		require_once $classFile;
-	}
-});
+spl_autoload_register(
+    function ($className) {
+        $classFile = __DIR__ . '/../../Classes/' . str_replace(
+                array('_', '\\'),
+                DIRECTORY_SEPARATOR,
+                $className
+            ) . '.php';
+        if (file_exists($classFile)) {
+            require_once $classFile;
+        }
+    }
+);

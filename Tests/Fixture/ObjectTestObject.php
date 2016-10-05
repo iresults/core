@@ -35,6 +35,7 @@ namespace Iresults\Core\Tests\Fixture;
 /**
  * A subclass of Iresults_Core
  */
-class ObjectTestObject extends \Iresults\Core\Core {
+class ObjectTestObject extends \Iresults\Core\Core
+{
     protected $name = 'mars';
 }

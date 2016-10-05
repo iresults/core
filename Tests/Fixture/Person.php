@@ -29,7 +29,8 @@
 
 namespace Iresults\Core\Tests\Fixture;
 
-class Person extends \Iresults\Core\Model {
+class Person extends \Iresults\Core\Model
+{
     /**
      * The name
      *
@@ -50,30 +51,34 @@ class Person extends \Iresults\Core\Model {
      * @var array<string>
      */
     protected $address = array(
-        'street' 	=> 'Bingstreet 14',
-        'city'		=> 'NYC',
-        'country'	=> 'USA'
+        'street'  => 'Bingstreet 14',
+        'city'    => 'NYC',
+        'country' => 'USA',
     );
 
     /**
      * Returns the name.
-     * @return	string
+     *
+     * @return    string
      */
-    public function getName(){
+    public function getName()
+    {
         return $this->name;
     }
 
     /**
      * Sets the name.
      *
-     * @param	string	$newValue The new value to set
-     * @return	void
+     * @param    string $newValue The new value to set
+     * @return    void
      */
-    public function setName($newValue){
+    public function setName($newValue)
+    {
         $this->name = $newValue;
     }
 
-    public function gar() {
+    public function gar()
+    {
         return $this->address;
     }
 }

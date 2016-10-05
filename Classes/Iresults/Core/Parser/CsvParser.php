@@ -31,6 +31,7 @@
 
 
 namespace Iresults\Core\Parser;
+
 use Iresults\Core\Parser\Exception\ParserInvalidInputException;
 
 /**
@@ -38,90 +39,95 @@ use Iresults\Core\Parser\Exception\ParserInvalidInputException;
  *
  * @package Iresults\Core\Parser
  */
-class CsvParser extends AbstractParser {
-	/**
-	 * Parses the given input
-	 *
-	 * @param mixed $input
-	 * @return mixed Returns the parsed data
-	 * @throws ParserInvalidInputException if the input could not be parsed
-	 */
-	public function parse($input) {
-		$data = NULL;
-		$parsedData = array();
-		$lineString = NULL;
-		$oldIniValue = ini_set('auto_detect_line_endings', TRUE);
+class CsvParser extends AbstractParser
+{
+    /**
+     * Parses the given input
+     *
+     * @param mixed $input
+     * @return mixed Returns the parsed data
+     * @throws ParserInvalidInputException if the input could not be parsed
+     */
+    public function parse($input)
+    {
+        $data = null;
+        $parsedData = array();
+        $lineString = null;
+        $oldIniValue = ini_set('auto_detect_line_endings', true);
 
-		$fileHandle = @fopen($input, 'r');
-		if ($fileHandle === FALSE) {
-			throw new ParserInvalidInputException('Could not load CSV file from "' . $input . '".', 1315232117);
-		}
+        $fileHandle = @fopen($input, 'r');
+        if ($fileHandle === false) {
+            throw new ParserInvalidInputException('Could not load CSV file from "' . $input . '".', 1315232117);
+        }
 
         $firstTwoLines = fgets($fileHandle) . fgets($fileHandle);
-		rewind($fileHandle);
-		list($delimiter, $enclosure, $escape) = $this->autoDetectMissingParserConfiguration($firstTwoLines);	rewind($fileHandle);
+        rewind($fileHandle);
+        list($delimiter, $enclosure, $escape) = $this->autoDetectMissingParserConfiguration($firstTwoLines);
+        rewind($fileHandle);
 
-		/*
-		 * fgetcsv() can handle multi line cells, but does not work without an
-		 * enclosure
-		 */
-		if ($enclosure) {
-			while (($data = fgetcsv($fileHandle, 0, $delimiter, $enclosure, $escape)) !== FALSE) {
-				$parsedData[] = $data;
-			}
-		} else {
-			while (($lineString = fgets($fileHandle)) !== FALSE) {
-				$data = str_getcsv($lineString, $delimiter, $enclosure, $escape);
-				$parsedData[] = $data;
-			}
-		}
-		fclose($fileHandle);
-		ini_set('auto_detect_line_endings', $oldIniValue);
+        /*
+         * fgetcsv() can handle multi line cells, but does not work without an
+         * enclosure
+         */
+        if ($enclosure) {
+            while (($data = fgetcsv($fileHandle, 0, $delimiter, $enclosure, $escape)) !== false) {
+                $parsedData[] = $data;
+            }
+        } else {
+            while (($lineString = fgets($fileHandle)) !== false) {
+                $data = str_getcsv($lineString, $delimiter, $enclosure, $escape);
+                $parsedData[] = $data;
+            }
+        }
+        fclose($fileHandle);
+        ini_set('auto_detect_line_endings', $oldIniValue);
 
-		return $parsedData;
-	}
+        return $parsedData;
+    }
 
-	/**
-	 * Tries to read the delimiter, enclosure and escape character from the
-	 * given line
-	 *
-	 * @param string $lineString
-	 * @return array Returns the delimiter, enclosure and escape characters in an array
-	 */
-	protected function autoDetectMissingParserConfiguration($lineString) {
-		$delimiter = $this->getConfigurationForKey('delimiter');
-		$enclosure = $this->getConfigurationForKey('enclosure');
-		$escape = $this->getConfigurationForKey('escape');
+    /**
+     * Tries to read the delimiter, enclosure and escape character from the
+     * given line
+     *
+     * @param string $lineString
+     * @return array Returns the delimiter, enclosure and escape characters in an array
+     */
+    protected function autoDetectMissingParserConfiguration($lineString)
+    {
+        $delimiter = $this->getConfigurationForKey('delimiter');
+        $enclosure = $this->getConfigurationForKey('enclosure');
+        $escape = $this->getConfigurationForKey('escape');
 
-		if (!$enclosure) {
-			$firstCharacter = $lineString[0];
-			$lastCharacter = substr(trim($lineString), -1);
-			if (!is_numeric($firstCharacter) && !ctype_alpha($firstCharacter)) {
-				$enclosure = $firstCharacter;
-			} else if (!is_numeric($lastCharacter) && !ctype_alpha($lastCharacter)) {
-				$enclosure = $lastCharacter;
-			}
-			$this->configuration['enclosure'] = $enclosure;
-		}
-		if (!$delimiter) {
-			$i = -1;
-			$lastDelimiterPosition = 5000;
-			$delimiterArray = array(';', ',', ':', "\t");
+        if (!$enclosure) {
+            $firstCharacter = $lineString[0];
+            $lastCharacter = substr(trim($lineString), -1);
+            if (!is_numeric($firstCharacter) && !ctype_alpha($firstCharacter)) {
+                $enclosure = $firstCharacter;
+            } elseif (!is_numeric($lastCharacter) && !ctype_alpha($lastCharacter)) {
+                $enclosure = $lastCharacter;
+            }
+            $this->configuration['enclosure'] = $enclosure;
+        }
+        if (!$delimiter) {
+            $i = -1;
+            $lastDelimiterPosition = 5000;
+            $delimiterArray = array(';', ',', ':', "\t");
 
-			$delimiterArrayCount = count($delimiterArray);
+            $delimiterArrayCount = count($delimiterArray);
 
-			while (++$i < $delimiterArrayCount) {
-				$currentDelimiterPosition = strpos($lineString, $delimiterArray[$i]);
-				if ($currentDelimiterPosition !== FALSE && $currentDelimiterPosition < $lastDelimiterPosition) {
-					$lastDelimiterPosition = $currentDelimiterPosition;
-					$delimiter = $delimiterArray[$i];
-				}
-			}
-			$this->configuration['delimiter'] = $delimiter;
-		}
-		if (!$escape) {
-			$escape = '\\';
-		}
-		return array($delimiter, $enclosure, $escape);
-	}
+            while (++$i < $delimiterArrayCount) {
+                $currentDelimiterPosition = strpos($lineString, $delimiterArray[$i]);
+                if ($currentDelimiterPosition !== false && $currentDelimiterPosition < $lastDelimiterPosition) {
+                    $lastDelimiterPosition = $currentDelimiterPosition;
+                    $delimiter = $delimiterArray[$i];
+                }
+            }
+            $this->configuration['delimiter'] = $delimiter;
+        }
+        if (!$escape) {
+            $escape = '\\';
+        }
+
+        return array($delimiter, $enclosure, $escape);
+    }
 }

@@ -37,5 +37,6 @@ namespace Iresults\Core\Parser\Exception;
  *
  * @package Iresults\Core\Parser\Exception
  */
-class ParserInvalidInputException extends \UnexpectedValueException {
+class ParserInvalidInputException extends \UnexpectedValueException
+{
 }

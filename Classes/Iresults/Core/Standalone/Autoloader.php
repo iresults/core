@@ -39,29 +39,33 @@ namespace Iresults\Core\Standalone;
  * require_once 'Classes/Iresults/Core/Standalone/Autoloader.php';
  * \Iresults\Core\Standalone\Autoloader::register();
  */
-class Autoloader {
-	/**
-	 * Defines if the Autoloader has been registered
-	 * @var bool
-	 */
-	static protected $isRegistered = FALSE;
+class Autoloader
+{
+    /**
+     * Defines if the Autoloader has been registered
+     *
+     * @var bool
+     */
+    static protected $isRegistered = false;
 
     /**
      * Registers the class to use for autoloading
-	 *
-	 * @param bool $prepend If TRUE, the Autoloader will be prepended on the autoload stack instead of being appended
-	 */
-	static public function register($prepend = FALSE) {
-		if (self::$isRegistered) {
-			return;
-		}
-		self::$isRegistered = spl_autoload_register(array(__CLASS__, 'autoload'), TRUE, $prepend);
+     *
+     * @param bool $prepend If TRUE, the Autoloader will be prepended on the autoload stack instead of being appended
+     */
+    static public function register($prepend = false)
+    {
+        if (self::$isRegistered) {
+            return;
+        }
+        self::$isRegistered = spl_autoload_register(array(__CLASS__, 'autoload'), true, $prepend);
     }
 
     /**
      * Unregisters the class to use for autoloading
      */
-    static public function unregister() {
+    static public function unregister()
+    {
         spl_autoload_unregister(array(__CLASS__, 'autoload'));
     }
 
@@ -70,7 +74,8 @@ class Autoloader {
      *
      * @param string $className
      */
-    static public function autoload($className) {
+    static public function autoload($className)
+    {
         if ($className[0] !== '\\') {
             $className = '\\' . $className;
         }
@@ -86,11 +91,13 @@ class Autoloader {
      *
      * @return string
      */
-    static protected function getClassBasePath() {
+    static protected function getClassBasePath()
+    {
         static $classBasePath = '';
         if (!$classBasePath) {
             $classBasePath = __DIR__ . '/../../../';
         }
+
         return $classBasePath;
     }
 }

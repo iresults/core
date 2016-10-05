@@ -32,5 +32,6 @@
 
 namespace Iresults\Core\Helpers\Exception;
 
-class ObjectHelperSetterException extends ObjectHelperException {
+class ObjectHelperSetterException extends ObjectHelperException
+{
 }

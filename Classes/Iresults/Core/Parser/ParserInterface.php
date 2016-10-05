@@ -31,6 +31,7 @@
 
 
 namespace Iresults\Core\Parser;
+
 use Iresults\Core\Parser\Exception\ParserInvalidInputException;
 
 /**
@@ -38,21 +39,22 @@ use Iresults\Core\Parser\Exception\ParserInvalidInputException;
  *
  * @package Iresults\Core\Parser
  */
-interface ParserInterface {
-	/**
-	 * Parses the given input
-	 *
-	 * @param mixed $input
-	 * @return mixed Returns the parsed data
-	 * @throws ParserInvalidInputException if the input could not be parsed
-	 */
-	public function parse($input);
+interface ParserInterface
+{
+    /**
+     * Parses the given input
+     *
+     * @param mixed $input
+     * @return mixed Returns the parsed data
+     * @throws ParserInvalidInputException if the input could not be parsed
+     */
+    public function parse($input);
 
-	/**
-	 * Set the configuration array
-	 *
-	 * @param array $configuration
-	 * @return $this
-	 */
-	public function setConfiguration($configuration);
+    /**
+     * Set the configuration array
+     *
+     * @param array $configuration
+     * @return $this
+     */
+    public function setConfiguration($configuration);
 }

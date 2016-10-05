@@ -33,7 +33,6 @@
 namespace Iresults\Core\Locale\TranslationProvider;
 
 
-use Iresults\Core\Iresults;
 use Iresults\Core\Locale\Environment;
 use Iresults\Core\Locale\TranslationProviderInterface;
 
@@ -42,100 +41,110 @@ use Iresults\Core\Locale\TranslationProviderInterface;
  *
  * @package Iresults\Core\Locale\TranslationProvider
  */
-abstract class AbstractTranslationProvider implements TranslationProviderInterface {
-	/**
-	 * The locale to use for translation
-	 *
-	 * @var string
-	 */
-	protected $boundLocale = '';
+abstract class AbstractTranslationProvider implements TranslationProviderInterface
+{
+    /**
+     * The locale to use for translation
+     *
+     * @var string
+     */
+    protected $boundLocale = '';
 
-	/**
-	 * The current package name
-	 *
-	 * @var string
-	 */
-	protected $package = self::PACKAGE_DEFAULT;
+    /**
+     * The current package name
+     *
+     * @var string
+     */
+    protected $package = self::PACKAGE_DEFAULT;
 
-	/**
-	 * Translates the given message
-	 *
-	 * @param string $message The message to translate
-	 * @return string
-	 */
-	abstract protected function findTranslation($message);
+    /**
+     * Translates the given message
+     *
+     * @param string $message The message to translate
+     * @return string
+     */
+    abstract protected function findTranslation($message);
 
-	/**
-	 * Constructor
-	 */
-	function __construct($package = self::PACKAGE_DEFAULT) {
-		$this->package = $package;
-	}
+    /**
+     * Constructor
+     */
+    function __construct($package = self::PACKAGE_DEFAULT)
+    {
+        $this->package = $package;
+    }
 
-	/**
-	 * Returns the locale to use for translation
-	 *
-	 * @return string
-	 */
-	public function getBoundLocale() {
-		if (!$this->boundLocale) {
-			return Environment::getSharedInstance()->getLocale();
-		}
-		return $this->boundLocale;
-	}
+    /**
+     * Returns the locale to use for translation
+     *
+     * @return string
+     */
+    public function getBoundLocale()
+    {
+        if (!$this->boundLocale) {
+            return Environment::getSharedInstance()->getLocale();
+        }
 
-	/**
-	 * Defines the locale to use for translation
-	 *
-	 * @param string $locale
-	 * @return $this
-	 */
-	public function bindToLocale($locale) {
-		$this->boundLocale = $locale;
-		return $this;
-	}
+        return $this->boundLocale;
+    }
 
-	/**
-	 * Translates the given message
-	 *
-	 * @param string $message         The message to translate
-	 * @param string $locale          Locale to use for this translation
-	 * @return string
-	 */
-	public function translate($message, $locale = NULL) {
-		$previousLocale = FALSE;
+    /**
+     * Defines the locale to use for translation
+     *
+     * @param string $locale
+     * @return $this
+     */
+    public function bindToLocale($locale)
+    {
+        $this->boundLocale = $locale;
 
-		// Set the environment to the temporary locale
-		if ($locale !== NULL) {
-			$previousLocale = $this->getBoundLocale();
-			$this->setEnvironment($locale);
-		}
+        return $this;
+    }
 
-		// Get the translated message
-		$translatedMessage = $this->findTranslation($message);
+    /**
+     * Translates the given message
+     *
+     * @param string $message The message to translate
+     * @param string $locale  Locale to use for this translation
+     * @return string
+     */
+    public function translate($message, $locale = null)
+    {
+        $previousLocale = false;
 
-		// Reset the environment to the previous locale
-		if ($previousLocale) {
-			$this->setEnvironment($previousLocale);
-		}
-		return $translatedMessage;
-	}
+        // Set the environment to the temporary locale
+        if ($locale !== null) {
+            $previousLocale = $this->getBoundLocale();
+            $this->setEnvironment($locale);
+        }
 
-	/**
-	 * Sets the locale environment
-	 *
-	 * @param string $locale
-	 */
-	protected function setEnvironment($locale) {
-		Environment::getSharedInstance()->setLocale($locale);
-	}
+        // Get the translated message
+        $translatedMessage = $this->findTranslation($message);
 
-	/**
-	 * Returns the current package name or 'default' if it isn't set
-	 *
-	 * @return string
-	 */
-	protected function getPackage() {
-		return $this->package;
-	}
+        // Reset the environment to the previous locale
+        if ($previousLocale) {
+            $this->setEnvironment($previousLocale);
+        }
+
+        return $translatedMessage;
+    }
+
+    /**
+     * Sets the locale environment
+     *
+     * @param string $locale
+     */
+    protected function setEnvironment($locale)
+    {
+        Environment::getSharedInstance()->setLocale($locale);
+    }
+
+    /**
+     * Returns the current package name or 'default' if it isn't set
+     *
+     * @return string
+     */
+    protected function getPackage()
+    {
+        return $this->package;
+    }
 }

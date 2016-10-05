@@ -37,5 +37,6 @@ namespace Iresults\Core\Tools\Exception;
  *
  * @package Iresults\Core\Tools\Exception
  */
-class DivisionByZeroException extends MathException {
+class DivisionByZeroException extends MathException
+{
 }

@@ -24,205 +24,232 @@ namespace Iresults\Core\Cache;
  * SOFTWARE.
  */
 
+use Iresults\Core\System\Lock;
+
 
 /**
  * Ir adapter for the cache. Writes the cache to a file.
  *
- * @author	Daniel Corn <cod@iresults.li>
- * @package	Iresults
- * @subpackage	Iresults_Core
+ * @author        Daniel Corn <cod@iresults.li>
+ * @package       Iresults
+ * @subpackage    Iresults_Core
  */
-class Ir extends \Iresults\Core\Cache\AbstractCache {
-	/**
-	 * @var array The cache itself.
-	 */
-	static protected $_cache = array();
+class Ir extends \Iresults\Core\Cache\AbstractCache
+{
+    /**
+     * The cache itself
+     *
+     * @var array
+     */
+    static protected $_cache = array();
 
-	/**
-	 * @var boolean Indicates if the shutdown handler was registered.
-	 */
-	static protected $_didInstallShutdownHandler = FALSE;
+    /**
+     * Indicates if the shutdown handler was registered
+     *
+     * @var boolean
+     */
+    static protected $_didInstallShutdownHandler = false;
 
-	/**
-	 * @var string The file name of the cache file.
-	 */
-	static protected $_fileName = 'IRESULTS_CACHE';
+    /**
+     * The file name of the cache file
+     *
+     * @var string
+     */
+    static protected $_fileName = 'IRESULTS_CACHE';
 
-	/**
-	 * @var \Iresults\Core\System\LockAbstract A lock to provide errors if multiple
-	 * processes wont the write the cache file.
-	 */
-	static protected $_lock = NULL;
+    /**
+     * A lock to provide errors if multiple processes wont the write the cache file
+     *
+     * @var \Iresults\Core\System\AbstractLock
+     */
+    static protected $_lock = null;
 
-	/**
-	 * @var boolean Indicates if the cache was changed. If not, the cache file
-	 * doesn't have to be written.
-	 */
-	static protected $_cacheWasChanged = FALSE;
+    /**
+     * Indicates if the cache was changed. If not, the cache file does not have to be written
+     *
+     * @var boolean
+     */
+    static protected $_cacheWasChanged = false;
 
-	/**
-	 * The constructor.
-	 *
-	 * @return	\Iresults\Core\Cache\Ir
-	 */
-	public function __construct() {
-		if (!self::$_lock) {
-			self::$_lock = new \Iresults\Core\System\Lock('ir_cache_lock' . self::_getLanguageSuffix());
-		}
+    /**
+     * The constructor
+     */
+    public function __construct()
+    {
+        if (!self::$_lock) {
+            self::$_lock = new Lock('ir_cache_lock' . self::_getLanguageSuffix());
+        }
 
-		parent::__construct();
+        parent::__construct();
 
-		if (!self::$_didInstallShutdownHandler) {
-			register_shutdown_function(array('\Iresults\Core\Cache\Ir', '_writeCacheFile'));
-			self::$_didInstallShutdownHandler = TRUE;
-		}
-		if (!self::$_cache || empty(self::$_cache)) {
-			self::_readCacheFile();
-		}
+        if (!self::$_didInstallShutdownHandler) {
+            register_shutdown_function(array('\Iresults\Core\Cache\Ir', '_writeCacheFile'));
+            self::$_didInstallShutdownHandler = true;
+        }
+        if (!self::$_cache || empty(self::$_cache)) {
+            self::_readCacheFile();
+        }
 
 
-		return $this;
-	}
+        return $this;
+    }
 
-	/**
-	 * Returns the object at the given key.
-	 *
-	 * @param	string	$key
-	 * @return	mixed
-	 */
-	public function getObjectForKey($key) {
-		if (isset(self::$_cache[$key])) {
-			return self::$_cache[$key];
-		} else {
-			return NULL;
-		}
-	}
+    /**
+     * Returns the object at the given key.
+     *
+     * @param    string $key
+     * @return    mixed
+     */
+    public function getObjectForKey($key)
+    {
+        if (isset(self::$_cache[$key])) {
+            return self::$_cache[$key];
+        } else {
+            return null;
+        }
+    }
 
-	/**
-	 * Stores the value of $object at the given key.
-	 *
-	 * @param	string	$key
-	 * @param	mixed	$object
-	 * @return	void
-	 */
-	public function setObjectForKey($key, $object) {
-		self::$_cacheWasChanged = TRUE;
-		self::$_cache[$key] = $object;
-	}
+    /**
+     * Stores the value of $object at the given key.
+     *
+     * @param    string $key
+     * @param    mixed  $object
+     * @return    void
+     */
+    public function setObjectForKey($key, $object)
+    {
+        self::$_cacheWasChanged = true;
+        self::$_cache[$key] = $object;
+    }
 
-	/**
-	 * Removes the object with the given key.
-	 *
-	 * @param	string	$key
-	 * @return	void
-	 */
-	public function removeObjectForKey($key) {
-		if (isset(self::$_cache[$key])) {
-			unset(self::$_cache[$key]);
-			self::$_cacheWasChanged = TRUE;
-		}
-	}
+    /**
+     * Removes the object with the given key.
+     *
+     * @param    string $key
+     * @return    void
+     */
+    public function removeObjectForKey($key)
+    {
+        if (isset(self::$_cache[$key])) {
+            unset(self::$_cache[$key]);
+            self::$_cacheWasChanged = true;
+        }
+    }
 
-	/**
-	 * Removes the complete cache.
-	 *
-	 * @return	void
-	 */
-	public function clear() {
-		self::$_cache = array();
-		$result = TRUE;
-		$path = self::getCacheDir() . self::$_fileName . '*';
-		$foundPaths = glob($path);
+    /**
+     * Removes the complete cache.
+     *
+     * @return    void
+     */
+    public function clear()
+    {
+        self::$_cache = array();
+        $result = true;
+        $path = self::getCacheDir() . self::$_fileName . '*';
+        $foundPaths = glob($path);
 
-		if (!$foundPaths || empty($foundPaths)) {
-			$this->pd('No matching cache files found for pattern "' . $path . '"');
-			return;
-		}
+        if (!$foundPaths || empty($foundPaths)) {
+            $this->pd('No matching cache files found for pattern "' . $path . '"');
 
-		self::$_lock->lock();
-		foreach ($foundPaths as $onePath) {
-			if (!unlink($onePath)) {
-				$this->pd('Cache could not be cleared because the cache file $onePath couldn\'t be deleted');
-				$result = FALSE;
-			} else {
-				$this->pd('Cache file "' . $onePath . '" deleted');
-			}
-		}
-		self::$_lock->unlock();
+            return;
+        }
 
-		if ($result) {
-			$this->pd('Cache cleared');
-		}
-	}
+        self::$_lock->lock();
+        foreach ($foundPaths as $onePath) {
+            if (!unlink($onePath)) {
+                $this->pd('Cache could not be cleared because the cache file $onePath couldn\'t be deleted');
+                $result = false;
+            } else {
+                $this->pd('Cache file "' . $onePath . '" deleted');
+            }
+        }
+        self::$_lock->unlock();
 
-	/**
-	 * If the object is destructed and uncommited changes exist, write the cache
-	 * file.
-	 *
-	 * @return	void
-	 */
-	public function __destruct() {
-		if (self::$_cacheWasChanged) {
-			self::_writeCacheFile();
-		}
-	}
+        if ($result) {
+            $this->pd('Cache cleared');
+        }
+    }
 
-	/**
-	 * Reads the cache from the cache file.
-	 *
-	 * @return	void
-	 */
-	static public function _readCacheFile() {
-		$path = self::getCacheDir() . self::$_fileName . self::_getLanguageSuffix();
-		if (!file_exists($path)) return;
-		$contents = file_get_contents($path);
-		if (!$contents) return;
+    /**
+     * If the object is destructed and uncommited changes exist, write the cache
+     * file.
+     *
+     * @return    void
+     */
+    public function __destruct()
+    {
+        if (self::$_cacheWasChanged) {
+            self::_writeCacheFile();
+        }
+    }
 
-		$temp = unserialize($contents);
-		if ($temp === FALSE) return;
-		self::$_cache = $temp;
-	}
+    /**
+     * Reads the cache from the cache file.
+     *
+     * @return    void
+     */
+    static public function _readCacheFile()
+    {
+        $path = self::getCacheDir() . self::$_fileName . self::_getLanguageSuffix();
+        if (!file_exists($path)) {
+            return;
+        }
+        $contents = file_get_contents($path);
+        if (!$contents) {
+            return;
+        }
 
-	/**
-	 * Writes the cache to a cache file.
-	 *
-	 * @return	void
-	 */
-	static public function _writeCacheFile() {
-		if (!self::$_cache || empty(self::$_cache)) {
-			return;
-		} else if (!self::$_cacheWasChanged) {
-			\Iresults\Core\Iresults::pd('Cache was not changed');
-			return;
-		}
-		$path = self::getCacheDir() . self::$_fileName . self::_getLanguageSuffix();
-		$contents = serialize(self::$_cache);
+        $temp = unserialize($contents);
+        if ($temp === false) {
+            return;
+        }
+        self::$_cache = $temp;
+    }
 
-		self::$_lock->tryLock();
+    /**
+     * Writes the cache to a cache file.
+     *
+     * @return    void
+     */
+    static public function _writeCacheFile()
+    {
+        if (!self::$_cache || empty(self::$_cache)) {
+            return;
+        } elseif (!self::$_cacheWasChanged) {
+            \Iresults\Core\Iresults::pd('Cache was not changed');
 
-		$fh = @fopen($path, 'wb');
-		if (!$fh) {
-			$msg = 'Couldn\'t open file "' . $path . '" for writing the cache information';
-			trigger_error($msg, E_USER_WARNING);
-			return;
-		}
+            return;
+        }
+        $path = self::getCacheDir() . self::$_fileName . self::_getLanguageSuffix();
+        $contents = serialize(self::$_cache);
 
-		if (fwrite($fh, $contents) === FALSE) {
-			$msg = 'Writing cache to file "' . $path . '" failed';
-			trigger_error($msg, E_USER_WARNING);
-		}
-		fclose($fh);
+        self::$_lock->tryLock();
 
-		self::$_lock->unlock();
-		self::$_cacheWasChanged = FALSE;
-	}
+        $fh = @fopen($path, 'wb');
+        if (!$fh) {
+            $msg = 'Couldn\'t open file "' . $path . '" for writing the cache information';
+            trigger_error($msg, E_USER_WARNING);
 
-	/**
-	 * Returns the path to the cache directory.
-	 *
-	 * @return	string
-	 */
-	static public function getCacheDir() {
-		return \Iresults\Core\Iresults::getTempPath();
-	}
+            return;
+        }
+
+        if (fwrite($fh, $contents) === false) {
+            $msg = 'Writing cache to file "' . $path . '" failed';
+            trigger_error($msg, E_USER_WARNING);
+        }
+        fclose($fh);
+
+        self::$_lock->unlock();
+        self::$_cacheWasChanged = false;
+    }
+
+    /**
+     * Returns the path to the cache directory.
+     *
+     * @return    string
+     */
+    static public function getCacheDir()
+    {
+        return \Iresults\Core\Iresults::getTempPath();
+    }
 }

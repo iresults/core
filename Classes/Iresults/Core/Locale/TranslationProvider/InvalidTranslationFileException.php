@@ -37,5 +37,6 @@ namespace Iresults\Core\Locale\TranslationProvider;
  *
  * @package Iresults\Core\Locale\TranslationProvider
  */
-class InvalidTranslationFileException extends \InvalidArgumentException {
+class InvalidTranslationFileException extends \InvalidArgumentException
+{
 }

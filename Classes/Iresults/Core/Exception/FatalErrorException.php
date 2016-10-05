@@ -37,5 +37,6 @@ namespace Iresults\Core\Exception;
  *
  * @package Iresults\Core\Exception
  */
-class FatalErrorException extends \Exception {
+class FatalErrorException extends \Exception
+{
 }

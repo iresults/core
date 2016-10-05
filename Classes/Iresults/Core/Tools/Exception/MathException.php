@@ -37,5 +37,6 @@ namespace Iresults\Core\Tools\Exception;
  *
  * @package Iresults\Core\Tools\Exception
  */
-class MathException extends \UnexpectedValueException {
+class MathException extends \UnexpectedValueException
+{
 }
