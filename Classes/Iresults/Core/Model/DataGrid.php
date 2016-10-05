@@ -191,7 +191,7 @@ class DataGrid extends Core implements \Iterator, \ArrayAccess
      */
     public function initWithContentsOfCSVFile($filePath, $delimiter = ',', $enclosure = '"', $escape = '\\')
     {
-        $csvParser = new \Iresults\Core\Parser\CsvParser();
+        $csvParser = new \Iresults\Core\Parser\CsvFileParser();
         $csvParserConfiguration = array();
         $numberOfArguments = func_num_args();
         switch (true) {

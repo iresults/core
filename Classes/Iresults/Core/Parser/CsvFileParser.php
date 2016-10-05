@@ -39,17 +39,18 @@ use Iresults\Core\Parser\Exception\ParserInvalidInputException;
  *
  * @package Iresults\Core\Parser
  */
-class CsvParser extends AbstractParser
+class CsvFileParser extends AbstractFileParser
 {
     /**
      * Parses the given input
      *
-     * @param mixed $input
-     * @return mixed Returns the parsed data
+     * @param string $input
+     * @return array Returns the parsed data
      * @throws ParserInvalidInputException if the input could not be parsed
      */
     public function parse($input)
     {
+        $this->validateFile($input);
         $data = null;
         $parsedData = array();
         $lineString = null;

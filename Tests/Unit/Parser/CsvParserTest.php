@@ -35,18 +35,18 @@ namespace Iresults\Core\Tests\Unit\Parser;
 
 require_once __DIR__ . '/../Autoloader.php';
 
-use Iresults\Core\Parser\CsvParser;
+use Iresults\Core\Parser\CsvFileParser;
 
 class CsvParserTest extends \PHPUnit_Framework_TestCase
 {
     /**
-     * @var CsvParser
+     * @var CsvFileParser
      */
     protected $fixture;
 
     protected function setUp()
     {
-        $this->fixture = new CsvParser();
+        $this->fixture = new CsvFileParser();
     }
 
     protected function tearDown()
@@ -224,6 +224,34 @@ class CsvParserTest extends \PHPUnit_Framework_TestCase
                 array('12', "Saturday\nAfternoon", '2:00'),
                 array('13', "Sunday\nMorning", '2:00'),
                 array('14', "Sunday\nAfternoon", '2:00'),
+            ),
+            $result
+        );
+    }
+
+    /**
+     * @test
+     */
+    public function parseFile7Test()
+    {
+        $filePath = __DIR__ . '/../SampleData/csv-example-7.csv';
+        $result = $this->fixture->parse($filePath);
+
+        /*
+         * Unit/SampleData/csv-example-7.csv
+         *
+         *
+
+
+
+
+         */
+        $this->assertEquals(
+            array(
+                array('firstname','lastname','age'),
+                array('Peter','Dingbert','29'),
+                array('Philip','Captain','53'),
+                array('Susan','Reader','101'),
             ),
             $result
         );
