@@ -237,23 +237,40 @@ class CsvParserTest extends \PHPUnit_Framework_TestCase
         $filePath = __DIR__ . '/../SampleData/csv-example-7.csv';
         $result = $this->fixture->parse($filePath);
 
-        /*
-         * Unit/SampleData/csv-example-7.csv
-         *
-         *
-
-
-
-
-         */
         $this->assertEquals(
             array(
-                array('firstname','lastname','age'),
+                array('firstName','lastName','age'),
                 array('Peter','Dingbert','29'),
                 array('Philip','Captain','53'),
                 array('Susan','Reader','101'),
             ),
             $result
         );
+    }
+
+    /**
+     * @test
+     */
+    public function parseFile8Test()
+    {
+        $filePath = __DIR__ . '/../SampleData/csv-example-8.csv';
+        $result = $this->fixture->parse($filePath);
+
+        $this->assertEquals(
+            array(
+                array('firstName','lastName','age'),
+            ),
+            $result
+        );
+    }
+
+    /**
+     * @test
+     */
+    public function parseFile9Test()
+    {
+        $filePath = __DIR__ . '/../SampleData/csv-example-9.csv';
+        $result = $this->fixture->parse($filePath);
+        $this->assertCount(0, $result);
     }
 }

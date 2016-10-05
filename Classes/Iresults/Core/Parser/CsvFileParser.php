@@ -99,7 +99,7 @@ class CsvFileParser extends AbstractFileParser
         $enclosure = $this->getConfigurationForKey('enclosure');
         $escape = $this->getConfigurationForKey('escape');
 
-        if (!$enclosure) {
+        if (!$enclosure && $lineString) {
             $firstCharacter = $lineString[0];
             $lastCharacter = substr(trim($lineString), -1);
             if (!is_numeric($firstCharacter) && !ctype_alpha($firstCharacter)) {
