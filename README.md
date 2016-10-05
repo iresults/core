@@ -14,3 +14,21 @@ The features include:
 - Tree based data structures (Iresults\Core\Model\DataTree)
 - Cache abstraction (Iresults\Core\Cache)
 - and many more...
+
+
+Installation
+------------
+
+Merge the following into your composer JSON file:
+
+```json
+  "require": {
+    "iresults/core": "~3.2"
+  },
+  "repositories": [
+    {
+      "type": "git",
+      "url": "https://git.iresults.li/git/iresults/core.git"
+    }
+  ],
+```
