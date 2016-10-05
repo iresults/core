@@ -33,7 +33,7 @@ namespace Iresults\Core;
  * @package       Iresults
  * @subpackage    Iresults
  */
-class Error extends \Exception implements JsonSerializable
+class Error extends \Exception implements \JsonSerializable
 {
     /**
      * The additional information transported with this error.
