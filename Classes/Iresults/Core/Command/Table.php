@@ -41,6 +41,11 @@ class Table
     private $useColors;
 
     /**
+     * @var int
+     */
+    private $tableColumnCount;
+
+    /**
      * Table constructor.
      */
     public function __construct()
@@ -65,12 +70,20 @@ class Table
         $separator = '|',
         $firstRowContainsHeader = false
     ) {
-        $list = '';
+        if (!$data) {
+            return '';
+        }
+
 
         $data = $this->prepareData($data);
         $head = $this->getHeaderRow($data, $firstRowContainsHeader);
 
-        $columnWidths = $this->calculateColumnWidths($data, $maxColumnWidth, $disableHead, $head);
+        if (!$head && !$data) {
+            return '';
+        }
+
+        $list = '';
+        $columnWidths = $this->calculateColumnWidthsAndTableColumnCount($data, $maxColumnWidth, $disableHead, $head);
 
         if (!$disableHead) {
             $list = $this->renderHead($head, $separator, $columnWidths);
@@ -114,19 +127,17 @@ class Table
      */
     private function getHeaderRow(&$data, $firstRowContainsHeader)
     {
+        if ($firstRowContainsHeader) {
+            return array_shift($data);
+        }
+
         // Make sure the first row is an array
         $firstRow = reset($data);
         if (!is_array($firstRow)) {
             $firstRow = iterator_to_array($firstRow);
         }
-        $header = array_keys($firstRow);
-        if ($firstRowContainsHeader) {
-            array_shift($data);
 
-            return $firstRow;
-        }
-
-        return $header;
+        return array_keys($firstRow);
     }
 
     /**
@@ -158,34 +169,42 @@ class Table
      * @param array $head
      * @return int[]
      */
-    private function calculateColumnWidths(array $data, $maxColumnWidth, $disableHead, $head)
+    private function calculateColumnWidthsAndTableColumnCount(array $data, $maxColumnWidth, $disableHead, $head)
     {
         $columnWidths = array();
         $columnCount = count($head);
+        $tempTableColumnCount = $columnCount;
+
         if ($disableHead) {
             $columnWidths = array_fill(0, $columnCount - 1, 1);
         } else {
             for ($i = 0; $i < $columnCount; $i++) {
                 $currentColumnWidth = strlen(utf8_decode($head[$i]));
-                if ($currentColumnWidth > $maxColumnWidth) {
-                    $currentColumnWidth = $maxColumnWidth;
-                }
-                $columnWidths[] = $currentColumnWidth;
+                $columnWidths[] = $currentColumnWidth > $maxColumnWidth ? $maxColumnWidth : $currentColumnWidth;
             }
         }
+
         foreach ($data as $row) {
             $indexedRow = array_values($row);
             $columnCount = count($indexedRow);
+
+            // Check if a new table column count is reached
+            if ($tempTableColumnCount < $columnCount) {
+                $tempTableColumnCount = $columnCount;
+            }
+
             for ($i = 0; $i < $columnCount; $i++) {
-                if ($columnWidths[$i] < strlen(utf8_decode($indexedRow[$i]))) {
-                    $currentColumnWidth = strlen(utf8_decode($indexedRow[$i]));
-                    if ($currentColumnWidth > $maxColumnWidth) {
-                        $currentColumnWidth = $maxColumnWidth;
-                    }
-                    $columnWidths[$i] = $currentColumnWidth;
+                $storedColumnWidth = isset($columnWidths[$i]) ? $columnWidths[$i] : 0;
+                $columnStringLength = strlen(utf8_decode($indexedRow[$i]));
+
+                if ($storedColumnWidth < $columnStringLength) {
+                    $currentColumnWidth = $columnStringLength;
+                    $columnWidths[$i] = $currentColumnWidth > $maxColumnWidth ? $maxColumnWidth : $currentColumnWidth;;
                 }
             }
         }
+
+        $this->tableColumnCount = $tempTableColumnCount;
 
         return $columnWidths;
     }
@@ -205,9 +224,9 @@ class Table
             $list .= ColorInterface::ESCAPE . ColorInterface::REVERSE;
         }
 
-        $columnCount = count($head);
-        for ($i = 0; $i < $columnCount; $i++) {
-            $col = $head[$i];
+        $tableColumnCount = $this->tableColumnCount;
+        for ($i = 0; $i < $tableColumnCount; $i++) {
+            $col = isset($head[$i]) ? $head[$i] : '';
             $columnWidth = $columnWidths[$i];
 
             if (is_array($col)) {
@@ -248,10 +267,10 @@ class Table
         }
 
         $indexedRow = array_values($row);
-        $columnCount = count($indexedRow);
+        $tableColumnCount = $this->tableColumnCount;
 
-        for ($i = 0; $i < $columnCount; $i++) {
-            $col = $indexedRow[$i];
+        for ($i = 0; $i < $tableColumnCount; $i++) {
+            $col = isset($indexedRow[$i]) ? $indexedRow[$i] : '';
             $columnWidth = $columnWidths[$i];
 
             if (is_array($col)) {

@@ -37,6 +37,11 @@ use Iresults\Core\Command\Table;
 
 class TableTest extends \PHPUnit_Framework_TestCase
 {
+    protected function setUp()
+    {
+        unset($_SERVER['TERM']);
+    }
+
     /**
      * @test
      */
@@ -56,8 +61,6 @@ class TableTest extends \PHPUnit_Framework_TestCase
      */
     public function renderWithoutColorsTest()
     {
-        unset($_SERVER['TERM']);
-
         $output = (new Table())->render($this->getTestData());
         $expected = $this->expectedOutput();
 
@@ -67,13 +70,40 @@ class TableTest extends \PHPUnit_Framework_TestCase
         $this->assertSame($expected, $output);
     }
 
+
+    /**
+     * @test
+     */
+    public function renderEmptyInputTest()
+    {
+        $this->assertSame('', (new Table())->render([]));
+        $this->assertSame(PHP_EOL.'|'.PHP_EOL.'|'.PHP_EOL, (new Table())->render([[]]));
+        $this->assertNotSame('', (new Table())->render([[],[1]]));
+    }
+
+    /**
+     * @test
+     */
+    public function renderTinyInputTest()
+    {
+        $this->assertSame('', (new Table())->render([]));
+        $this->assertSame(PHP_EOL.'|'.PHP_EOL.'|'.PHP_EOL, (new Table())->render([[]]));
+
+        $expected = <<<EXPECTED
+
+|   |
+|   |
+| 1 |
+
+EXPECTED;
+        $this->assertSame($expected, (new Table())->render([[],[1]]));
+    }
+
     /**
      * @test
      */
     public function renderWitSeparatorTest()
     {
-        unset($_SERVER['TERM']);
-
         $output = (new Table())->render($this->getTestData(), PHP_INT_MAX, false, '#');
         $expected = $this->expectedOutput();
 
