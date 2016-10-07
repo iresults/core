@@ -297,7 +297,7 @@ class Table
         } elseif ($input instanceof \Traversable) {
             return iterator_to_array($input);
         } elseif (is_object($input)) {
-            return get_object_vars($input);
+            return method_exists($input, 'toArray') ? $input->toArray() : get_object_vars($input);
         }
 
         return (array)$input;

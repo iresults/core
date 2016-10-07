@@ -34,6 +34,7 @@ namespace Iresults\Core\Unit\Cli;
 
 
 use Iresults\Core\Cli\Table;
+use Iresults\Core\DataObject;
 
 class TableTest extends \PHPUnit_Framework_TestCase
 {
@@ -50,10 +51,29 @@ class TableTest extends \PHPUnit_Framework_TestCase
         $_SERVER['TERM'] = 'a-good terminal';
 
         $output = (new Table())->render($this->getTestDataArrayCollection());
-        $expected = $this->expectedOutput();
+        $this->assertColoredOutput($output);
+    }
+    /**
+     * @test
+     */
+    public function renderWithColorsManuallyDisabledTest()
+    {
+        $_SERVER['TERM'] = 'a-good terminal';
 
-        $this->assertSame(549, strlen($output));
-        $this->assertSame(substr_count($expected, '|'), substr_count($output, '|'));
+        $table = new Table();
+        $table->setUseColors(false);
+        $output = $table->render($this->getTestDataArrayCollection());
+        $this->assertOutput($output);
+    }
+    /**
+     * @test
+     */
+    public function renderWithColorsManuallyEnabledTest()
+    {
+        $table = new Table();
+        $table->setUseColors(true);
+        $output = $table->render($this->getTestDataArrayCollection());
+        $this->assertColoredOutput($output);
     }
 
     /**
@@ -62,12 +82,7 @@ class TableTest extends \PHPUnit_Framework_TestCase
     public function renderWithoutColorsTest()
     {
         $output = (new Table())->render($this->getTestDataArrayCollection());
-        $expected = $this->expectedOutput();
-
-        $this->assertSame(strlen($expected), strlen($output));
-        $this->assertSame(substr_count($expected, '|'), substr_count($output, '|'));
-
-        $this->assertSame($expected, $output);
+        $this->assertOutput($output);
     }
 
     /**
@@ -76,12 +91,16 @@ class TableTest extends \PHPUnit_Framework_TestCase
     public function renderWithObjectsTest()
     {
         $output = (new Table())->render($this->getTestDataObjectCollection());
-        $expected = $this->expectedOutput();
+        $this->assertOutput($output);
+    }
 
-        $this->assertSame(strlen($expected), strlen($output));
-        $this->assertSame(substr_count($expected, '|'), substr_count($output, '|'));
-
-        $this->assertSame($expected, $output);
+    /**
+     * @test
+     */
+    public function renderWithDataObjectsTest()
+    {
+        $output = (new Table())->render($this->getTestDataDataObjectCollection());
+        $this->assertOutput($output);
     }
 
 
@@ -142,6 +161,14 @@ EXPECTED;
         return json_decode($this->getTestDataString(), true);
     }
 
+    private function getTestDataDataObjectCollection()
+    {
+        return array_map(function($row) {
+            return new DataObject($row);
+        },
+            $this->getTestDataArrayCollection());
+    }
+
     private function getTestDataObjectCollection()
     {
         return json_decode($this->getTestDataString(), false);
@@ -178,5 +205,24 @@ EXPECTED;
 {"id":4,"first_name":"Lois","last_name":"Willis","email":"lwillis3@youku.com","gender":"Female","ip_address":"68.111.41.71"},
 {"id":5,"first_name":"Judith","last_name":"Hall","email":"jhall4@etsy.com","gender":"Female","ip_address":"52.29.162.163"}]
 TEST_DATA;
+    }
+
+    /**
+     * @param $output
+     */
+    private function assertOutput($output)
+    {
+        $this->assertSame($this->expectedOutput(), $output);
+    }
+
+    /**
+     * @param $output
+     */
+    private function assertColoredOutput($output)
+    {
+        $expected = $this->expectedOutput();
+
+        $this->assertSame(549, strlen($output));
+        $this->assertSame(substr_count($expected, '|'), substr_count($output, '|'));
     }
 }
