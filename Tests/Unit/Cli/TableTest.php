@@ -30,10 +30,10 @@
  */
 
 
-namespace Iresults\Core\Unit\Command;
+namespace Iresults\Core\Unit\Cli;
 
 
-use Iresults\Core\Command\Table;
+use Iresults\Core\Cli\Table;
 
 class TableTest extends \PHPUnit_Framework_TestCase
 {
@@ -49,7 +49,7 @@ class TableTest extends \PHPUnit_Framework_TestCase
     {
         $_SERVER['TERM'] = 'a-good terminal';
 
-        $output = (new Table())->render($this->getTestData());
+        $output = (new Table())->render($this->getTestDataArrayCollection());
         $expected = $this->expectedOutput();
 
         $this->assertSame(549, strlen($output));
@@ -61,7 +61,21 @@ class TableTest extends \PHPUnit_Framework_TestCase
      */
     public function renderWithoutColorsTest()
     {
-        $output = (new Table())->render($this->getTestData());
+        $output = (new Table())->render($this->getTestDataArrayCollection());
+        $expected = $this->expectedOutput();
+
+        $this->assertSame(strlen($expected), strlen($output));
+        $this->assertSame(substr_count($expected, '|'), substr_count($output, '|'));
+
+        $this->assertSame($expected, $output);
+    }
+
+    /**
+     * @test
+     */
+    public function renderWithObjectsTest()
+    {
+        $output = (new Table())->render($this->getTestDataObjectCollection());
         $expected = $this->expectedOutput();
 
         $this->assertSame(strlen($expected), strlen($output));
@@ -77,8 +91,8 @@ class TableTest extends \PHPUnit_Framework_TestCase
     public function renderEmptyInputTest()
     {
         $this->assertSame('', (new Table())->render([]));
-        $this->assertSame(PHP_EOL.'|'.PHP_EOL.'|'.PHP_EOL, (new Table())->render([[]]));
-        $this->assertNotSame('', (new Table())->render([[],[1]]));
+        $this->assertSame(PHP_EOL . '|' . PHP_EOL . '|' . PHP_EOL, (new Table())->render([[]]));
+        $this->assertNotSame('', (new Table())->render([[], [1]]));
     }
 
     /**
@@ -87,7 +101,7 @@ class TableTest extends \PHPUnit_Framework_TestCase
     public function renderTinyInputTest()
     {
         $this->assertSame('', (new Table())->render([]));
-        $this->assertSame(PHP_EOL.'|'.PHP_EOL.'|'.PHP_EOL, (new Table())->render([[]]));
+        $this->assertSame(PHP_EOL . '|' . PHP_EOL . '|' . PHP_EOL, (new Table())->render([[]]));
 
         $expected = <<<EXPECTED
 
@@ -96,7 +110,7 @@ class TableTest extends \PHPUnit_Framework_TestCase
 | 1 |
 
 EXPECTED;
-        $this->assertSame($expected, (new Table())->render([[],[1]]));
+        $this->assertSame($expected, (new Table())->render([[], [1]]));
     }
 
     /**
@@ -104,7 +118,7 @@ EXPECTED;
      */
     public function renderWitSeparatorTest()
     {
-        $output = (new Table())->render($this->getTestData(), PHP_INT_MAX, false, '#');
+        $output = (new Table())->render($this->getTestDataArrayCollection(), PHP_INT_MAX, false, '#');
         $expected = $this->expectedOutput();
 
         $this->assertSame(strlen($expected), strlen($output));
@@ -113,17 +127,24 @@ EXPECTED;
         $this->assertSame(str_replace('|', '#', $expected), $output);
     }
 
-    private function getTestData()
+    /**
+     * @test
+     * @expectedException \InvalidArgumentException
+     * @expectedExceptionCode 1475842895
+     */
+    public function throwForInvalidDataTest()
     {
-        $data = <<<TEST_DATA
-            [{"id":1,"first_name":"Raymond","last_name":"Rodriguez","email":"rrodriguez0@si.edu","gender":"Male","ip_address":"213.76.135.143"},
-{"id":2,"first_name":"Michelle","last_name":"Turner","email":"mturner1@mediafire.com","gender":"Female","ip_address":"24.196.215.163"},
-{"id":3,"first_name":"William","last_name":"Burke","email":"wburke2@nhs.uk","gender":"Male","ip_address":"22.31.214.205"},
-{"id":4,"first_name":"Lois","last_name":"Willis","email":"lwillis3@youku.com","gender":"Female","ip_address":"68.111.41.71"},
-{"id":5,"first_name":"Judith","last_name":"Hall","email":"jhall4@etsy.com","gender":"Female","ip_address":"52.29.162.163"}]
-TEST_DATA;
+        (new Table())->render(new \stdClass());
+    }
 
-        return json_decode($data, true);
+    private function getTestDataArrayCollection()
+    {
+        return json_decode($this->getTestDataString(), true);
+    }
+
+    private function getTestDataObjectCollection()
+    {
+        return json_decode($this->getTestDataString(), false);
     }
 
     /**
@@ -143,5 +164,19 @@ TEST_DATA;
 EXPECTED;
 
         return $expected;
+    }
+
+    /**
+     * @return string
+     */
+    private function getTestDataString()
+    {
+        return <<<TEST_DATA
+            [{"id":1,"first_name":"Raymond","last_name":"Rodriguez","email":"rrodriguez0@si.edu","gender":"Male","ip_address":"213.76.135.143"},
+{"id":2,"first_name":"Michelle","last_name":"Turner","email":"mturner1@mediafire.com","gender":"Female","ip_address":"24.196.215.163"},
+{"id":3,"first_name":"William","last_name":"Burke","email":"wburke2@nhs.uk","gender":"Male","ip_address":"22.31.214.205"},
+{"id":4,"first_name":"Lois","last_name":"Willis","email":"lwillis3@youku.com","gender":"Female","ip_address":"68.111.41.71"},
+{"id":5,"first_name":"Judith","last_name":"Hall","email":"jhall4@etsy.com","gender":"Female","ip_address":"52.29.162.163"}]
+TEST_DATA;
     }
 }

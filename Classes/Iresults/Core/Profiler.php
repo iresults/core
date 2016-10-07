@@ -102,7 +102,7 @@ class Profiler
 
             if ($print) {
                 if (\Iresults\Core\Iresults::getEnvironment() == \Iresults\Core\Iresults::ENVIRONMENT_SHELL) {
-                    \Iresults\Core\Iresults::say($msg, \Iresults\Core\Command\ColorInterface::GREEN);
+                    \Iresults\Core\Iresults::say($msg, \Iresults\Core\Cli\ColorInterface::GREEN);
                 } else {
                     echo "<pre class='ir_profile'>$msg</pre>";
                 }
@@ -133,7 +133,7 @@ class Profiler
         $msg = sprintf("Current memory usage is %0.3f MB", (memory_get_usage() / 1024.0 / 1024.0));
         if ($print) {
             if (\Iresults\Core\Iresults::getEnvironment() == \Iresults\Core\Iresults::ENVIRONMENT_SHELL) {
-                Iresults::say($msg, \Iresults\Core\Command\ColorInterface::BOLD_GREEN);
+                Iresults::say($msg, \Iresults\Core\Cli\ColorInterface::BOLD_GREEN);
             } else {
                 echo "<pre class='ir_profile ir_profile_memory'>$msg</pre>\n";
             }
@@ -174,7 +174,7 @@ class Profiler
         if (\Iresults\Core\Iresults::getEnvironment() == \Iresults\Core\Iresults::ENVIRONMENT_SHELL) {
             \Iresults\Core\Iresults::say(
                 $file . ' @ ' . $bt[$i]['line'],
-                \Iresults\Core\Command\ColorInterface::MAGENTA
+                \Iresults\Core\Cli\ColorInterface::MAGENTA
             );
         } else {
             echo "<span style='font-size:0.8em'>

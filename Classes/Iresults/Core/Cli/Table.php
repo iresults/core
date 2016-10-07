@@ -24,7 +24,7 @@
  *  This copyright notice MUST APPEAR in all copies of the script!
  */
 
-namespace Iresults\Core\Command;
+namespace Iresults\Core\Cli;
 
 use Iresults\Core\Tools\StringTool;
 
@@ -73,7 +73,6 @@ class Table
         if (!$data) {
             return '';
         }
-
 
         $data = $this->prepareData($data);
         $head = $this->getHeaderRow($data, $firstRowContainsHeader);
@@ -134,7 +133,7 @@ class Table
         // Make sure the first row is an array
         $firstRow = reset($data);
         if (!is_array($firstRow)) {
-            $firstRow = iterator_to_array($firstRow);
+            $firstRow = $this->transformRowToDictionary($firstRow);
         }
 
         return array_keys($firstRow);
@@ -148,16 +147,16 @@ class Table
      */
     private function prepareData($data)
     {
-        if (!is_array($data) && ($data instanceof \Traversable)) {
-            $data = iterator_to_array($data);
+        if (is_array($data)) {
+            return $data;
+        } elseif ($data instanceof \Traversable) {
+            return iterator_to_array($data);
         }
 
-        $firstRow = reset($data);
-        if (!is_array($firstRow) && !($firstRow instanceof \Traversable)) {
-            $data = array($data);
-        }
-
-        return $data;
+        throw new \InvalidArgumentException(
+            sprintf('Data must be traversable, %s given', is_object($data) ? get_class($data) : gettype($data)),
+            1475842895
+        );
     }
 
     /**
@@ -185,7 +184,7 @@ class Table
         }
 
         foreach ($data as $row) {
-            $indexedRow = array_values($row);
+            $indexedRow = array_values($this->transformRowToDictionary($row));
             $columnCount = count($indexedRow);
 
             // Check if a new table column count is reached
@@ -194,8 +193,17 @@ class Table
             }
 
             for ($i = 0; $i < $columnCount; $i++) {
+                if (!isset($indexedRow[$i])) {
+                    continue;
+                }
                 $storedColumnWidth = isset($columnWidths[$i]) ? $columnWidths[$i] : 0;
-                $columnStringLength = strlen(utf8_decode($indexedRow[$i]));
+                $cellValue = $indexedRow[$i];
+                if (is_scalar($cellValue)) {
+                    $cellValueAsString = (string)$cellValue;
+                } else {
+                    $cellValueAsString = $this->transformCellToString($cellValue);
+                }
+                $columnStringLength = strlen(utf8_decode($cellValueAsString));
 
                 if ($storedColumnWidth < $columnStringLength) {
                     $currentColumnWidth = $columnStringLength;
@@ -217,38 +225,18 @@ class Table
      */
     private function renderHead($head, $separator, $columnWidths)
     {
-        $useColors = $this->getUseColors();
+        $row = $this->renderRowCells($head, $separator, $columnWidths);
 
-        $list = PHP_EOL;
-        if ($useColors) {
-            $list .= ColorInterface::ESCAPE . ColorInterface::REVERSE;
-        }
-
-        $tableColumnCount = $this->tableColumnCount;
-        for ($i = 0; $i < $tableColumnCount; $i++) {
-            $col = isset($head[$i]) ? $head[$i] : '';
-            $columnWidth = $columnWidths[$i];
-
-            if (is_array($col)) {
-                $col = reset($col);
-            }
-            $col = (string)$col;
-
-            if (strlen(utf8_decode($col)) > $columnWidth) {
-                $col = substr($col, 0, $columnWidth);
-            }
-            // Add spaces to fill the cell to the needed length
-            $list .= $separator . ' ' . StringTool::pad($col, $columnWidth, ' ') . ' ';
-        }
-
-        // Final separator
-        if ($useColors) {
-            $list .= $separator . ColorInterface::SIGNAL_ATTRIBUTES_OFF . PHP_EOL;
+        if ($this->getUseColors()) {
+            return PHP_EOL
+            . ColorInterface::ESCAPE . ColorInterface::REVERSE
+            . $row
+            . $separator . ColorInterface::SIGNAL_ATTRIBUTES_OFF . PHP_EOL;
         } else {
-            $list .= $separator . PHP_EOL;
+            return PHP_EOL
+            . $row
+            . $separator . PHP_EOL;
         }
-
-        return $list;
     }
 
     /**
@@ -260,39 +248,101 @@ class Table
      */
     private function renderRow($row, $separator, $columnWidths, $even)
     {
-        $useColors = $this->getUseColors();
+        $row = $this->renderRowCells($this->transformRowToArray($row), $separator, $columnWidths);
+
+        if (!$this->getUseColors()) {
+            return $row . $separator . PHP_EOL;
+        }
+
+        return ''
+        . ($even === false ? ColorInterface::ESCAPE . ColorInterface::GRAY . ColorInterface::ESCAPE . ColorInterface::REVERSE : '')
+        . $row
+        . $separator . ColorInterface::SIGNAL_ATTRIBUTES_OFF . PHP_EOL;
+    }
+
+    /**
+     * @param $row
+     * @param $columnPosition
+     * @param $separator
+     * @param $columnWidths
+     * @return string
+     */
+    private function renderCell($row, $columnPosition, $separator, $columnWidths)
+    {
         $list = '';
-        if (!$even && $useColors) {
-            $list .= ColorInterface::ESCAPE . ColorInterface::GRAY . ColorInterface::ESCAPE . ColorInterface::REVERSE;
-        }
-
-        $indexedRow = array_values($row);
-        $tableColumnCount = $this->tableColumnCount;
-
-        for ($i = 0; $i < $tableColumnCount; $i++) {
-            $col = isset($indexedRow[$i]) ? $indexedRow[$i] : '';
-            $columnWidth = $columnWidths[$i];
-
-            if (is_array($col)) {
-                $col = reset($col);
-            }
-            $col = (string)$col;
-
-            // Add spaces to fill the cell to the needed length
-            if (strlen($col) > $columnWidth) {
-                $col = substr($col, 0, $columnWidth - 1) . '…';
-            }
-            $list .= $separator . ' ' . StringTool::pad($col, $columnWidth, ' ') . ' ';
-        }
-
-        if ($useColors) {
-            $list .= $separator . ColorInterface::SIGNAL_ATTRIBUTES_OFF . PHP_EOL;
-
+        if (isset($row[$columnPosition])) {
+            $col = $this->transformCellToString($row[$columnPosition]);
         } else {
-            $list .= $separator . PHP_EOL;
-
+            $col = '';
         }
+        $columnWidth = $columnWidths[$columnPosition];
+
+        if (strlen(utf8_decode($col)) > $columnWidth) {
+            $col = substr($col, 0, $columnWidth - 1) . '…';
+        }
+        // Add spaces to fill the cell to the needed length
+        $list .= $separator . ' ' . StringTool::pad($col, $columnWidth, ' ') . ' ';
 
         return $list;
+    }
+
+    /**
+     * @param mixed $input
+     * @return array
+     */
+    private function transformRowToDictionary($input)
+    {
+        if (is_array($input)) {
+            return $input;
+        } elseif ($input instanceof \Traversable) {
+            return iterator_to_array($input);
+        } elseif (is_object($input)) {
+            return get_object_vars($input);
+        }
+
+        return (array)$input;
+    }
+
+    /**
+     * @param mixed $input
+     * @return array
+     */
+    private function transformRowToArray($input)
+    {
+        return array_values($this->transformRowToDictionary($input));
+    }
+
+    /**
+     * @param mixed $input
+     * @return string
+     */
+    private function transformCellToString($input)
+    {
+        if (is_array($input)) {
+            return implode(',', $input);
+        } elseif ($input instanceof \Traversable) {
+            return implode(',', iterator_to_array($input));
+        } elseif (is_object($input)) {
+            return method_exists($input, '__toString') ? (string)$input : get_class($input);
+        }
+
+        return (string)$input;
+    }
+
+    /**
+     * @param $head
+     * @param $separator
+     * @param $columnWidths
+     * @return string
+     */
+    private function renderRowCells($head, $separator, $columnWidths)
+    {
+        $tableColumnCount = $this->tableColumnCount;
+        $listT = '';
+        for ($i = 0; $i < $tableColumnCount; $i++) {
+            $listT .= $this->renderCell($head, $i, $separator, $columnWidths);
+        }
+
+        return $listT;
     }
 }

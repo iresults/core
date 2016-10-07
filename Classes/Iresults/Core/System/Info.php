@@ -98,10 +98,9 @@ class Info
     /**
      * Displays information how the script got to this point.
      *
-     * @param    mixed $here An optional parameter to debug
      * @return    void
      */
-    static public function howDidIGetHere($here = null)
+    static public function howDidIGetHere()
     {
         $isShell = Iresults::getEnvironment() === Iresults::ENVIRONMENT_SHELL;
 
@@ -307,7 +306,7 @@ class Info
             if (!$isShell) {
                 echo "<span style='color:#f00'>";
             }
-            Iresults::say("You are here: $fileAbs @ $callLine", \Iresults\Core\Command\ColorInterface::RED);
+            Iresults::say("You are here: $fileAbs @ $callLine", \Iresults\Core\Cli\ColorInterface::RED);
             if (!$isShell) {
                 echo "</span>";
             }
@@ -448,10 +447,10 @@ class Info
         if (!$isShell) {
             Iresults::say("<h$importance>" . $headline . "</h$importance>");
         } else {
-            $color = \Iresults\Core\Command\ColorInterface::CYAN;
+            $color = \Iresults\Core\Cli\ColorInterface::CYAN;
             $spaceBefore = 2;
             if ($importance == 2) {
-                $color = \Iresults\Core\Command\ColorInterface::BLUE;
+                $color = \Iresults\Core\Cli\ColorInterface::BLUE;
                 $spaceBefore = 1;
             }
             Iresults::say(str_repeat(PHP_EOL, $spaceBefore) . $headline . PHP_EOL, $color);
