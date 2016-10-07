@@ -26,7 +26,7 @@
 
 namespace Iresults\Core\Ui;
 
-use Iresults\Core\Command\ColorInterface;
+use Iresults\Core\Cli\ColorInterface;
 use Iresults\Core\Core;
 use Iresults\Core\Iresults;
 use Iresults\Core\Tools\StringTool;
@@ -203,8 +203,6 @@ class Table extends Core
      */
     public function renderShell($data = null, $maxColumnWidth = PHP_INT_MAX, $disableHead = false, $separator = '|')
     {
-        $list = '';
-
         // If renderShell() is invoked from render() with the default arguments
         if ($maxColumnWidth === 'list') {
             $maxColumnWidth = PHP_INT_MAX;
@@ -214,106 +212,9 @@ class Table extends Core
             $data = $this->getData();
         }
         $data = $this->prepareData($data);
-        $head = $this->getHeaderRow($data);
+        $cliTable = new \Iresults\Core\Cli\Table();
 
-
-        // Calculate the column widths
-        $columnWidths = array();
-        $columnCount = count($head);
-        if ($disableHead) {
-            $columnWidths = array_fill(0, $columnCount - 1, 1);
-        } else {
-
-            for ($i = 0; $i < $columnCount; $i++) {
-                $currentColumnWidth = strlen(utf8_decode($head[$i]));
-                if ($currentColumnWidth > $maxColumnWidth) {
-                    $currentColumnWidth = $maxColumnWidth;
-                }
-                $columnWidths[] = $currentColumnWidth;
-            }
-        }
-        foreach ($data as $row) {
-            $indexedRow = array_values($row);
-            $columnCount = count($indexedRow);
-            for ($i = 0; $i < $columnCount; $i++) {
-                if ($columnWidths[$i] < strlen(utf8_decode($indexedRow[$i]))) {
-                    $currentColumnWidth = strlen(utf8_decode($indexedRow[$i]));
-                    if ($currentColumnWidth > $maxColumnWidth) {
-                        $currentColumnWidth = $maxColumnWidth;
-                    }
-                    $columnWidths[$i] = $currentColumnWidth;
-                }
-            }
-        }
-
-        $useColors = $this->getUseColors();
-        if (!$disableHead) {
-            $list .= PHP_EOL;
-            if ($useColors) {
-                $list .= ColorInterface::ESCAPE . ColorInterface::REVERSE;
-            }
-
-            $columnCount = count($head);
-            for ($i = 0; $i < $columnCount; $i++) {
-                $col = $head[$i];
-                $columnWidth = $columnWidths[$i];
-
-                if (is_array($col)) {
-                    $col = reset($col);
-                }
-                $col = (string)$col;
-
-                if (strlen(utf8_decode($col)) > $columnWidth) {
-                    $col = substr($col, 0, $columnWidth);
-                }
-                // Add spaces to fill the cell to the needed length
-                $list .= $separator . ' ' . StringTool::pad($col, $columnWidth, ' ') . ' ';
-            }
-            if ($useColors) {
-                $list .= $separator . ColorInterface::SIGNAL_ATTRIBUTES_OFF . PHP_EOL;
-            } else {
-                $list .= $separator . PHP_EOL;
-            }
-        }
-
-        $even = true;
-        reset($data);
-        foreach ($data as $row) {
-            if ($even) {
-                $even = false;
-            } else {
-                $even = true;
-                if ($useColors) {
-                    $list .= ColorInterface::ESCAPE . ColorInterface::GRAY . ColorInterface::ESCAPE . ColorInterface::REVERSE;
-                }
-            }
-
-            $indexedRow = array_values($row);
-            $columnCount = count($indexedRow);
-            for ($i = 0; $i < $columnCount; $i++) {
-                $col = $indexedRow[$i];
-                $columnWidth = $columnWidths[$i];
-
-                if (is_array($col)) {
-                    $col = reset($col);
-                }
-                $col = (string)$col;
-
-                // Add spaces to fill the cell to the needed length
-                if (strlen($col) > $columnWidth) {
-                    $col = substr($col, 0, $columnWidth - 1) . '…';
-                    //$col = implode(PHP_EOL . ' ', str_split($col, $columnWidth));
-                }
-                $list .= $separator . ' ' . StringTool::pad($col, $columnWidth, ' ') . ' ';
-            }
-            if ($useColors) {
-                $list .= $separator . ColorInterface::SIGNAL_ATTRIBUTES_OFF . PHP_EOL;
-            } else {
-                $list .= $separator . PHP_EOL;
-            }
-        }
-
-        return $list;
+        return $cliTable->render($data, $maxColumnWidth, $disableHead, $separator, $this->getUseFirstRowAsHeaderRow());
     }
 
     /**
