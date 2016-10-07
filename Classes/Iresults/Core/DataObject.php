@@ -225,7 +225,7 @@ class DataObject implements \ArrayAccess, \JsonSerializable, KVCInterface
 
             return $this->getObjectForKey($this->functionNameToPropertyName($name));
         } else {
-            throw new UndefinedMethod("You called the method '$name', which isn no getter or setter", 1323971571);
+            throw new UndefinedMethod("You called the method '$name', which is no getter or setter", 1323971571);
         }
 
         return null;
