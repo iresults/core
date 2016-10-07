@@ -29,10 +29,6 @@ use Iresults\Core\DataObject;
 /**
  * Test case for the mutable Data Object
  *
- * @version     $Id$
- * @copyright   Copyright belongs to the respective authors
- * @license     http://www.gnu.org/licenses/gpl.html GNU General Public License, version 3 or later
- *
  * @author      Daniel Corn <cod@iresults.li>
  */
 class DataObjectTest extends \PHPUnit_Framework_TestCase

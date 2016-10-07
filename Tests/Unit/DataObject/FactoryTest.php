@@ -25,7 +25,7 @@
  */
 
 /**
- * @author COD
+ * @author Daniel Corn <cod@iresults.li>
  * Created 05.10.16 14:50
  */
 
@@ -36,11 +36,7 @@ use Iresults\Core\DataObject;
 
 
 /**
- * Test case for Iresults Mutable
- *
- * @version     $Id$
- * @copyright   Copyright belongs to the respective authors
- * @license     http://www.gnu.org/licenses/gpl.html GNU General Public License, version 3 or later
+ * Test case for the Data Object factory
  *
  * @author      Daniel Corn <cod@iresults.li>
  */

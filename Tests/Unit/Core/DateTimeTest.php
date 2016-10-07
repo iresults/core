@@ -29,14 +29,7 @@ use Iresults\Core\DateTime;
 require_once __DIR__ . '/../Autoloader.php';
 
 /**
- * Test case for functionality of the DateTime object.
- *
- * @version    $Id$
- * @copyright  Copyright belongs to the respective authors
- * @license    http://www.gnu.org/licenses/gpl.html GNU General Public License, version 3 or later
- *
- * @package    TYPO3
- * @subpackage Iresults_Helpers
+ * Test case for functionality of the DateTime object
  *
  * @author     Daniel Corn <cod@iresults.li>
  */

@@ -25,7 +25,7 @@
  */
 
 /**
- * @author COD
+ * @author Daniel Corn <cod@iresults.li>
  * Created 11.07.14 10:21
  */
 

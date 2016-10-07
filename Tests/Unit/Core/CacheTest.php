@@ -30,16 +30,9 @@ use Iresults\Core\Cache\Factory;
 require_once __DIR__ . '/../Autoloader.php';
 
 /**
- * Test case for functionality of the iresults Cache.
+ * Test case for functionality of the iresults Cache
  *
- * @version    $Id$
- * @copyright  Copyright belongs to the respective authors
- * @license    http://www.gnu.org/licenses/gpl.html GNU General Public License, version 3 or later
- *
- * @package    TYPO3
- * @subpackage Iresults_Helpers
- *
- * @author     Daniel Corn <cod@iresults.li>
+ * @author Daniel Corn <cod@iresults.li>
  */
 class CacheTest extends \PHPUnit_Framework_TestCase
 {

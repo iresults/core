@@ -32,10 +32,6 @@ require_once __DIR__ . '/../Autoloader.php';
 /**
  * Test case for Iresults Mutable
  *
- * @version     $Id$
- * @copyright   Copyright belongs to the respective authors
- * @license     http://www.gnu.org/licenses/gpl.html GNU General Public License, version 3 or later
- *
  * @author      Daniel Corn <cod@iresults.li>
  */
 class MutableTest extends \PHPUnit_Framework_TestCase

@@ -27,14 +27,7 @@ namespace Iresults\Core\Tests\Unit\Helpers;
 require_once __DIR__ . '/../Autoloader.php';
 
 /**
- * Test case for the String Tool class.
- *
- * @version    $Id$
- * @copyright  Copyright belongs to the respective authors
- * @license    http://www.gnu.org/licenses/gpl.html GNU General Public License, version 3 or later
- *
- * @package    TYPO3
- * @subpackage Iresults_Tools
+ * Test case for the String Tool class
  *
  * @author     Daniel Corn <cod@iresults.li>
  */

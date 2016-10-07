@@ -31,13 +31,6 @@ require_once __DIR__ . '/../Autoloader.php';
 /**
  * Test case for Iresults_Model
  *
- * @version    $Id$
- * @copyright  Copyright belongs to the respective authors
- * @license    http://www.gnu.org/licenses/gpl.html GNU General Public License, version 3 or later
- *
- * @package    TYPO3
- * @subpackage Iresults
- *
  * @author     Daniel Corn <cod@iresults.li>
  */
 class ModelTest extends \PHPUnit_Framework_TestCase
