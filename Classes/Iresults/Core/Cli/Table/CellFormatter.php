@@ -55,7 +55,7 @@ class CellFormatter implements CellFormatterInterface
      * @param mixed $data
      * @return string
      */
-    private function transformDataToString($data)
+    protected function transformDataToString($data)
     {
         if (is_scalar($data)) {
             return (string)$data;
@@ -74,7 +74,7 @@ class CellFormatter implements CellFormatterInterface
      * @param string $input
      * @return string
      */
-    private function removeNewLines($input)
+    protected function removeNewLines($input)
     {
         $parts = array();
         $separator = "\r\n";
