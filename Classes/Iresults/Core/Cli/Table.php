@@ -63,17 +63,17 @@ class Table
      * Returns the rendered table for terminal output
      *
      * @param array|\Traversable $data                   The data to output
-     * @param int                $maxColumnWidth         Maximum column width
      * @param int                $headerPosition         Defines the position of the header
      * @param string             $separator              The column separator
+     * @param int                $maxColumnWidth         Maximum column width
      * @param bool               $firstRowContainsHeader Defines if the first row contains the column headers
      * @return string The rendered table
      */
     public function render(
         $data,
-        $maxColumnWidth = PHP_INT_MAX,
         $headerPosition = self::HEADER_POSITION_TOP,
         $separator = '|',
+        $maxColumnWidth = PHP_INT_MAX,
         $firstRowContainsHeader = false
     ) {
         if (!$data) {

@@ -50,7 +50,7 @@ class TableTest extends \PHPUnit_Framework_TestCase
     {
         $_SERVER['TERM'] = 'a-good terminal';
 
-        $output = (new Table())->render($this->getTestDataArrayCollection(), PHP_INT_MAX, Table::HEADER_POSITION_NONE);
+        $output = (new Table())->render($this->getTestDataArrayCollection(), Table::HEADER_POSITION_NONE, '|', PHP_INT_MAX);
         $this->assertColoredOutputWithoutHeader($output);
     }
 
@@ -73,7 +73,7 @@ class TableTest extends \PHPUnit_Framework_TestCase
     {
         $_SERVER['TERM'] = 'a-good terminal';
 
-        $output = (new Table())->render($this->getTestDataArrayCollection(), PHP_INT_MAX, Table::HEADER_POSITION_LEFT);
+        $output = (new Table())->render($this->getTestDataArrayCollection(), Table::HEADER_POSITION_LEFT, '|', PHP_INT_MAX);
         $this->assertColoredOutputHeaderLeft($output);
     }
     /**
@@ -81,7 +81,7 @@ class TableTest extends \PHPUnit_Framework_TestCase
      */
     public function renderWithoutColorsHeaderLeftTest()
     {
-        $output = (new Table())->render($this->getTestDataArrayCollection(), PHP_INT_MAX, Table::HEADER_POSITION_LEFT);
+        $output = (new Table())->render($this->getTestDataArrayCollection(), Table::HEADER_POSITION_LEFT, '|', PHP_INT_MAX);
         $this->assertSame($this->expectedOutputWithoutHeader(), $output);
     }
 
@@ -171,9 +171,9 @@ EXPECTED;
     {
         $output = (new Table())->render(
             $this->getTestDataArrayCollection(),
-            PHP_INT_MAX,
             Table::HEADER_POSITION_TOP,
-            '#'
+            '#',
+            PHP_INT_MAX
         );
         $expected = $this->expectedOutput();
 

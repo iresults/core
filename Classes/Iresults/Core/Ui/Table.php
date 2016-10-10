@@ -27,6 +27,7 @@
 namespace Iresults\Core\Ui;
 
 use Iresults\Core\Cli\ColorInterface;
+use Iresults\Core\Cli\Table as CliTable;
 use Iresults\Core\Core;
 use Iresults\Core\Iresults;
 use Iresults\Core\Tools\StringTool;
@@ -212,9 +213,10 @@ class Table extends Core
             $data = $this->getData();
         }
         $data = $this->prepareData($data);
-        $cliTable = new \Iresults\Core\Cli\Table();
+        $headerPosition = $disableHead ? CliTable::HEADER_POSITION_NONE : CliTable::HEADER_POSITION_TOP;
+        $cliTable = new CliTable();
 
-        return $cliTable->render($data, $maxColumnWidth, $disableHead, $separator, $this->getUseFirstRowAsHeaderRow());
+        return $cliTable->render($data, $headerPosition, $separator, $maxColumnWidth, $this->getUseFirstRowAsHeaderRow());
     }
 
     /**
