@@ -46,6 +46,17 @@ class CellFormatter implements CellFormatterInterface
      */
     public function formatCellData($data, Table $table)
     {
+        return $this->removeNewLines($this->transformDataToString($data));
+    }
+
+    /**
+     * Transform the data into a string
+     *
+     * @param mixed $data
+     * @return string
+     */
+    private function transformDataToString($data)
+    {
         if (is_scalar($data)) {
             return (string)$data;
         } elseif (is_array($data)) {
@@ -57,5 +68,23 @@ class CellFormatter implements CellFormatterInterface
         }
 
         return (string)$data;
+    }
+
+    /**
+     * @param string $input
+     * @return string
+     */
+    private function removeNewLines($input)
+    {
+        $parts = array();
+        $separator = "\r\n";
+        $line = strtok($input, $separator);
+
+        while ($line !== false) {
+            $parts[] = trim($line);
+            $line = strtok($separator);
+        }
+
+        return implode(' ', $parts);
     }
 }

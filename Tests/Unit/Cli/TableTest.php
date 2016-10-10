@@ -50,7 +50,12 @@ class TableTest extends \PHPUnit_Framework_TestCase
     {
         $_SERVER['TERM'] = 'a-good terminal';
 
-        $output = (new Table())->render($this->getTestDataArrayCollection(), Table::HEADER_POSITION_NONE, '|', PHP_INT_MAX);
+        $output = (new Table())->render(
+            $this->getTestDataArrayCollection(),
+            Table::HEADER_POSITION_NONE,
+            '|',
+            PHP_INT_MAX
+        );
         $this->assertColoredOutputWithoutHeader($output);
     }
 
@@ -73,15 +78,26 @@ class TableTest extends \PHPUnit_Framework_TestCase
     {
         $_SERVER['TERM'] = 'a-good terminal';
 
-        $output = (new Table())->render($this->getTestDataArrayCollection(), Table::HEADER_POSITION_LEFT, '|', PHP_INT_MAX);
+        $output = (new Table())->render(
+            $this->getTestDataArrayCollection(),
+            Table::HEADER_POSITION_LEFT,
+            '|',
+            PHP_INT_MAX
+        );
         $this->assertColoredOutputHeaderLeft($output);
     }
+
     /**
      * @test
      */
     public function renderWithoutColorsHeaderLeftTest()
     {
-        $output = (new Table())->render($this->getTestDataArrayCollection(), Table::HEADER_POSITION_LEFT, '|', PHP_INT_MAX);
+        $output = (new Table())->render(
+            $this->getTestDataArrayCollection(),
+            Table::HEADER_POSITION_LEFT,
+            '|',
+            PHP_INT_MAX
+        );
         $this->assertSame($this->expectedOutputWithoutHeader(), $output);
     }
 
@@ -136,7 +152,6 @@ class TableTest extends \PHPUnit_Framework_TestCase
         $this->assertOutput($output);
     }
 
-
     /**
      * @test
      */
@@ -178,6 +193,55 @@ EXPECTED;
         $expected = $this->expectedOutput();
 
         $this->assertSame(str_replace('|', '#', $expected), $output);
+    }
+
+    /**
+     * @test
+     */
+    public function stripMultiLineTest()
+    {
+        $output = (new Table())->render(
+            [
+                [
+                    "uid\n\rPerson" => "12",
+                    "message"       => "Hello\nI am Daniel\n\rI wrote this library",
+                ],
+            ]
+        );
+
+        $expected = <<<WITHOUT_NEWLINES
+| uid Person | message                                |
+| 12         | Hello I am Daniel I wrote this library |
+
+WITHOUT_NEWLINES;
+        $this->assertSame($expected, $output);
+    }
+
+    /**
+     * @test
+     */
+    public function unicodeTest()
+    {
+        $output = (new Table())->render(
+            [
+                [
+                    'uid'     => 1,
+                    'message' => 'Comment ça va ?',
+                ],
+                [
+                    'uid'     => 2,
+                    'message' => 'Vielen Dank für deine Nachricht!',
+                ],
+            ]
+        );
+
+        $expected = <<<WITHOUT_NEWLINES
+| uid | message                          |
+| 1   | Comment ça va ?                  |
+| 2   | Vielen Dank für deine Nachricht! |
+
+WITHOUT_NEWLINES;
+        $this->assertSame($expected, $output);
     }
 
     /**
