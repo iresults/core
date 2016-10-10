@@ -26,6 +26,8 @@
 
 namespace Iresults\Core\Cli;
 
+use Iresults\Core\Cli\Table\CellFormatter;
+use Iresults\Core\Cli\Table\CellFormatterInterface;
 use Iresults\Core\Tools\StringTool;
 
 /**
@@ -52,11 +54,19 @@ class Table
     private $tableColumnCount;
 
     /**
-     * Table constructor.
+     * @var CellFormatterInterface
      */
-    public function __construct()
+    private $cellFormatter;
+
+    /**
+     * Create a new Table instance
+     *
+     * @param CellFormatterInterface $cellFormatter
+     */
+    public function __construct(CellFormatterInterface $cellFormatter = null)
     {
         $this->useColors = (isset($_SERVER['TERM']) && trim(isset($_SERVER['TERM'])));
+        $this->cellFormatter = $cellFormatter ?: new CellFormatter();
     }
 
     /**
@@ -234,6 +244,12 @@ class Table
         return $this->wrapRowOutput($row, $separator, self::STYLE_HEADER_ROW);
     }
 
+    /**
+     * @param $row
+     * @param $separator
+     * @param $style
+     * @return string
+     */
     private function wrapRowOutput($row, $separator, $style)
     {
         if (!$this->getUseColors()) {
@@ -337,17 +353,18 @@ class Table
      */
     private function transformCellToString($input)
     {
-        if (is_scalar($input)) {
-            return (string)$input;
-        } elseif (is_array($input)) {
-            return implode(',', $input);
-        } elseif ($input instanceof \Traversable) {
-            return implode(',', iterator_to_array($input));
-        } elseif (is_object($input)) {
-            return method_exists($input, '__toString') ? (string)$input : get_class($input);
+        $transformedValue = $this->cellFormatter->formatCellData($input, $this);
+        if (!is_string($transformedValue)) {
+            throw new \LogicException(
+                sprintf(
+                    'Call to the %s->formatCellData() must return string, %s given',
+                    get_class($this->cellFormatter),
+                    is_object($transformedValue) ? get_class($transformedValue) : gettype($transformedValue)
+                )
+            );
         }
 
-        return (string)$input;
+        return $transformedValue;
     }
 
     /**
