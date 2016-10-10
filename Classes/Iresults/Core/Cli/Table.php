@@ -33,6 +33,12 @@ use Iresults\Core\Tools\StringTool;
  */
 class Table
 {
+    const HEADER_POSITION_NONE = 0;
+    const HEADER_POSITION_TOP = 1;
+    const HEADER_POSITION_LEFT = 2;
+    const STYLE_HEADER_ROW = ColorInterface::ESCAPE . ColorInterface::REVERSE;
+    const STYLE_ODD_ROW = ColorInterface::ESCAPE . ColorInterface::GRAY . ColorInterface::ESCAPE . ColorInterface::REVERSE;
+
     /**
      * Defines if the table should be colored
      *
@@ -58,7 +64,7 @@ class Table
      *
      * @param array|\Traversable $data                   The data to output
      * @param int                $maxColumnWidth         Maximum column width
-     * @param boolean            $disableHead            Indicates if the head row should be rendered
+     * @param int                $headerPosition         Defines the position of the header
      * @param string             $separator              The column separator
      * @param bool               $firstRowContainsHeader Defines if the first row contains the column headers
      * @return string The rendered table
@@ -66,7 +72,7 @@ class Table
     public function render(
         $data,
         $maxColumnWidth = PHP_INT_MAX,
-        $disableHead = false,
+        $headerPosition = self::HEADER_POSITION_TOP,
         $separator = '|',
         $firstRowContainsHeader = false
     ) {
@@ -74,23 +80,31 @@ class Table
             return '';
         }
 
-        $data = $this->prepareData($data);
-        $head = $this->getHeaderRow($data, $firstRowContainsHeader);
+        $preparedData = $this->prepareData($data);
+        $headerRowData = [];
+        if ($headerPosition === self::HEADER_POSITION_TOP) {
+            $headerRowData = $this->getHeaderRow($preparedData, $firstRowContainsHeader);
+        }
 
-        if (!$head && !$data) {
+        if (!$preparedData) {
             return '';
         }
 
         $list = '';
-        $columnWidths = $this->calculateColumnWidthsAndTableColumnCount($data, $maxColumnWidth, $disableHead, $head);
+        $columnWidths = $this->calculateColumnWidthsAndTableColumnCount(
+            $data,
+            $maxColumnWidth,
+            $headerPosition,
+            $headerRowData
+        );
 
-        if (!$disableHead) {
-            $list = $this->renderHead($head, $separator, $columnWidths);
+        if ($headerPosition === self::HEADER_POSITION_TOP) {
+            $list = $this->renderHeaderRow($headerRowData, $separator, $columnWidths);
         }
 
         $even = true;
-        foreach ($data as $row) {
-            $list .= $this->renderRow($row, $separator, $columnWidths, $even);
+        foreach ($preparedData as $row) {
+            $list .= $this->renderRow($row, $separator, $columnWidths, $even, $headerPosition);
             $even = !$even;
         }
 
@@ -164,26 +178,21 @@ class Table
      *
      * @param array $data
      * @param int   $maxColumnWidth
-     * @param bool  $disableHead
+     * @param bool  $headerPosition
      * @param array $head
-     * @return int[]
+     * @return \int[]
      */
-    private function calculateColumnWidthsAndTableColumnCount(array $data, $maxColumnWidth, $disableHead, $head)
+    private function calculateColumnWidthsAndTableColumnCount(array $data, $maxColumnWidth, $headerPosition, $head)
     {
         $columnWidths = array();
-        $columnCount = count($head);
-        $tempTableColumnCount = $columnCount;
+        $tempTableColumnCount = 0;
 
-        if ($disableHead) {
-            $columnWidths = array_fill(0, $columnCount - 1, 1);
-        } else {
-            for ($i = 0; $i < $columnCount; $i++) {
-                $currentColumnWidth = strlen(utf8_decode($head[$i]));
-                $columnWidths[] = $currentColumnWidth > $maxColumnWidth ? $maxColumnWidth : $currentColumnWidth;
-            }
+        $dataForCalculation = $data;
+        if ($headerPosition === self::HEADER_POSITION_TOP) {
+            array_unshift($dataForCalculation, $head);
         }
 
-        foreach ($data as $row) {
+        foreach ($dataForCalculation as $row) {
             $indexedRow = array_values($this->transformRowToDictionary($row));
             $columnCount = count($indexedRow);
 
@@ -197,12 +206,7 @@ class Table
                     continue;
                 }
                 $storedColumnWidth = isset($columnWidths[$i]) ? $columnWidths[$i] : 0;
-                $cellValue = $indexedRow[$i];
-                if (is_scalar($cellValue)) {
-                    $cellValueAsString = (string)$cellValue;
-                } else {
-                    $cellValueAsString = $this->transformCellToString($cellValue);
-                }
+                $cellValueAsString = $this->transformCellToString($indexedRow[$i]);
                 $columnStringLength = strlen(utf8_decode($cellValueAsString));
 
                 if ($storedColumnWidth < $columnStringLength) {
@@ -223,20 +227,23 @@ class Table
      * @param $columnWidths
      * @return string
      */
-    private function renderHead($head, $separator, $columnWidths)
+    private function renderHeaderRow($head, $separator, $columnWidths)
     {
-        $row = $this->renderRowCells($head, $separator, $columnWidths);
+        $row = $this->renderHeaderRowCells($head, $separator, $columnWidths);
 
-        if ($this->getUseColors()) {
-            return PHP_EOL
-            . ColorInterface::ESCAPE . ColorInterface::REVERSE
-            . $row
-            . $separator . ColorInterface::SIGNAL_ATTRIBUTES_OFF . PHP_EOL;
-        } else {
-            return PHP_EOL
-            . $row
-            . $separator . PHP_EOL;
+        return $this->wrapRowOutput($row, $separator, self::STYLE_HEADER_ROW);
+    }
+
+    private function wrapRowOutput($row, $separator, $style)
+    {
+        if (!$this->getUseColors()) {
+            return $separator . $row . PHP_EOL;
         }
+
+        return ''
+        . $style . $separator . ColorInterface::SIGNAL_ATTRIBUTES_OFF
+        . $row
+        . PHP_EOL;
     }
 
     /**
@@ -244,46 +251,58 @@ class Table
      * @param $separator
      * @param $columnWidths
      * @param $even
+     * @param $headerPosition
      * @return string
      */
-    private function renderRow($row, $separator, $columnWidths, $even)
+    private function renderRow($row, $separator, $columnWidths, $even, $headerPosition)
     {
-        $row = $this->renderRowCells($this->transformRowToArray($row), $separator, $columnWidths);
+        $row = $this->renderRowCells(
+            $this->transformRowToArray($row),
+            $separator,
+            $columnWidths,
+            $headerPosition,
+            $even
+        );
 
-        if (!$this->getUseColors()) {
-            return $row . $separator . PHP_EOL;
+        $style = '';
+        if ($headerPosition === self::HEADER_POSITION_LEFT) {
+            $style = self::STYLE_HEADER_ROW;
+        } elseif ($even === false) {
+            $style = self::STYLE_ODD_ROW;
         }
 
-        return ''
-        . ($even === false ? ColorInterface::ESCAPE . ColorInterface::GRAY . ColorInterface::ESCAPE . ColorInterface::REVERSE : '')
-        . $row
-        . $separator . ColorInterface::SIGNAL_ATTRIBUTES_OFF . PHP_EOL;
+        return $this->wrapRowOutput($row, $separator, $style);
     }
 
     /**
-     * @param $row
-     * @param $columnPosition
-     * @param $separator
-     * @param $columnWidths
+     * @param array  $row
+     * @param int    $columnPosition
+     * @param string $separator
+     * @param int[]  $columnWidths
+     * @param bool   $style
      * @return string
      */
-    private function renderCell($row, $columnPosition, $separator, $columnWidths)
+    private function renderCell($row, $columnPosition, $separator, $columnWidths, $style)
     {
-        $list = '';
+        $columnWidth = $columnWidths[$columnPosition];
+
         if (isset($row[$columnPosition])) {
             $col = $this->transformCellToString($row[$columnPosition]);
+            if (strlen(utf8_decode($col)) > $columnWidth) {
+                $col = substr($col, 0, $columnWidth - 1) . '…';
+            }
         } else {
             $col = '';
         }
-        $columnWidth = $columnWidths[$columnPosition];
 
-        if (strlen(utf8_decode($col)) > $columnWidth) {
-            $col = substr($col, 0, $columnWidth - 1) . '…';
-        }
         // Add spaces to fill the cell to the needed length
-        $list .= $separator . ' ' . StringTool::pad($col, $columnWidth, ' ') . ' ';
+        $rowContent = ' ' . StringTool::pad($col, $columnWidth, ' ') . ' ' . $separator;
 
-        return $list;
+        if ($style && $this->getUseColors()) {
+            return $style . $rowContent . ColorInterface::SIGNAL_ATTRIBUTES_OFF;
+        }
+
+        return $rowContent;
     }
 
     /**
@@ -318,7 +337,9 @@ class Table
      */
     private function transformCellToString($input)
     {
-        if (is_array($input)) {
+        if (is_scalar($input)) {
+            return (string)$input;
+        } elseif (is_array($input)) {
             return implode(',', $input);
         } elseif ($input instanceof \Traversable) {
             return implode(',', iterator_to_array($input));
@@ -330,19 +351,37 @@ class Table
     }
 
     /**
-     * @param $head
+     * @param $row
      * @param $separator
      * @param $columnWidths
+     * @param $headerPosition
+     * @param $even
      * @return string
      */
-    private function renderRowCells($head, $separator, $columnWidths)
+    private function renderRowCells($row, $separator, $columnWidths, $headerPosition, $even)
     {
         $tableColumnCount = $this->tableColumnCount;
-        $listT = '';
+        $isHeader = $headerPosition === self::HEADER_POSITION_LEFT;
+        $cells = array_fill(0, $tableColumnCount, '');
         for ($i = 0; $i < $tableColumnCount; $i++) {
-            $listT .= $this->renderCell($head, $i, $separator, $columnWidths);
+            $style = $isHeader ? self::STYLE_HEADER_ROW : ($even ? null : self::STYLE_ODD_ROW);
+            $cells[$i] = $this->renderCell($row, $i, $separator, $columnWidths, $style);
+
+            // Following cells should not be rendered as header
+            $isHeader = false;
         }
 
-        return $listT;
+        return implode('', $cells);
+    }
+
+    private function renderHeaderRowCells($row, $separator, $columnWidths)
+    {
+        $tableColumnCount = $this->tableColumnCount;
+        $cells = array_fill(0, $tableColumnCount, '');
+        for ($i = 0; $i < $tableColumnCount; $i++) {
+            $cells[$i] = $this->renderCell($row, $i, $separator, $columnWidths, self::STYLE_HEADER_ROW);
+        }
+
+        return implode('', $cells);
     }
 }

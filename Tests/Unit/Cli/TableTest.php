@@ -46,13 +46,45 @@ class TableTest extends \PHPUnit_Framework_TestCase
     /**
      * @test
      */
+    public function renderWithoutHeaderTest()
+    {
+        $_SERVER['TERM'] = 'a-good terminal';
+
+        $output = (new Table())->render($this->getTestDataArrayCollection(), PHP_INT_MAX, Table::HEADER_POSITION_NONE);
+        $this->assertColoredOutputWithoutHeader($output);
+    }
+
+
+    /**
+     * @test
+     */
     public function renderWithColorsTest()
     {
         $_SERVER['TERM'] = 'a-good terminal';
 
         $output = (new Table())->render($this->getTestDataArrayCollection());
-        $this->assertColoredOutput($output);
+        $this->assertColoredOutputHeaderTop($output);
     }
+
+    /**
+     * @test
+     */
+    public function renderWithColorsHeaderLeftTest()
+    {
+        $_SERVER['TERM'] = 'a-good terminal';
+
+        $output = (new Table())->render($this->getTestDataArrayCollection(), PHP_INT_MAX, Table::HEADER_POSITION_LEFT);
+        $this->assertColoredOutputHeaderLeft($output);
+    }
+    /**
+     * @test
+     */
+    public function renderWithoutColorsHeaderLeftTest()
+    {
+        $output = (new Table())->render($this->getTestDataArrayCollection(), PHP_INT_MAX, Table::HEADER_POSITION_LEFT);
+        $this->assertSame($this->expectedOutputWithoutHeader(), $output);
+    }
+
     /**
      * @test
      */
@@ -65,6 +97,7 @@ class TableTest extends \PHPUnit_Framework_TestCase
         $output = $table->render($this->getTestDataArrayCollection());
         $this->assertOutput($output);
     }
+
     /**
      * @test
      */
@@ -73,7 +106,7 @@ class TableTest extends \PHPUnit_Framework_TestCase
         $table = new Table();
         $table->setUseColors(true);
         $output = $table->render($this->getTestDataArrayCollection());
-        $this->assertColoredOutput($output);
+        $this->assertColoredOutputHeaderTop($output);
     }
 
     /**
@@ -110,7 +143,7 @@ class TableTest extends \PHPUnit_Framework_TestCase
     public function renderEmptyInputTest()
     {
         $this->assertSame('', (new Table())->render([]));
-        $this->assertSame(PHP_EOL . '|' . PHP_EOL . '|' . PHP_EOL, (new Table())->render([[]]));
+        $this->assertSame('|' . PHP_EOL . '|' . PHP_EOL, (new Table())->render([[]]));
         $this->assertNotSame('', (new Table())->render([[], [1]]));
     }
 
@@ -120,10 +153,9 @@ class TableTest extends \PHPUnit_Framework_TestCase
     public function renderTinyInputTest()
     {
         $this->assertSame('', (new Table())->render([]));
-        $this->assertSame(PHP_EOL . '|' . PHP_EOL . '|' . PHP_EOL, (new Table())->render([[]]));
+        $this->assertSame('|' . PHP_EOL . '|' . PHP_EOL, (new Table())->render([[]]));
 
         $expected = <<<EXPECTED
-
 |   |
 |   |
 | 1 |
@@ -135,13 +167,15 @@ EXPECTED;
     /**
      * @test
      */
-    public function renderWitSeparatorTest()
+    public function renderWithSeparatorTest()
     {
-        $output = (new Table())->render($this->getTestDataArrayCollection(), PHP_INT_MAX, false, '#');
+        $output = (new Table())->render(
+            $this->getTestDataArrayCollection(),
+            PHP_INT_MAX,
+            Table::HEADER_POSITION_TOP,
+            '#'
+        );
         $expected = $this->expectedOutput();
-
-        $this->assertSame(strlen($expected), strlen($output));
-        $this->assertSame(substr_count($expected, '|'), substr_count($output, '#'));
 
         $this->assertSame(str_replace('|', '#', $expected), $output);
     }
@@ -163,10 +197,12 @@ EXPECTED;
 
     private function getTestDataDataObjectCollection()
     {
-        return array_map(function($row) {
-            return new DataObject($row);
-        },
-            $this->getTestDataArrayCollection());
+        return array_map(
+            function ($row) {
+                return new DataObject($row);
+            },
+            $this->getTestDataArrayCollection()
+        );
     }
 
     private function getTestDataObjectCollection()
@@ -180,8 +216,6 @@ EXPECTED;
     private function expectedOutput()
     {
         $expected = <<<EXPECTED
-
-| id | first_name | last_name | email                  | gender | ip_address     |
 | 1  | Raymond    | Rodriguez | rrodriguez0@si.edu     | Male   | 213.76.135.143 |
 | 2  | Michelle   | Turner    | mturner1@mediafire.com | Female | 24.196.215.163 |
 | 3  | William    | Burke     | wburke2@nhs.uk         | Male   | 22.31.214.205  |
@@ -190,8 +224,55 @@ EXPECTED;
 
 EXPECTED;
 
+        return $this->expectedOutputHeader() . PHP_EOL . $expected;
+    }
+
+    /**
+     * @return string
+     */
+    private function expectedOutputHeader()
+    {
+        $expected = <<<EXPECTED
+| id | first_name | last_name | email                  | gender | ip_address     |
+EXPECTED;
+
         return $expected;
     }
+
+    /**
+     * @return string
+     */
+    private function expectedOutputWithoutHeader()
+    {
+        $expected = <<<EXPECTED
+| 1 | Raymond  | Rodriguez | rrodriguez0@si.edu     | Male   | 213.76.135.143 |
+| 2 | Michelle | Turner    | mturner1@mediafire.com | Female | 24.196.215.163 |
+| 3 | William  | Burke     | wburke2@nhs.uk         | Male   | 22.31.214.205  |
+| 4 | Lois     | Willis    | lwillis3@youku.com     | Female | 68.111.41.71   |
+| 5 | Judith   | Hall      | jhall4@etsy.com        | Female | 52.29.162.163  |
+
+EXPECTED;
+
+        return $expected;
+    }
+
+//    /**
+//     * @return string
+//     */
+//    private function expectedOutputRotated()
+//    {
+//        $expected = <<<EXPECTED
+//| id         | 1                  | 2                         | 3              | 4                  | 5               |
+//| first_name | Raymond            | Michelle                  | William        | Lois               | Judith          |
+//| last_name  | Rodriguez          | Turner                    | Burke          | Willis             | Hall            |
+//| email      | rrodriguez0@si.edu |  mturner1@mediafire.com   | wburke2@nhs.uk | lwillis3@youku.com | jhall4@etsy.com |
+//| gender     | Male               | Female                    | Male           | Female             | Female          |
+//| ip_address | 213.76.135.143     | 24.196.215.163            | 22.31.214.205  | 68.111.41.71       | 52.29.162.163   |
+//
+//EXPECTED;
+//
+//        return $expected;
+//    }
 
     /**
      * @return string
@@ -218,11 +299,33 @@ TEST_DATA;
     /**
      * @param $output
      */
-    private function assertColoredOutput($output)
+    private function assertColoredOutputHeaderTop($output)
     {
         $expected = $this->expectedOutput();
 
-        $this->assertSame(549, strlen($output));
+        $this->assertSame(776, strlen($output));
+        $this->assertSame(substr_count($expected, '|'), substr_count($output, '|'));
+    }
+
+    /**
+     * @param $output
+     */
+    private function assertColoredOutputHeaderLeft($output)
+    {
+        $expected = $this->expectedOutputWithoutHeader();
+
+        $this->assertSame(630, strlen($output));
+        $this->assertSame(substr_count($expected, '|'), substr_count($output, '|'));
+    }
+
+    /**
+     * @param $output
+     */
+    private function assertColoredOutputWithoutHeader($output)
+    {
+        $expected = $this->expectedOutputWithoutHeader();
+
+        $this->assertSame(622, strlen($output));
         $this->assertSame(substr_count($expected, '|'), substr_count($output, '|'));
     }
 }
