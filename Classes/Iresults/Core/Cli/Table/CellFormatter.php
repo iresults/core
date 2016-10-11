@@ -63,6 +63,8 @@ class CellFormatter implements CellFormatterInterface
             return implode(',', $data);
         } elseif ($data instanceof \Traversable) {
             return implode(',', iterator_to_array($data));
+        } elseif ($data instanceof \DateTimeInterface) {
+            return $data->format('r');
         } elseif (is_object($data)) {
             return method_exists($data, '__toString') ? (string)$data : get_class($data);
         }
