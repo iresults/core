@@ -61,8 +61,14 @@ class CollectionGenerator
         }
 
         $header = array_shift($data);
+        $headerColumnCount = count($header);
         $collection = [];
         foreach ($data as $row) {
+            $columnCount = count($row);
+            if ($headerColumnCount > $columnCount) {
+                $row = array_pad($row, $headerColumnCount, null);
+            }
+
             $collection[] = $callback(
                 array_combine(
                     $header,
