@@ -1,28 +1,7 @@
 <?php
+
 namespace Iresults\Core\Model;
 
-    /*
-     * The MIT License (MIT)
-     * Copyright (c) 2013 Andreas Thurnheer-Meier <tma@iresults.li>, iresults
-     *
-     * Permission is hereby granted, free of charge, to any person obtaining a copy
-     * of this software and associated documentation files (the "Software"), to deal
-     * in the Software without restriction, including without limitation the rights
-     * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-     * copies of the Software, and to permit persons to whom the Software is
-     * furnished to do so, subject to the following conditions:
-     *
-     * The above copyright notice and this permission notice shall be included in
-     * all copies or substantial portions of the Software.
-     *
-     * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-     * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-     * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-     * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-     * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-     * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
-     * SOFTWARE.
-     */
 use InvalidArgumentException;
 
 
@@ -52,7 +31,7 @@ interface PathAccessInterface
      *
      * The path 1.2.0 would return the object in square brackets.
      *
-     * @param    string $path The path to the object
+     * @param string $path The path to the object
      * @return    object    The object at the given path, or NULL if none exists
      */
     public function getObjectAtPath($path);
@@ -70,8 +49,8 @@ interface PathAccessInterface
      *
      * The path 1.2.0 would point to the object in square brackets.
      *
-     * @param    string $path   The path to set
-     * @param    object $object The new object
+     * @param string $path   The path to set
+     * @param object $object The new object
      * @return    void
      *
      * @throws InvalidArgumentException if the given value is not an object.
@@ -92,7 +71,7 @@ interface PathAccessInterface
      *
      * The path 1.2.0 would return TRUE.
      *
-     * @param    string $path The path to the object
+     * @param string $path The path to the object
      * @return    boolean    TRUE if an object exists at the given path, otherwise FALSE
      */
     public function hasObjectAtPath($path);
@@ -104,7 +83,7 @@ interface PathAccessInterface
     /**
      * Returns the path to the given object.
      *
-     * @param    object $object A object in the container
+     * @param object $object A object in the container
      * @return    string    The path to the given object
      *
      * @throws \Iresults\Core\Model\PathAccess\Exception\EntryNotFound if the object doesn't exist in the tree.
@@ -114,7 +93,7 @@ interface PathAccessInterface
     /**
      * Returns if the object exists in the container.
      *
-     * @param    object $object The object to search in the container
+     * @param object $object The object to search in the container
      * @return    boolean    TRUE if the object is in the tree, otherwise FALSE
      */
     public function containsObject($object);
@@ -133,8 +112,8 @@ interface PathAccessInterface
      * If $isParsed is set to TRUE the given pattern will be treated as regular
      * expression and will not be parsed.
      *
-     * @param    string  $pattern  A path pattern
-     * @param    boolean $isParsed Indicates if the given pattern is already parsed
+     * @param string  $pattern  A path pattern
+     * @param boolean $isParsed Indicates if the given pattern is already parsed
      * @return    array<string>    The matching paths or an empty array if none was found
      */
     public function findAllPathsMatchingPattern($pattern, $isParsed = false);
@@ -149,8 +128,8 @@ interface PathAccessInterface
      * If $isParsed is set to TRUE the given pattern will be treated as regular
      * expression and will not be parsed.
      *
-     * @param    string  $pattern  A path pattern
-     * @param    boolean $isParsed Indicates if the given pattern is already parsed
+     * @param string  $pattern  A path pattern
+     * @param boolean $isParsed Indicates if the given pattern is already parsed
      * @return    string    The best matching path
      */
     public function findPathMatchingPattern($pattern, $isParsed = false);
@@ -165,8 +144,8 @@ interface PathAccessInterface
      * If $isParsed is set to TRUE the given pattern will be treated as regular
      * expression and will not be parsed.
      *
-     * @param    string  $pattern  A path pattern
-     * @param    boolean $isParsed Indicates if the given pattern is already parsed
+     * @param string  $pattern  A path pattern
+     * @param boolean $isParsed Indicates if the given pattern is already parsed
      * @return    array<object>    The matching objects or an empty array if none was found
      */
     public function findAllObjectsWithPathsMatchingPattern($pattern, $isParsed = false);
@@ -181,8 +160,8 @@ interface PathAccessInterface
      * If $isParsed is set to TRUE the given pattern will be treated as regular
      * expression and will not be parsed.
      *
-     * @param    string  $pattern  A path pattern
-     * @param    boolean $isParsed Indicates if the given pattern is already parsed
+     * @param string  $pattern  A path pattern
+     * @param boolean $isParsed Indicates if the given pattern is already parsed
      * @return    object    The object with the best matching path
      */
     public function findObjectWithPathMatchingPattern($pattern, $isParsed = false);
@@ -202,7 +181,7 @@ interface PathAccessInterface
      * The path 4.5.3 would return obj3.
      * The path 5.12.4 would return obj4.
      *
-     * @param    string $path The path to find the similar paths to
+     * @param string $path The path to find the similar paths to
      * @return    object    The object with matching with similar paths or an empty array if none are found
      */
     public function findObjectMostSimilarToPath($path);
@@ -222,7 +201,7 @@ interface PathAccessInterface
      * The path 4.5.3 would return 4.5.1.
      * The path 5.12.4 would return 5.11.3.
      *
-     * @param    string $path The path to find the similar paths to
+     * @param string $path The path to find the similar paths to
      * @return    array<string>    The similar paths or an empty array if none are found
      */
     public function findPathMostSimilarToPath($path);
@@ -233,8 +212,8 @@ interface PathAccessInterface
      *
      * Property key paths may also be passed to compare those values.
      *
-     * @param    string $propertyKey   The property key to look for
-     * @param    mixed  $propertyValue The property value to look for
+     * @param string $propertyKey   The property key to look for
+     * @param mixed  $propertyValue The property value to look for
      * @return    array<object>    The objects with matching properties or an empty array if none are found
      */
     public function findObjectsWithProperty($propertyKey, $propertyValue);
@@ -246,7 +225,7 @@ interface PathAccessInterface
     /**
      * Returns the path to the parent node of the node at the given path.
      *
-     * @param    string $path A path
+     * @param string $path A path
      * @return    string    The path to the parent
      */
     public function getParentPathOfPath($path);

@@ -1,28 +1,6 @@
 <?php
-namespace Iresults\Core\Cache;
 
-/*
- * The MIT License (MIT)
- * Copyright (c) 2013 Andreas Thurnheer-Meier <tma@iresults.li>, iresults
- *
- * Permission is hereby granted, free of charge, to any person obtaining a copy
- * of this software and associated documentation files (the "Software"), to deal
- * in the Software without restriction, including without limitation the rights
- * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
- * copies of the Software, and to permit persons to whom the Software is
- * furnished to do so, subject to the following conditions:
- *
- * The above copyright notice and this permission notice shall be included in
- * all copies or substantial portions of the Software.
- *
- * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
- * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
- * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
- * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
- * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
- * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
- * SOFTWARE.
- */
+namespace Iresults\Core\Cache;
 
 use Iresults\Core\System\Lock;
 
@@ -41,7 +19,7 @@ class Ir extends \Iresults\Core\Cache\AbstractCache
      *
      * @var array
      */
-    static protected $_cache = array();
+    static protected $_cache = [];
 
     /**
      * Indicates if the shutdown handler was registered
@@ -83,7 +61,7 @@ class Ir extends \Iresults\Core\Cache\AbstractCache
         parent::__construct();
 
         if (!self::$_didInstallShutdownHandler) {
-            register_shutdown_function(array('\Iresults\Core\Cache\Ir', '_writeCacheFile'));
+            register_shutdown_function(['\Iresults\Core\Cache\Ir', '_writeCacheFile']);
             self::$_didInstallShutdownHandler = true;
         }
         if (!self::$_cache || empty(self::$_cache)) {
@@ -97,7 +75,7 @@ class Ir extends \Iresults\Core\Cache\AbstractCache
     /**
      * Returns the object at the given key.
      *
-     * @param    string $key
+     * @param string $key
      * @return    mixed
      */
     public function getObjectForKey($key)
@@ -112,8 +90,8 @@ class Ir extends \Iresults\Core\Cache\AbstractCache
     /**
      * Stores the value of $object at the given key.
      *
-     * @param    string $key
-     * @param    mixed  $object
+     * @param string $key
+     * @param mixed  $object
      * @return    void
      */
     public function setObjectForKey($key, $object)
@@ -125,7 +103,7 @@ class Ir extends \Iresults\Core\Cache\AbstractCache
     /**
      * Removes the object with the given key.
      *
-     * @param    string $key
+     * @param string $key
      * @return    void
      */
     public function removeObjectForKey($key)
@@ -143,7 +121,7 @@ class Ir extends \Iresults\Core\Cache\AbstractCache
      */
     public function clear()
     {
-        self::$_cache = array();
+        self::$_cache = [];
         $result = true;
         $path = self::getCacheDir() . self::$_fileName . '*';
         $foundPaths = glob($path);

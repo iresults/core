@@ -1,28 +1,6 @@
 <?php
-namespace Iresults\Core\Helpers;
 
-/*
- * The MIT License (MIT)
- * Copyright (c) 2013 Andreas Thurnheer-Meier <tma@iresults.li>, iresults
- *
- * Permission is hereby granted, free of charge, to any person obtaining a copy
- * of this software and associated documentation files (the "Software"), to deal
- * in the Software without restriction, including without limitation the rights
- * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
- * copies of the Software, and to permit persons to whom the Software is
- * furnished to do so, subject to the following conditions:
- *
- * The above copyright notice and this permission notice shall be included in
- * all copies or substantial portions of the Software.
- *
- * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
- * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
- * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
- * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
- * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
- * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
- * SOFTWARE.
- */
+namespace Iresults\Core\Helpers;
 
 use Iresults\Core\Helpers\Exception\ObjectHelperGetterException;
 use Iresults\Core\Helpers\Exception\ObjectHelperSetterException;
@@ -60,8 +38,8 @@ class ObjectHelper
     /**
      *
      *
-     * @param    string $propertyPath
-     * @param    object $object
+     * @param string $propertyPath
+     * @param object $object
      * @return        mixed
      */
 
@@ -154,10 +132,10 @@ class ObjectHelper
                 ObjectHelperGetterException::errorWithMessageCodeAndUserInfo(
                     'Cannot get property \'' . $path . '\' of object of type ' . $type . '.',
                     1320769266,
-                    array(
+                    [
                         'object'   => $parentObject,
                         'property' => $path,
-                    )
+                    ]
                 );
             }
 
@@ -169,8 +147,8 @@ class ObjectHelper
     /**
      * Returns the value of the given object at the given key.
      *
-     * @param    string $key    The property key to get
-     * @param    object $object The object to get the property from
+     * @param string $key    The property key to get
+     * @param object $object The object to get the property from
      * @return        mixed            Returns the property's value
      */
     static public function getObjectForKeyOfObject($key, $object)
@@ -181,7 +159,7 @@ class ObjectHelper
     /**
      * Returns the properties from the given object as a dictionary.
      *
-     * @param    object $object The object to analyse
+     * @param object $object The object to analyse
      * @return    mixed
      */
     static public function getPropertiesOfObject($object)
@@ -195,8 +173,8 @@ class ObjectHelper
      *
      * Spying is evil, you maybe should not use this function.
      *
-     * @param    string $key    The property key to get
-     * @param    object $object The object to get the property from
+     * @param string $key    The property key to get
+     * @param object $object The object to get the property from
      * @return    mixed            Returns the property's value
      */
     static public function spyPropertyOfObject($key, $object)
@@ -282,11 +260,11 @@ class ObjectHelper
             ObjectHelperSetterException::errorWithMessageCodeAndUserInfo(
                 'Cannot set property \'' . $setKey . '\' of object of type ' . $type . '.',
                 1320769037,
-                array(
+                [
                     'object'   => $setObject,
                     'property' => $setKey,
                     'value'    => $object,
-                )
+                ]
             );
         }
 
@@ -296,9 +274,9 @@ class ObjectHelper
     /**
      * Sets the value of the given parent object at the given key.
      *
-     * @param    string $key          The property key to set
-     * @param    mixed  $object       The new value to set
-     * @param    object $parentObject The parent object to change
+     * @param string $key          The property key to set
+     * @param mixed  $object       The new value to set
+     * @param object $parentObject The parent object to change
      * @return    boolean    Returns TRUE on success, otherwise FALSE
      */
     static public function setObjectForKeyOfParentObject($key, $object, $parentObject)
@@ -312,9 +290,9 @@ class ObjectHelper
      * Sets the values from the given array|dictionary as the object's
      * properties.
      *
-     * @param            array        <mixed> $array  The source array|dictionary
-     * @param    object  $object      The object to change
-     * @param    boolean $convertKeys Set if array keys should be converted from lowerlevel-underscored to camelCase
+     * @param         array        <mixed> $array  The source array|dictionary
+     * @param object  $object      The object to change
+     * @param boolean $convertKeys Set if array keys should be converted from lowerlevel-underscored to camelCase
      * @return    void
      */
     static public function setPropertiesOfObjectFromArray($array, $object, $convertKeys = false)
@@ -337,7 +315,7 @@ class ObjectHelper
     /**
      * Creates an object for the given value.
      *
-     * @param    mixed $value The value to transform into an object
+     * @param mixed $value The value to transform into an object
      * @return    object    The object representation of the given value or NULL on error
      */
     static public function createObjectWithValue($value)
@@ -366,8 +344,8 @@ class ObjectHelper
      *
      * @link http://www.waynehaffenden.com/Blog/PHP-Deep-Object-Cloning
      *
-     * @param    object  $object   The object to create a copy of
-     * @param    boolean $useSleep If set to TRUE the __sleep() and __wakeup() methods will be called
+     * @param object  $object   The object to create a copy of
+     * @param boolean $useSleep If set to TRUE the __sleep() and __wakeup() methods will be called
      * @return    object    Returns the object's clone
      */
     static public function createCopyOfObject($object, $useSleep = false)
@@ -394,7 +372,7 @@ class ObjectHelper
     /**
      * Creates an unique identifier for the given object.
      *
-     * @param    object $object The object to create the hash of
+     * @param object $object The object to create the hash of
      * @return    string    The unique identifier
      */
     static public function createIdentfierForObject($object)
@@ -456,7 +434,7 @@ class ObjectHelper
     /**
      * Set if the stdClass should be treated as mutable.
      *
-     * @param    boolean $flag The flag
+     * @param boolean $flag The flag
      * @return    void
      */
     static public function setTreatStdClassAsMutable($flag)

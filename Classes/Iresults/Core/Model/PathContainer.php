@@ -1,28 +1,7 @@
 <?php
+
 namespace Iresults\Core\Model;
 
-    /*
-     * The MIT License (MIT)
-     * Copyright (c) 2013 Andreas Thurnheer-Meier <tma@iresults.li>, iresults
-     *
-     * Permission is hereby granted, free of charge, to any person obtaining a copy
-     * of this software and associated documentation files (the "Software"), to deal
-     * in the Software without restriction, including without limitation the rights
-     * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-     * copies of the Software, and to permit persons to whom the Software is
-     * furnished to do so, subject to the following conditions:
-     *
-     * The above copyright notice and this permission notice shall be included in
-     * all copies or substantial portions of the Software.
-     *
-     * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-     * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-     * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-     * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-     * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-     * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
-     * SOFTWARE.
-     */
 use Iresults\Core\KVCInterface;
 use Iresults\Core\Mutable;
 use Iresults\Core\Mutable\Xml;
@@ -43,7 +22,7 @@ class PathContainer extends \Iresults\Core\Model\PathAccess\AbstractContainer im
     /**
      * Initializes a path container instance with the data from the given array.
      *
-     * @param    array $array The associative array|dictionary to read the data from
+     * @param array $array The associative array|dictionary to read the data from
      * @return    \Iresults\Core\Model\PathContainerInterface
      *
      * @throws \InvalidArgumentException if the given value is not an object.
@@ -78,8 +57,8 @@ class PathContainer extends \Iresults\Core\Model\PathAccess\AbstractContainer im
      *        </entry>
      *    </paths>
      *
-     * @param    Xml $mutable               The mutable object from which to read the data
-     * @param    boolean                    $throwOnDuplicatePaths If set to TRUE an exception will be thrown if a given path already exists in the pathToObject-map
+     * @param Xml     $mutable               The mutable object from which to read the data
+     * @param boolean $throwOnDuplicatePaths If set to TRUE an exception will be thrown if a given path already exists in the pathToObject-map
      * @return    \Iresults\Core\Model\PathContainer
      * @throws \Iresults\Core\Model\PathAccess\Exception\DuplicatePath if $throwOnDuplicatePaths is TRUE and the path already exists
      */
@@ -142,7 +121,7 @@ class PathContainer extends \Iresults\Core\Model\PathAccess\AbstractContainer im
      * Factory method: Returns a path container instance with the data from the
      * given array.
      *
-     * @param    array $array The associative array|dictionary to read the data from
+     * @param array $array The associative array|dictionary to read the data from
      * @return    \Iresults\Core\Model\PathContainerInterface
      */
     static public function containerWithArray($array)

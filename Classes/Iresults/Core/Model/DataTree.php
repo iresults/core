@@ -1,28 +1,7 @@
 <?php
+
 namespace Iresults\Core\Model;
 
-    /*
-     * The MIT License (MIT)
-     * Copyright (c) 2013 Andreas Thurnheer-Meier <tma@iresults.li>, iresults
-     *
-     * Permission is hereby granted, free of charge, to any person obtaining a copy
-     * of this software and associated documentation files (the "Software"), to deal
-     * in the Software without restriction, including without limitation the rights
-     * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-     * copies of the Software, and to permit persons to whom the Software is
-     * furnished to do so, subject to the following conditions:
-     *
-     * The above copyright notice and this permission notice shall be included in
-     * all copies or substantial portions of the Software.
-     *
-     * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-     * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-     * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-     * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-     * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-     * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
-     * SOFTWARE.
-     */
 use InvalidArgumentException;
 use Traversable;
 
@@ -41,14 +20,14 @@ class DataTree extends \Iresults\Core\Model\PathAccess\AbstractContainer impleme
      *
      * @var array<object>
      */
-    protected $pathToObject = array();
+    protected $pathToObject = [];
 
     /**
      * The dictionary holding the object's hash and the path to the object.
      *
      * @var array<string>
      */
-    protected $hashToPath = array();
+    protected $hashToPath = [];
 
     /**
      * The number of level inside the tree.
@@ -85,8 +64,8 @@ class DataTree extends \Iresults\Core\Model\PathAccess\AbstractContainer impleme
      * The object itself will be set at path 0 and the objects at the given
      * property key path as children of path 0.
      *
-     * @param    object $object          The object from which the data will be read, using the property key path
-     * @param    string $propertyKeyPath The property key path to the object's children
+     * @param object $object          The object from which the data will be read, using the property key path
+     * @param string $propertyKeyPath The property key path to the object's children
      * @return    \Iresults\Core\Model\DataTree
      */
     public function initWithObjectAndProperty($object, $propertyKeyPath = 'children')
@@ -162,7 +141,7 @@ class DataTree extends \Iresults\Core\Model\PathAccess\AbstractContainer impleme
      *
      * The path 1.2.0 would return the object in square brackets.
      *
-     * @param    string $path The path to the object
+     * @param string $path The path to the object
      * @return    object    The object at the given path, or NULL if none exists
      */
     public function getObjectAtPath($path)
@@ -210,8 +189,8 @@ class DataTree extends \Iresults\Core\Model\PathAccess\AbstractContainer impleme
      *
      * An exception would be thrown when setting the path 1.0.0.
      *
-     * @param    string $path   The path to set
-     * @param    object $object The new object
+     * @param string $path   The path to set
+     * @param object $object The new object
      * @return    void
      *
      * @throws InvalidArgumentException if the given value is not an object.
@@ -243,7 +222,7 @@ class DataTree extends \Iresults\Core\Model\PathAccess\AbstractContainer impleme
      *
      * The path 1 would return the objects 1.0, 1.1 and 1.2.
      *
-     * @param    string $path The path to the parent object
+     * @param string $path The path to the parent object
      * @return    array<object> The child objects of the given path
      *
      * @throws \Iresults\Core\Model\PathAccess\Exception\EntryNotFound if no object exists at the path.
@@ -302,16 +281,16 @@ class DataTree extends \Iresults\Core\Model\PathAccess\AbstractContainer impleme
      *       )
      *  )
      *
-     * @param    string $path The path to the parent object
+     * @param string $path The path to the parent object
      * @return    array<array<...>>    An array of arrays of objects
      */
     public function getChildObjectsAtPathRecursive($path)
     {
-        $returnArray = array();
+        $returnArray = [];
         $path = $path . $this->pathSeparator . '*';
         $foundObjects = $this->findAllObjectsWithPathsMatchingPattern($path);
         foreach ($foundObjects as $foundPath => $foundObject) {
-            $currentObjectArray = array();
+            $currentObjectArray = [];
             $currentObjectArray['obj'] = $foundObject;
             #$currentObjectArray['path'] = $foundPath;
             $currentObjectArray['children'] = $this->getChildObjectsAtPathRecursive($foundPath);
@@ -339,13 +318,13 @@ class DataTree extends \Iresults\Core\Model\PathAccess\AbstractContainer impleme
      * The path 1 would return the objects in square brackets on Level 1 and all
      * their children.
      *
-     * @param    string   $path     The path to the parent object
-     * @param    callable $callback The callable that will be invoked with the found object as argument see getChildObjectsAtPathRecursiveExampleCallback()
+     * @param string   $path     The path to the parent object
+     * @param callable $callback The callable that will be invoked with the found object as argument see getChildObjectsAtPathRecursiveExampleCallback()
      * @return    array<array<...>>    An array of arrays of objects
      */
     public function getChildObjectsAtPathRecursiveWithCallback($path, $callback)
     {
-        $returnArray = array();
+        $returnArray = [];
         $path = $path . $this->pathSeparator . '*';
         $foundObjects = $this->findAllObjectsWithPathsMatchingPattern($path);
         foreach ($foundObjects as $foundPath => $foundObject) {
@@ -366,7 +345,7 @@ class DataTree extends \Iresults\Core\Model\PathAccess\AbstractContainer impleme
      */
     public function getChildObjectsAtPathRecursiveExampleCallback($foundObject, $foundPath, $callback, $treeObject)
     {
-        $currentObjectArray = array();
+        $currentObjectArray = [];
         $currentObjectArray['obj'] = $foundObject;
         $currentObjectArray['path'] = $foundPath;
         $currentObjectArray['children'] = $treeObject->getChildObjectsAtPathRecursiveWithCallback(
@@ -390,8 +369,8 @@ class DataTree extends \Iresults\Core\Model\PathAccess\AbstractContainer impleme
      *
      * If a child object is added to path 1, the path 1.2 would be created.
      *
-     * @param    string $path   The path to the parent object
-     * @param    object $object The new object
+     * @param string $path   The path to the parent object
+     * @param object $object The new object
      * @return    string The path to the added object
      *
      * @throws \Iresults\Core\Model\PathAccess\Exception\EntryNotFound if no object exists at the path to the parent object.
@@ -447,8 +426,8 @@ class DataTree extends \Iresults\Core\Model\PathAccess\AbstractContainer impleme
      * If a child object is added to the parent object 1, the path 1.2 would be
      * created.
      *
-     * @param    object $child  The child object to add
-     * @param    object $parent The parent object
+     * @param object $child  The child object to add
+     * @param object $parent The parent object
      * @return    string The path to the added object
      *
      * @throws \Iresults\Core\Model\PathAccess\Exception\EntryNotFound if the parent object doesn't exist in the tree.
@@ -465,9 +444,9 @@ class DataTree extends \Iresults\Core\Model\PathAccess\AbstractContainer impleme
      * Adds the given object's children (defined through the given property) as
      * tree node children at the given tree path.
      *
-     * @param    object $object          The object to get the children from
-     * @param    string $propertyKeyPath The property key path to the object's children
-     * @param    string $treePath        The path to the node where the children should be attached
+     * @param object $object          The object to get the children from
+     * @param string $propertyKeyPath The property key path to the object's children
+     * @param string $treePath        The path to the node where the children should be attached
      * @return    void
      */
     public function addChildrenFromObjectAtPropertyToTreeAtPath($object, $propertyKeyPath = 'children', $treePath = '0')
@@ -478,7 +457,7 @@ class DataTree extends \Iresults\Core\Model\PathAccess\AbstractContainer impleme
         $children = \Iresults\Core\Helpers\ObjectHelper::getObjectForKeyPathOfObject($propertyKeyPath, $object);
 
         if (is_object($children) && !$children instanceof Traversable) {
-            $children = array($children);
+            $children = [$children];
         }
 
         if (is_array($children) || $children instanceof Traversable) {
@@ -532,7 +511,7 @@ class DataTree extends \Iresults\Core\Model\PathAccess\AbstractContainer impleme
     /**
      * Returns the parent object of the given object.
      *
-     * @param    object $object A object in the tree
+     * @param object $object A object in the tree
      * @return    object    The object's parent object
      *
      * @throws \Iresults\Core\Model\PathAccess\Exception\EntryNotFound if the object doesn't exist in the tree.
@@ -548,7 +527,7 @@ class DataTree extends \Iresults\Core\Model\PathAccess\AbstractContainer impleme
     /**
      * Returns the child objects of the given object.
      *
-     * @param    object $object A object in the tree
+     * @param object $object A object in the tree
      * @return    array<object>    The object's children
      *
      * @throws \Iresults\Core\Model\PathAccess\Exception\EntryNotFound if the object doesn't exist in the tree.
@@ -580,14 +559,14 @@ class DataTree extends \Iresults\Core\Model\PathAccess\AbstractContainer impleme
      * If the object at 1.2.0 is passed, a dictionary of the objects in curly
      * brackets will be returned.
      *
-     * @param    string $path The path to the object
+     * @param string $path The path to the object
      * @return    array<object>    The branch to the path
      *
      * @throws \Iresults\Core\Model\PathAccess\Exception\EntryNotFound if the no object exists at the given path.
      */
     public function getBranchToPath($path)
     {
-        $branch = array();
+        $branch = [];
         $currentPath = $path;
         if (!$this->hasObjectAtPath($path)) {
             throw new \Iresults\Core\Model\PathAccess\Exception\EntryNotFound(
@@ -608,7 +587,7 @@ class DataTree extends \Iresults\Core\Model\PathAccess\AbstractContainer impleme
      *
      * @see getBranchToPath()
      *
-     * @param    object $object A object in the tree
+     * @param object $object A object in the tree
      * @return    array<object>    The branch to the object
      *
      * @throws \Iresults\Core\Model\PathAccess\Exception\EntryNotFound if the object doesn't exist in the tree.
@@ -634,15 +613,15 @@ class DataTree extends \Iresults\Core\Model\PathAccess\AbstractContainer impleme
      *
      * @see getBranchOfObjectsWithProperties()
      *
-     * @param    string $propertyKey The property key to look for
-     * @param           array        <mixed> $propertyValues    The property values to look for
-     * @param           array        <Error> $errors Reference to an array that will be filled with errors that occure
+     * @param string $propertyKey The property key to look for
+     * @param        array        <mixed> $propertyValues    The property values to look for
+     * @param        array        <Error> $errors Reference to an array that will be filled with errors that occure
      *
      * @return    array<object>    The branch to the object
      */
-    public function getBranchOfObjectsWithPropertyKeyAndValues($propertyKey, $propertyValues, &$errors = array())
+    public function getBranchOfObjectsWithPropertyKeyAndValues($propertyKey, $propertyValues, &$errors = [])
     {
-        $branch = array();
+        $branch = [];
         $loopNumber = 1;
         $currentValue = reset($propertyValues);
         $objectCollectionSearchHelper = $this->_getObjectCollectionSearchHelper();
@@ -663,13 +642,13 @@ class DataTree extends \Iresults\Core\Model\PathAccess\AbstractContainer impleme
              * property key and value) add an error to the errors array.
              */
             if (empty($childrenWithMatchingProperty)) {
-                $userInfo = array(
+                $userInfo = [
                     'child'         => $currentValue,
                     'children'      => $children,
                     'propertyValue' => $currentValue,
                     'propertyKey'   => $propertyKey,
                     'level'         => $loopNumber,
-                );
+                ];
                 $message = '';
                 if (is_scalar($currentValue)) {
                     $message = "No children found matching the property key '$propertyKey' and value '$currentValue' of the current child at loop number $loopNumber.";
@@ -701,13 +680,13 @@ class DataTree extends \Iresults\Core\Model\PathAccess\AbstractContainer impleme
                  */
                 $children = $this->getChildObjectsOfObject($currentChild);
                 if (empty($children)) {
-                    $userInfo = array(
+                    $userInfo = [
                         'child'         => $currentChild,
                         'propertyValue' => $currentValue,
                         'propertyKey'   => $propertyKey,
                         'level'         => $loopNumber,
                         'p'             => $this->getChildObjectsOfObject($currentChild),
-                    );
+                    ];
                     $errors[] = \Iresults\Core\Error::errorWithMessageCodeAndUserInfo(
                         "No children for current child at loop number $loopNumber.",
                         1321980307,
@@ -769,15 +748,15 @@ class DataTree extends \Iresults\Core\Model\PathAccess\AbstractContainer impleme
      *          objectN->propertyN == 'valueN',
      *      )
      *
-     * @param    array <mixed> $properties   A dictionary of property keys and values the objects are tested for
-     * @param    array <Error> $errors Reference to an array that will be filled with errors that occure
+     * @param array <mixed> $properties   A dictionary of property keys and values the objects are tested for
+     * @param array <Error> $errors Reference to an array that will be filled with errors that occure
      *
      * @return    array<object>    The branch to the object
      */
     public function getBranchOfObjectsWithProperties($properties, &$errors = null)
     {
         throw new \Exception("TEST ME");
-        $branch = array();
+        $branch = [];
         $loopNumber = 0;
         $currentValue = reset($properties);
         $currentKey = key($properties);
@@ -827,7 +806,7 @@ class DataTree extends \Iresults\Core\Model\PathAccess\AbstractContainer impleme
      *    2.*.*.1
      *    *.1.*.1
      *
-     * @param    string $pattern A path pattern to search for
+     * @param string $pattern A path pattern to search for
      * @return    array<object> An array of objects whose path match the given pattern
      */
     //protected function _searchObjectsWithPathLikePattern($pattern) {
@@ -850,7 +829,7 @@ class DataTree extends \Iresults\Core\Model\PathAccess\AbstractContainer impleme
      *    2.*.*.1
      *    *.1.*.1
      *
-     * @param    string $pattern A path pattern to search for
+     * @param string $pattern A path pattern to search for
      * @return    array<string> An array of the tree's paths matching the given pattern
      */
     //protected function _searchPathsLikePattern($pattern) {
@@ -911,8 +890,8 @@ class DataTree extends \Iresults\Core\Model\PathAccess\AbstractContainer impleme
      * The object itself will be set at path 0 and the objects at the given
      * property key path as children of path 0.
      *
-     * @param    object $object          The object from which the data will be read, using the property key path
-     * @param    string $propertyKeyPath The property key path to the object's children
+     * @param object $object          The object from which the data will be read, using the property key path
+     * @param string $propertyKeyPath The property key path to the object's children
      * @return    \Iresults\Core\Model\DataTree
      */
     static public function treeWithObjectAndProperty($object, $propertyKeyPath = 'children')

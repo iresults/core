@@ -1,28 +1,6 @@
 <?php
-namespace Iresults\Core;
 
-/*
- * The MIT License (MIT)
- * Copyright (c) 2013 Andreas Thurnheer-Meier <tma@iresults.li>, iresults
- *
- * Permission is hereby granted, free of charge, to any person obtaining a copy
- * of this software and associated documentation files (the "Software"), to deal
- * in the Software without restriction, including without limitation the rights
- * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
- * copies of the Software, and to permit persons to whom the Software is
- * furnished to do so, subject to the following conditions:
- *
- * The above copyright notice and this permission notice shall be included in
- * all copies or substantial portions of the Software.
- *
- * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
- * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
- * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
- * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
- * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
- * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
- * SOFTWARE.
- */
+namespace Iresults\Core;
 
 use Iresults\Core\Exception\FatalErrorException;
 use Iresults\Core\Exception\UndefinedMethod;
@@ -73,7 +51,7 @@ abstract class Iresults implements IresultsBaseConstants
     {
         $sharedInstance = static::getSharedInstance();
         if (method_exists($sharedInstance, $name)) {
-            return call_user_func_array(array($sharedInstance, $name), $arguments);
+            return call_user_func_array([$sharedInstance, $name], $arguments);
         }
         throw new UndefinedMethod('Method ' . $name . ' not found', 1380729299);
     }
@@ -172,7 +150,7 @@ abstract class Iresults implements IresultsBaseConstants
     /**
      * Returns the absolute path to the given resource
      *
-     * @param  \Iresults\FS\FilesystemInterface|string $resource Either a filesystem instance or the path of a resource
+     * @param \Iresults\FS\FilesystemInterface|string $resource Either a filesystem instance or the path of a resource
      * @return string                                        The absolute path of the resource
      */
     static public function getPathOfResource($resource)
@@ -183,7 +161,7 @@ abstract class Iresults implements IresultsBaseConstants
     /**
      * Returns the URL of the resource.
      *
-     * @param    \Iresults\FS\FilesystemInterface|string $resource Either a filesystem instance or the path of a resource
+     * @param \Iresults\FS\FilesystemInterface|string $resource Either a filesystem instance or the path of a resource
      * @return    string                                            The URL of the resource
      */
     static public function getUrlOfResource($resource)
@@ -264,7 +242,7 @@ abstract class Iresults implements IresultsBaseConstants
      * Returns the versioned file path for the given file path, or the original
      * file path, if it doesn't exist.
      *
-     * @param    string $filePath The file path to create versions
+     * @param string $filePath The file path to create versions
      * @return    string
      */
     static public function createVersionedFilePathForPath($filePath)
@@ -278,7 +256,7 @@ abstract class Iresults implements IresultsBaseConstants
      *
      * You shouldn't use this in an production environment
      *
-     * @param    boolean $lowerCaseUnderscored Set to TRUE if you want the returned value to be in lower_case_underscored
+     * @param boolean $lowerCaseUnderscored Set to TRUE if you want the returned value to be in lower_case_underscored
      * @return    string
      */
     static public function getNameOfCallingPackage($lowerCaseUnderscored = false)
@@ -312,12 +290,12 @@ abstract class Iresults implements IresultsBaseConstants
     /**
      * Returns the translated value for the given key.
      *
-     * @param    string $key           The key to translate
-     * @param    array  $arguments     An optional array of arguments that will be passed to vsprintf()
-     * @param    string $extensionName Optional extension name. If empty the extension name will be automatically determined
+     * @param string $key           The key to translate
+     * @param array  $arguments     An optional array of arguments that will be passed to vsprintf()
+     * @param string $extensionName Optional extension name. If empty the extension name will be automatically determined
      * @return    string
      */
-    static public function translate($key, array $arguments = array(), $extensionName = '')
+    static public function translate($key, array $arguments = [], $extensionName = '')
     {
         return static::getSharedInstance()->translate($key, $arguments, $extensionName);
     }
@@ -359,9 +337,9 @@ abstract class Iresults implements IresultsBaseConstants
     /**
      * Logs the given variable.
      *
-     * @param    mixed   $var     If $var is a scalar it will be written directly, else the output of var_export() is used
-     * @param    integer $code    The error code
-     * @param    string  $logfile The path to the log file. The default path is /typo3conf/iresults.log
+     * @param mixed   $var     If $var is a scalar it will be written directly, else the output of var_export() is used
+     * @param integer $code    The error code
+     * @param string  $logfile The path to the log file. The default path is /typo3conf/iresults.log
      * @return    boolean                TRUE on success otherwise FALSE
      */
     static public function log($var, $code = -1, $logfile = -1)
@@ -372,22 +350,22 @@ abstract class Iresults implements IresultsBaseConstants
     /**
      * Dumps a given variable (or the given variables) wrapped into a 'pre' tag.
      *
-     * @param    mixed $var1
+     * @param mixed $var1
      * @return    string The printed content
      */
     static public function pd($var1 = '__iresults_pd_noValue')
     {
         $arguments = func_get_args();
 
-        return call_user_func_array(array(static::getSharedInstance(), 'pd'), $arguments);
+        return call_user_func_array([static::getSharedInstance(), 'pd'], $arguments);
     }
 
     /**
      * Outputs the given string, taking the current environment into account.
      *
-     * @param    string  $message     The message to output
-     * @param    string  $color       An optional ASCII color to apply
-     * @param    boolean $insertBreak Insert a line break
+     * @param string  $message     The message to output
+     * @param string  $color       An optional ASCII color to apply
+     * @param boolean $insertBreak Insert a line break
      * @return    void
      */
     static public function say($message, $color = null, $insertBreak = true)
@@ -398,7 +376,7 @@ abstract class Iresults implements IresultsBaseConstants
     /**
      * Sets the debug renderer used by pd().
      *
-     * @param    integer $debugRenderer The debug renderer as one of the RENDERER constants
+     * @param integer $debugRenderer The debug renderer as one of the RENDERER constants
      * @return    integer    Returns the former configuration
      */
     static public function setDebugRenderer($debugRenderer)
@@ -533,7 +511,7 @@ abstract class Iresults implements IresultsBaseConstants
     /**
      * Returns a description of the given value.
      *
-     * @param    mixed $value The value to describe
+     * @param mixed $value The value to describe
      * @return    string    The description text
      */
     static public function descriptionOfValue($value)
@@ -549,7 +527,7 @@ abstract class Iresults implements IresultsBaseConstants
      * FALSE. If no key is given, the whole configuration array will be
      * returned.
      *
-     * @param    string $key The key for a configuration entry
+     * @param string $key The key for a configuration entry
      * @return    array|mixed    The whole configuration array, or the key's entry or FALSE for an unfound key
      */
     static public function getConfiguration($key = null)
@@ -560,8 +538,8 @@ abstract class Iresults implements IresultsBaseConstants
     /**
      * Overwrite the configuration at the given key with the new value.
      *
-     * @param    string $key   The key of the configuration to change
-     * @param    mixed  $value The new configuration value
+     * @param string $key   The key of the configuration to change
+     * @param mixed  $value The new configuration value
      * @return    void
      */
     static public function setConfiguration($key, $value)
@@ -596,8 +574,8 @@ abstract class Iresults implements IresultsBaseConstants
      *
      * This method will be used for exception handling in CLI environment.
      *
-     * @param    \Exception $exception The exception to handle
-     * @param    boolean    $graceful  Set to TRUE if the handler should not stop the PHP script
+     * @param \Exception $exception The exception to handle
+     * @param boolean    $graceful  Set to TRUE if the handler should not stop the PHP script
      * @return        void
      */
     static public function handleException($exception, $graceful = false)

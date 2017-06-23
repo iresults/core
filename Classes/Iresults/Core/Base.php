@@ -1,29 +1,4 @@
 <?php
-/*
- *  Copyright notice
- *
- *  (c) 2013 Andreas Thurnheer-Meier <tma@iresults.li>, iresults
- *  Daniel Corn <cod@iresults.li>, iresults
- *
- *  All rights reserved
- *
- *  This script is part of the TYPO3 project. The TYPO3 project is
- *  free software; you can redistribute it and/or modify
- *  it under the terms of the GNU General Public License as published by
- *  the Free Software Foundation; either version 3 of the License, or
- *  (at your option) any later version.
- *
- *  The GNU General Public License can be found at
- *  http://www.gnu.org/copyleft/gpl.html.
- *
- *  This script is distributed in the hope that it will be useful,
- *  but WITHOUT ANY WARRANTY; without even the implied warranty of
- *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- *  GNU General Public License for more details.
- *
- *  This copyright notice MUST APPEAR in all copies of the script!
- */
-
 /**
  * @author Daniel Corn <cod@iresults.li>
  * Created 02.10.13 16:24
@@ -152,7 +127,7 @@ class Base extends AbstractBase
      *
      * You shouldn't use this in an production environment
      *
-     * @param    boolean $lowerCaseUnderscored Set to TRUE if you want the returned value to be in lower_case_underscored
+     * @param boolean $lowerCaseUnderscored Set to TRUE if you want the returned value to be in lower_case_underscored
      * @return    string
      */
     public function getNameOfCallingPackage($lowerCaseUnderscored = false)
@@ -177,12 +152,12 @@ class Base extends AbstractBase
     /**
      * Returns the translated value for the given key.
      *
-     * @param    string $key           The key to translate
-     * @param    array  $arguments     An optional array of arguments that will be passed to vsprintf()
-     * @param    string $extensionName Optional extension name. If empty the extension name will be automatically determined
+     * @param string $key           The key to translate
+     * @param array  $arguments     An optional array of arguments that will be passed to vsprintf()
+     * @param string $extensionName Optional extension name. If empty the extension name will be automatically determined
      * @return    string
      */
-    public function translate($key, array $arguments = array(), $extensionName = '')
+    public function translate($key, array $arguments = [], $extensionName = '')
     {
         return $key;
     }
@@ -212,9 +187,9 @@ class Base extends AbstractBase
     /**
      * Logs the given variable.
      *
-     * @param    mixed   $var     If $var is a scalar it will be written directly, else the output of var_export() is used
-     * @param    integer $code    The error code
-     * @param    string  $logfile The path to the log file. The default path is /typo3conf/iresults.log
+     * @param mixed   $var     If $var is a scalar it will be written directly, else the output of var_export() is used
+     * @param integer $code    The error code
+     * @param string  $logfile The path to the log file. The default path is /typo3conf/iresults.log
      * @return    boolean                TRUE on success otherwise FALSE
      */
     public function log($var, $code = -1, $logfile = -1)

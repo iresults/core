@@ -1,29 +1,4 @@
 <?php
-/*
- *  Copyright notice
- *
- *  (c) 2013 Andreas Thurnheer-Meier <tma@iresults.li>, iresults
- *  Daniel Corn <cod@iresults.li>, iresults
- *
- *  All rights reserved
- *
- *  This script is part of the TYPO3 project. The TYPO3 project is
- *  free software; you can redistribute it and/or modify
- *  it under the terms of the GNU General Public License as published by
- *  the Free Software Foundation; either version 3 of the License, or
- *  (at your option) any later version.
- *
- *  The GNU General Public License can be found at
- *  http://www.gnu.org/copyleft/gpl.html.
- *
- *  This script is distributed in the hope that it will be useful,
- *  but WITHOUT ANY WARRANTY; without even the implied warranty of
- *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- *  GNU General Public License for more details.
- *
- *  This copyright notice MUST APPEAR in all copies of the script!
- */
-
 /**
  * @author Daniel Corn <cod@iresults.li>
  * Created 03.10.13 14:28
@@ -31,7 +6,6 @@
 
 
 namespace Iresults\Core\Locale;
-
 
 use Iresults\Core\Iresults;
 
@@ -45,8 +19,8 @@ abstract class TranslatorFactory
     /**
      * Returns a translator with the given source path
      *
-     * @param  string $sourcePath
-     * @param  string $package
+     * @param string $sourcePath
+     * @param string $package
      * @throws \UnexpectedValueException if an unsupported file URL is given
      * @return    \Iresults\Core\Locale\TranslatorInterface
      */
@@ -113,7 +87,7 @@ abstract class TranslatorFactory
      */
     static protected function searchSourcePathForTranslationFiles($sourcePath)
     {
-        $translatorSuffix = array('csv', 'not-found');
+        $translatorSuffix = ['csv', 'not-found'];
         $currentTranslatorSuffix = reset($translatorSuffix);
         while ($currentTranslatorSuffix && !glob(
                 $sourcePath . '*.locallang.' . $currentTranslatorSuffix,

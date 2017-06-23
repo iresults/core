@@ -1,29 +1,4 @@
 <?php
-/*
- *  Copyright notice
- *
- *  (c) 2013 Andreas Thurnheer-Meier <tma@iresults.li>, iresults
- *  Daniel Corn <cod@iresults.li>, iresults
- *
- *  All rights reserved
- *
- *  This script is part of the TYPO3 project. The TYPO3 project is
- *  free software; you can redistribute it and/or modify
- *  it under the terms of the GNU General Public License as published by
- *  the Free Software Foundation; either version 3 of the License, or
- *  (at your option) any later version.
- *
- *  The GNU General Public License can be found at
- *  http://www.gnu.org/copyleft/gpl.html.
- *
- *  This script is distributed in the hope that it will be useful,
- *  but WITHOUT ANY WARRANTY; without even the implied warranty of
- *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- *  GNU General Public License for more details.
- *
- *  This copyright notice MUST APPEAR in all copies of the script!
- */
-
 /**
  * @author Daniel Corn <cod@iresults.li>
  * Created 02.10.13 17:35
@@ -124,7 +99,7 @@ abstract class AbstractBase implements IresultsBaseInterface
          */
         if (php_sapi_name() === 'cli') {
             self::$environment = self::ENVIRONMENT_SHELL;
-            set_exception_handler(array($this, 'handleException'));
+            set_exception_handler([$this, 'handleException']);
         }
 
         /*
@@ -165,7 +140,7 @@ abstract class AbstractBase implements IresultsBaseInterface
     /**
      * Returns the absolute path to the given resource
      *
-     * @param  \Iresults\FS\FilesystemInterface|string $resource Either a filesystem instance or the path of a resource
+     * @param \Iresults\FS\FilesystemInterface|string $resource Either a filesystem instance or the path of a resource
      * @return string                                        The absolute path of the resource
      */
     public function getPathOfResource($resource)
@@ -185,7 +160,7 @@ abstract class AbstractBase implements IresultsBaseInterface
     /**
      * Returns the URL of the resource.
      *
-     * @param    \Iresults\FS\FilesystemInterface|string $resource Either a filesystem instance or the path of a resource
+     * @param \Iresults\FS\FilesystemInterface|string $resource Either a filesystem instance or the path of a resource
      * @return    string                                            The URL of the resource
      */
     public function getUrlOfResource($resource)
@@ -213,7 +188,7 @@ abstract class AbstractBase implements IresultsBaseInterface
      * Returns the versioned file path for the given file path, or the original
      * file path, if it doesn't exist.
      *
-     * @param    string $filePath The file path to create versions
+     * @param string $filePath The file path to create versions
      * @return    string
      */
     public function createVersionedFilePathForPath($filePath)
@@ -307,7 +282,7 @@ abstract class AbstractBase implements IresultsBaseInterface
     /**
      * Dumps a given variable (or the given variables) wrapped into a 'pre' tag.
      *
-     * @param    mixed $var1
+     * @param mixed $var1
      * @return    string The printed content
      */
     public function pd($var1 = '__iresults_pd_noValue')
@@ -353,7 +328,7 @@ abstract class AbstractBase implements IresultsBaseInterface
         if ($isFullDebugRenderer) {
             switch (self::$_renderer) {
                 case self::RENDERER_KINT:
-                    call_user_func_array(array('Kint', 'dump'), $args);
+                    call_user_func_array(['Kint', 'dump'], $args);
                     break;
             }
         }
@@ -484,9 +459,9 @@ abstract class AbstractBase implements IresultsBaseInterface
     /**
      * Outputs the given string, taking the current environment into account.
      *
-     * @param    string  $message     The message to output
-     * @param    string  $color       An optional ASCII color to apply
-     * @param    boolean $insertBreak Insert a line break
+     * @param string  $message     The message to output
+     * @param string  $color       An optional ASCII color to apply
+     * @param boolean $insertBreak Insert a line break
      * @return    void
      */
     public function say($message, $color = null, $insertBreak = true)
@@ -500,6 +475,7 @@ abstract class AbstractBase implements IresultsBaseInterface
                     $message .= PHP_EOL;
                 }
                 fwrite(STDOUT, $message); // Use fwrite and return
+
                 return;
             case $this->getOutputFormat() === self::OUTPUT_FORMAT_JSON:
 //				$message = json_encode(array('output' => $message)) . PHP_EOL;
@@ -523,7 +499,7 @@ abstract class AbstractBase implements IresultsBaseInterface
     /**
      * Sets the debug renderer used by pd()
      *
-     * @param    integer|Iresults::RENDERER $debugRenderer The debug renderer as one of the RENDERER constants
+     * @param integer|Iresults::RENDERER $debugRenderer The debug renderer as one of the RENDERER constants
      * @return    integer|Iresults::RENDERER    Returns the former configuration
      */
     public function setDebugRenderer($debugRenderer)
@@ -600,7 +576,7 @@ abstract class AbstractBase implements IresultsBaseInterface
     /**
      * Set the static $willDebug to the given flag.
      *
-     * @param    boolean $flag
+     * @param boolean $flag
      * @return    boolean    Returns the former setting
      */
     public function forceDebug($flag = true)
@@ -831,7 +807,7 @@ abstract class AbstractBase implements IresultsBaseInterface
     /**
      * Returns a description of the given value.
      *
-     * @param    mixed $value The value to describe
+     * @param mixed $value The value to describe
      * @return    string    The description text
      */
     public function descriptionOfValue($value)
@@ -845,7 +821,7 @@ abstract class AbstractBase implements IresultsBaseInterface
          */
         $hash = null;
         if (!$descCache) {
-            $descCache = array();
+            $descCache = [];
         }
         if (is_object($value)) {
             $hash = spl_object_hash($value);
@@ -860,7 +836,7 @@ abstract class AbstractBase implements IresultsBaseInterface
         }
 
         if (is_array($value) || $value instanceof \Traversable) {
-            $elementContainer = array();
+            $elementContainer = [];
             foreach ($value as $key => $element) {
                 $elementContainer[] = ($key && is_string($key) ? "$key: " : '') . $this->descriptionOfValue($element);
             }
@@ -886,7 +862,7 @@ abstract class AbstractBase implements IresultsBaseInterface
      * FALSE. If no key is given, the whole configuration array will be
      * returned.
      *
-     * @param    string $key The key for a configuration entry
+     * @param string $key The key for a configuration entry
      * @return    array|mixed    The whole configuration array, or the key's entry or FALSE for an unfound key
      */
     public function getConfiguration($key = null)
@@ -904,8 +880,8 @@ abstract class AbstractBase implements IresultsBaseInterface
     /**
      * Overwrite the configuration at the given key with the new value.
      *
-     * @param    string $key   The key of the configuration to change
-     * @param    mixed  $value The new configuration value
+     * @param string $key   The key of the configuration to change
+     * @param mixed  $value The new configuration value
      * @return    void
      */
     public function setConfiguration($key, $value)
@@ -940,8 +916,8 @@ abstract class AbstractBase implements IresultsBaseInterface
      *
      * This method will be used for exception handling in CLI environment
      *
-     * @param    \Exception $exception The exception to handle
-     * @param    boolean    $graceful  Set to TRUE if the handler should not stop the PHP script
+     * @param \Exception $exception The exception to handle
+     * @param boolean    $graceful  Set to TRUE if the handler should not stop the PHP script
      * @return        void
      */
     public function handleException($exception, $graceful = false)

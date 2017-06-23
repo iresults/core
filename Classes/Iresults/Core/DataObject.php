@@ -1,28 +1,6 @@
 <?php
-namespace Iresults\Core;
 
-/*
- * The MIT License (MIT)
- * Copyright (c) 2013 Andreas Thurnheer-Meier <tma@iresults.li>, iresults
- *
- * Permission is hereby granted, free of charge, to any person obtaining a copy
- * of this software and associated documentation files (the "Software"), to deal
- * in the Software without restriction, including without limitation the rights
- * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
- * copies of the Software, and to permit persons to whom the Software is
- * furnished to do so, subject to the following conditions:
- *
- * The above copyright notice and this permission notice shall be included in
- * all copies or substantial portions of the Software.
- *
- * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
- * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
- * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
- * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
- * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
- * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
- * SOFTWARE.
- */
+namespace Iresults\Core;
 
 use Iresults\Core\Exception\UndefinedMethod;
 use Iresults\Core\Helpers\ObjectHelper;
@@ -45,7 +23,7 @@ class DataObject implements \ArrayAccess, \JsonSerializable, KVCInterface
      *
      * @var array
      */
-    protected $data = array();
+    protected $data = [];
 
     /**
      * The constructor
@@ -53,7 +31,7 @@ class DataObject implements \ArrayAccess, \JsonSerializable, KVCInterface
      * @param array  $data         Data to store in the object
      * @param string $virtualClass Virtual class name for the object
      */
-    public function __construct(array $data = array(), $virtualClass = '')
+    public function __construct(array $data = [], $virtualClass = '')
     {
         $this->data = $data;
         $this->virtualClass = $virtualClass ?: get_class($this);
@@ -77,7 +55,7 @@ class DataObject implements \ArrayAccess, \JsonSerializable, KVCInterface
     /**
      * Returns the value of the property at the given key path
      *
-     * @param    string $propertyPath The property key path to resolve in the format "object.property"
+     * @param string $propertyPath The property key path to resolve in the format "object.property"
      * @return    mixed
      */
     public function getObjectForKeyPath($propertyPath)
@@ -108,8 +86,8 @@ class DataObject implements \ArrayAccess, \JsonSerializable, KVCInterface
     /**
      * Sets the value for the property identified by a given key path.
      *
-     * @param    string $propertyPath The property key path in the form (object.property)
-     * @param    mixed  $object       The new value to assign
+     * @param string $propertyPath The property key path in the form (object.property)
+     * @param mixed  $object       The new value to assign
      * @return    void
      */
     public function setObjectForKeyPath($propertyPath, $object)

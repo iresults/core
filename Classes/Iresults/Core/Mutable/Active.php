@@ -1,28 +1,6 @@
 <?php
-namespace Iresults\Core\Mutable;
 
-    /*
-     * The MIT License (MIT)
-     * Copyright (c) 2013 Andreas Thurnheer-Meier <tma@iresults.li>, iresults
-     *
-     * Permission is hereby granted, free of charge, to any person obtaining a copy
-     * of this software and associated documentation files (the "Software"), to deal
-     * in the Software without restriction, including without limitation the rights
-     * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-     * copies of the Software, and to permit persons to whom the Software is
-     * furnished to do so, subject to the following conditions:
-     *
-     * The above copyright notice and this permission notice shall be included in
-     * all copies or substantial portions of the Software.
-     *
-     * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-     * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-     * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-     * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-     * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-     * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
-     * SOFTWARE.
-     */
+namespace Iresults\Core\Mutable;
 
 
 /**
@@ -52,7 +30,7 @@ class Active extends \Iresults\Core\Mutable\AutoExpanding
     /**
      * Sets a properties data.
      *
-     * @param    string $key
+     * @param string $key
      * @return    void
      */
     public function __set($key, $value)
@@ -66,7 +44,7 @@ class Active extends \Iresults\Core\Mutable\AutoExpanding
     /**
      * Returns a properties data.
      *
-     * @param    string $key
+     * @param string $key
      * @return    mixed
      */
     public function __get($key)
@@ -83,7 +61,7 @@ class Active extends \Iresults\Core\Mutable\AutoExpanding
      *
      * Invoked when unset() is used on inaccessible properties.
      *
-     * @param    string $key The property to delete
+     * @param string $key The property to delete
      * @return    void
      */
     public function __unset($key)
@@ -97,14 +75,14 @@ class Active extends \Iresults\Core\Mutable\AutoExpanding
     /**
      * Create a new property with the given key and value.
      *
-     * @param    string $key   The key for the property which should be created
-     * @param    mixed  $value The value for the new property
+     * @param string $key   The key for the property which should be created
+     * @param mixed  $value The value for the new property
      * @return    mixed    Returns the result from the delegated calls
      */
     public function createProperty($key, $value)
     {
         if ($this->createCallback) {
-            $arguments = array($key, $value, $this);
+            $arguments = [$key, $value, $this];
 
             return call_user_func_array($this->createCallback, $arguments);
         } else {
@@ -120,14 +98,14 @@ class Active extends \Iresults\Core\Mutable\AutoExpanding
     /**
      * Remove a the given property.
      *
-     * @param    string $key The key for the property which should be removed
+     * @param string $key The key for the property which should be removed
      * @return    mixed    Returns the result from the delegated calls
      */
     public function removeProperty($key)
     {
         if ($this->removeCallback) {
             $oldValue = $this->getObjectForKey($key);
-            $arguments = array($key, $oldValue, $this);
+            $arguments = [$key, $oldValue, $this];
 
             return call_user_func_array($this->removeCallback, $arguments);
         } else {

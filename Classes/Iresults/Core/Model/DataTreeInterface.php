@@ -1,28 +1,7 @@
 <?php
+
 namespace Iresults\Core\Model;
 
-    /*
-     * The MIT License (MIT)
-     * Copyright (c) 2013 Andreas Thurnheer-Meier <tma@iresults.li>, iresults
-     *
-     * Permission is hereby granted, free of charge, to any person obtaining a copy
-     * of this software and associated documentation files (the "Software"), to deal
-     * in the Software without restriction, including without limitation the rights
-     * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-     * copies of the Software, and to permit persons to whom the Software is
-     * furnished to do so, subject to the following conditions:
-     *
-     * The above copyright notice and this permission notice shall be included in
-     * all copies or substantial portions of the Software.
-     *
-     * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-     * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-     * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-     * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-     * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-     * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
-     * SOFTWARE.
-     */
 use InvalidArgumentException;
 
 
@@ -45,8 +24,8 @@ interface DataTreeInterface extends \Iresults\Core\Model\PathAccessInterface
      * The object itself will be set at path 0 and the objects at the given
      * property key path as children of path 0.
      *
-     * @param    object $object          The object from which the data will be read, using the property key path
-     * @param    string $propertyKeyPath The property key path to the object's children
+     * @param object $object          The object from which the data will be read, using the property key path
+     * @param string $propertyKeyPath The property key path to the object's children
      * @return    \Iresults\Core\Model\DataTree
      */
     public function initWithObjectAndProperty($object, $propertyKeyPath = 'children');
@@ -92,7 +71,7 @@ interface DataTreeInterface extends \Iresults\Core\Model\PathAccessInterface
      *
      * The path 1.2.0 would return the object in square brackets.
      *
-     * @param    string $path The path to the object
+     * @param string $path The path to the object
      * @return    object    The object at the given path, or NULL if none exists
      *
      * public function getObjectAtPath($path);
@@ -138,8 +117,8 @@ interface DataTreeInterface extends \Iresults\Core\Model\PathAccessInterface
      *
      * An exception would be thrown when setting the path 1.0.0.
      *
-     * @param    string $path   The path to set
-     * @param    object $object The new object
+     * @param string $path   The path to set
+     * @param object $object The new object
      * @return    void
      *
      * @throws InvalidArgumentException if the given value is not an object.
@@ -165,7 +144,7 @@ interface DataTreeInterface extends \Iresults\Core\Model\PathAccessInterface
      *
      * The path 1.2.0 would return TRUE.
      *
-     * @param    string $path The path to the object
+     * @param string $path The path to the object
      * @return    boolean    TRUE if an object exists at the given path, otherwise FALSE
      *
      * public function hasObjectAtPath($path);
@@ -184,7 +163,7 @@ interface DataTreeInterface extends \Iresults\Core\Model\PathAccessInterface
      *
      * The path 1 would return the objects 1.0, 1.1 and 1.2.
      *
-     * @param    string $path The path to the parent object
+     * @param string $path The path to the parent object
      * @return    array<object> The child objects of the given path
      *
      * @throws \Iresults\Core\Model\PathAccess\Exception\EntryNotFound if no object exists at the path.
@@ -234,7 +213,7 @@ interface DataTreeInterface extends \Iresults\Core\Model\PathAccessInterface
      *       )
      *  )
      *
-     * @param    string $path The path to the parent object
+     * @param string $path The path to the parent object
      * @return    array<array<...>>    An array of arrays of objects
      */
     public function getChildObjectsAtPathRecursive($path);
@@ -252,8 +231,8 @@ interface DataTreeInterface extends \Iresults\Core\Model\PathAccessInterface
      *
      * If a child object is added to path 1, the path 1.2 would be created.
      *
-     * @param    string $path   The path to the parent object
-     * @param    object $object The new object
+     * @param string $path   The path to the parent object
+     * @param object $object The new object
      * @return    string The path to the added object
      *
      * @throws \Iresults\Core\Model\PathAccess\Exception\EntryNotFound if no object exists at the path to the parent object.
@@ -275,8 +254,8 @@ interface DataTreeInterface extends \Iresults\Core\Model\PathAccessInterface
      * If a child object is added to the parent object 1, the path 1.2 would be
      * created.
      *
-     * @param    object $child  The child object to add
-     * @param    object $parent The parent object
+     * @param object $child  The child object to add
+     * @param object $parent The parent object
      * @return    string The path to the added object
      *
      * @throws \Iresults\Core\Model\PathAccess\Exception\EntryNotFound if the parent object doesn't exist in the tree.
@@ -288,9 +267,9 @@ interface DataTreeInterface extends \Iresults\Core\Model\PathAccessInterface
      * Adds the given object's children (defined through the given property) as
      * tree node children at the given tree path.
      *
-     * @param    object $object          The object to get the children from
-     * @param    string $propertyKeyPath The property key path to the object's children
-     * @param    string $treePath        The path to the node where the children should be attached
+     * @param object $object          The object to get the children from
+     * @param string $propertyKeyPath The property key path to the object's children
+     * @param string $treePath        The path to the node where the children should be attached
      * @return    void
      */
     public function addChildrenFromObjectAtPropertyToTreeAtPath(
@@ -306,7 +285,7 @@ interface DataTreeInterface extends \Iresults\Core\Model\PathAccessInterface
     /**
      * Returns the parent object of the given object.
      *
-     * @param    object $object A object in the tree
+     * @param object $object A object in the tree
      * @return    object    The object's parent object
      *
      * @throws \Iresults\Core\Model\PathAccess\Exception\EntryNotFound if the object doesn't exist in the tree.
@@ -316,7 +295,7 @@ interface DataTreeInterface extends \Iresults\Core\Model\PathAccessInterface
     /**
      * Returns the child objects of the given object.
      *
-     * @param    object $object A object in the tree
+     * @param object $object A object in the tree
      * @return    array<object>    The object's children
      *
      * @throws \Iresults\Core\Model\PathAccess\Exception\EntryNotFound if the object doesn't exist in the tree.
@@ -343,7 +322,7 @@ interface DataTreeInterface extends \Iresults\Core\Model\PathAccessInterface
      * If the object at 1.2.0 is passed, a dictionary of the objects in curly
      * brackets will be returned.
      *
-     * @param    string $path The path to the object
+     * @param string $path The path to the object
      * @return    array<object>    The branch to the path
      *
      * @throws \Iresults\Core\Model\PathAccess\Exception\EntryNotFound if the no object exists at the given path.
@@ -355,7 +334,7 @@ interface DataTreeInterface extends \Iresults\Core\Model\PathAccessInterface
      *
      * @see getBranchToPath()
      *
-     * @param    object $object A object in the tree
+     * @param object $object A object in the tree
      * @return    array<object>    The branch to the object
      *
      * @throws \Iresults\Core\Model\PathAccess\Exception\EntryNotFound if the object doesn't exist in the tree.
@@ -370,13 +349,13 @@ interface DataTreeInterface extends \Iresults\Core\Model\PathAccessInterface
      *
      * @see getBranchOfObjectsWithProperties()
      *
-     * @param    string $propertyKey The property key to look for
-     * @param           array        <mixed> $propertyValues    The property values to look for
-     * @param           array        <Error> $errors Reference to an array that will be filled with errors that occure
+     * @param string $propertyKey The property key to look for
+     * @param        array        <mixed> $propertyValues    The property values to look for
+     * @param        array        <Error> $errors Reference to an array that will be filled with errors that occure
      *
      * @return    array<object>    The branch to the object
      */
-    public function getBranchOfObjectsWithPropertyKeyAndValues($propertyKey, $propertyValues, &$errors = array());
+    public function getBranchOfObjectsWithPropertyKeyAndValues($propertyKey, $propertyValues, &$errors = []);
 
     /**
      * Returns a dictionary of objects that build the branch defined in the
@@ -386,8 +365,8 @@ interface DataTreeInterface extends \Iresults\Core\Model\PathAccessInterface
      *
      * Example:
      *
-     * @param    array <mixed> $properties   A dictionary of property keys and values the objects are tested for
-     * @param    array <Error> $errors Reference to an array that will be filled with errors that occure
+     * @param array <mixed> $properties   A dictionary of property keys and values the objects are tested for
+     * @param array <Error> $errors Reference to an array that will be filled with errors that occure
      *
      * @return    array<object>    The branch to the object
      */
@@ -411,8 +390,8 @@ interface DataTreeInterface extends \Iresults\Core\Model\PathAccessInterface
      * The object itself will be set at path 0 and the objects at the given
      * property key path as children of path 0.
      *
-     * @param    object $object          The object from which the data will be read, using the property key path
-     * @param    string $propertyKeyPath The property key path to the object's children
+     * @param object $object          The object from which the data will be read, using the property key path
+     * @param string $propertyKeyPath The property key path to the object's children
      * @return    \Iresults\Core\Model\DataTree
      */
     static public function treeWithObjectAndProperty($object, $propertyKeyPath = 'children');

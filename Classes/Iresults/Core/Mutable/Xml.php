@@ -1,28 +1,6 @@
 <?php
-namespace Iresults\Core\Mutable;
 
-/*
- * The MIT License (MIT)
- * Copyright (c) 2013 Andreas Thurnheer-Meier <tma@iresults.li>, iresults
- *
- * Permission is hereby granted, free of charge, to any person obtaining a copy
- * of this software and associated documentation files (the "Software"), to deal
- * in the Software without restriction, including without limitation the rights
- * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
- * copies of the Software, and to permit persons to whom the Software is
- * furnished to do so, subject to the following conditions:
- *
- * The above copyright notice and this permission notice shall be included in
- * all copies or substantial portions of the Software.
- *
- * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
- * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
- * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
- * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
- * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
- * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
- * SOFTWARE.
- */
+namespace Iresults\Core\Mutable;
 
 use DOMDocument;
 use Iresults\Core\Error;
@@ -114,7 +92,7 @@ class Xml extends \Iresults\Core\Mutable
             $xmlError = libxml_get_last_error();
             if ($xmlString) {
                 $xmlDebugString = '';
-                $xmlString = str_replace(array("\r", "\r\n", "\n"), PHP_EOL, $xmlString);
+                $xmlString = str_replace(["\r", "\r\n", "\n"], PHP_EOL, $xmlString);
                 $xmlStringParts = explode(PHP_EOL, $xmlString);
                 foreach ($xmlStringParts as $lineNumber => $xmlLine) {
                     $xmlDebugString .= '#' . ($lineNumber + 1) . ": \t $xmlLine" . PHP_EOL;
@@ -123,9 +101,9 @@ class Xml extends \Iresults\Core\Mutable
             }
             if ($xmlError === false) {
                 $xmlError = "Couldn't detect the XML error (This may be because of a timeout or a firewall)";
-                throw Error::errorWithMessageCodeAndUserInfo($xmlError, 1337692752, array($xmlError));
+                throw Error::errorWithMessageCodeAndUserInfo($xmlError, 1337692752, [$xmlError]);
             }
-            throw Error::errorWithMessageCodeAndUserInfo($xmlError->message, $xmlError->code, array($xmlError));
+            throw Error::errorWithMessageCodeAndUserInfo($xmlError->message, $xmlError->code, [$xmlError]);
         }
 
         $this->_addXmlDataToObject($xmlDoc, $this, $xmlDoc->getName());
@@ -164,12 +142,12 @@ class Xml extends \Iresults\Core\Mutable
                 }
             }
             $currentDataString = str_replace(
-                array(
+                [
                     '<?xml version=\'1.0\'' . $encodingString . '?>',
                     '<?xml version="1.0"' . $encodingString . '?>',
                     '<iresults_mutable_xml_root>',
                     '</iresults_mutable_xml_root>',
-                ),
+                ],
                 '',
                 $currentDataString
             );
@@ -194,12 +172,12 @@ class Xml extends \Iresults\Core\Mutable
             }
         }
         $xmlString = str_replace(
-            array(
+            [
                 '<?xml version=\'1.0\'' . $encodingString . '?>',
                 '<?xml version="1.0"' . $encodingString . '?>',
                 '<iresults_mutable_xml_root>',
                 '</iresults_mutable_xml_root>',
-            ),
+            ],
             '',
             $xmlString
         );
@@ -216,9 +194,9 @@ class Xml extends \Iresults\Core\Mutable
      * Sets the data from the given XML node as the properties of the mutable
      * object.
      *
-     * @param    SimpleXMLElement       $data       The XML node to process
-     * @param    \Iresults\Core\Mutable $object     The object whose properties to set
-     * @param    string                 $objectName The node name of the given object
+     * @param SimpleXMLElement       $data       The XML node to process
+     * @param \Iresults\Core\Mutable $object     The object whose properties to set
+     * @param string                 $objectName The node name of the given object
      * @return    void
      */
     protected function _addXmlDataToObject($data, \Iresults\Core\Mutable $object, $objectName = '')
@@ -237,7 +215,7 @@ class Xml extends \Iresults\Core\Mutable
             if ($object->getObjectForKey($key)) {
                 $oldChild = $object->getObjectForKey($key);
                 if (!is_array($oldChild) || $oldChild instanceof Traversable) {
-                    $oldChild = array($oldChild);
+                    $oldChild = [$oldChild];
                 }
                 $oldChild[] = $this->_getRepresentationForNode($currentChild);
                 $object->setObjectForKey($key, $oldChild);
@@ -247,7 +225,7 @@ class Xml extends \Iresults\Core\Mutable
             } elseif ($objectName && $automaticFeaturesEnabledLocal &&
                 $this->_checkIfNamesIndicateThatTheChildIsACollection($objectName, $key)
             ) {
-                $collection = array();
+                $collection = [];
                 $collection[] = $this->_getRepresentationForNode($currentChild);
                 $object->setObjectForKey($key, $collection);
                 /*
@@ -265,8 +243,8 @@ class Xml extends \Iresults\Core\Mutable
      * Collects all the attributes of the given node and sets it as the objects
      * attribute-property.
      *
-     * @param    SimpleXMLElement       $data   The XML node to process
-     * @param    \Iresults\Core\Mutable $object The object whose property to set
+     * @param SimpleXMLElement       $data   The XML node to process
+     * @param \Iresults\Core\Mutable $object The object whose property to set
      * @return    void
      */
     protected function _addXmlAttributesToObject($data, \Iresults\Core\Mutable $object)
@@ -277,7 +255,7 @@ class Xml extends \Iresults\Core\Mutable
 
         $attributesXml = $data->attributes();
         if ($attributesXml->count()) {
-            $attributes = array();
+            $attributes = [];
             foreach ($attributesXml as $key => $attribute) {
                 $key = $this->_prepareKeyOfNode($key);
                 if (self::$useAtNotationForAttributes) { // Set the value directly
@@ -299,7 +277,7 @@ class Xml extends \Iresults\Core\Mutable
      * Returns a representation of the given XML node which may be set as the
      * property of the mutable object.
      *
-     * @param    SimpleXMLElement $node The node to get a representation of
+     * @param SimpleXMLElement $node The node to get a representation of
      * @return    mixed
      */
     protected function _getRepresentationForNode($node)
@@ -353,12 +331,12 @@ class Xml extends \Iresults\Core\Mutable
      * The node which is identified by the given key is passed too, this may be
      * used in subclasses.
      *
-     * @param    string $key The key to prepare
+     * @param string $key The key to prepare
      * @return string
      */
     protected function _prepareKeyOfNode($key)
     {
-        $key = str_replace(array('/', ',', '|', '\\'), '_', $key);
+        $key = str_replace(['/', ',', '|', '\\'], '_', $key);
         if (self::$keyTransformFormat !== StringTool::FORMAT_KEEP) {
             return StringTool::transformStringToFormat($key, self::$keyTransformFormat);
         }
@@ -369,7 +347,7 @@ class Xml extends \Iresults\Core\Mutable
     /**
      * Prepares the XML string before it is passed through simplexml_load_string().
      *
-     * @param    string $xmlString
+     * @param string $xmlString
      * @return    string
      */
     protected function _prepareXmlString($xmlString)
@@ -386,7 +364,7 @@ class Xml extends \Iresults\Core\Mutable
      * class will be returned or TRUE if useEmptyMutableForSelfClosingTags is
      * disabled.
      *
-     * @param    SimpleXMLElement $node The node
+     * @param SimpleXMLElement $node The node
      * @return    mixed
      */
     protected function _createEndPointOfNode($node)
@@ -413,7 +391,7 @@ class Xml extends \Iresults\Core\Mutable
     /**
      * Creates and returns a new sub object
      *
-     * @param    SimpleXMLElement $node The corresponding XML node is passed for handling in subclasses
+     * @param SimpleXMLElement $node The corresponding XML node is passed for handling in subclasses
      *
      * @return    \Iresults\Core\Mutable\Xml|object
      */
@@ -435,10 +413,10 @@ class Xml extends \Iresults\Core\Mutable
      *
      * @see _checkIfNamesIndicateThatTheChildIsACollection()
      *
-     * @param    \Iresults\Core\Mutable $parent     The parent node
-     * @param    mixed                  $child      The child node
-     * @param    string                 $parentName The node name of the parent
-     * @param    string                 $childName  The node name of the child
+     * @param \Iresults\Core\Mutable $parent     The parent node
+     * @param mixed                  $child      The child node
+     * @param string                 $parentName The node name of the parent
+     * @param string                 $childName  The node name of the child
      * @return    boolean    Returns TRUE if the child should be an array
      */
     protected function _checkIfChildShouldBeACollection($parent, $child, $parentName, $childName)
@@ -477,8 +455,8 @@ class Xml extends \Iresults\Core\Mutable
      *  parent: 'category'
      *  child: 'categories'
      *
-     * @param    string $parentName The node name of the parent
-     * @param    string $childName  The node name of the child
+     * @param string $parentName The node name of the parent
+     * @param string $childName  The node name of the child
      * @return    boolean    Returns TRUE if the child should be an array
      */
     protected function _checkIfNamesIndicateThatTheChildIsACollection($parentName, $childName)
@@ -514,7 +492,7 @@ class Xml extends \Iresults\Core\Mutable
     /**
      * Returns a properties data
      *
-     * @param    string $name
+     * @param string $name
      * @return    mixed
      */
     public function __get($name)
@@ -536,7 +514,7 @@ class Xml extends \Iresults\Core\Mutable
     /**
      * Sets the configuration of useAtNotationForAttributes.
      *
-     * @param    boolean $flag
+     * @param boolean $flag
      * @return    void
      */
     static public function setUseAtNotation($flag)
@@ -557,7 +535,7 @@ class Xml extends \Iresults\Core\Mutable
     /**
      * Sets the configuration of keyTransformFormat.
      *
-     * @param    integer|\Iresults\Core\Tools\StringTool::FORMAT $format The format to transform to
+     * @param integer|\Iresults\Core\Tools\StringTool::FORMAT $format The format to transform to
      *
      * @return    void
      */
@@ -579,7 +557,7 @@ class Xml extends \Iresults\Core\Mutable
     /**
      * Sets the configuration of useEmptyMutableForSelfClosingTags.
      *
-     * @param    boolean $flag
+     * @param boolean $flag
      * @return    void
      */
     static public function setUseEmptyMutableForSelfClosingTags($flag)
@@ -600,7 +578,7 @@ class Xml extends \Iresults\Core\Mutable
     /**
      * Sets the configuration of trimStringInputs.
      *
-     * @param    boolean $flag
+     * @param boolean $flag
      * @return    void
      */
     static public function setTrimStringInputs($flag)
@@ -623,7 +601,7 @@ class Xml extends \Iresults\Core\Mutable
      *
      * @see getAutomaticFeaturesEnabled()
      *
-     * @param    boolean $flag
+     * @param boolean $flag
      * @return    void
      */
     static public function setAutomaticFeaturesEnabled($flag)

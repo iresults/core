@@ -1,28 +1,6 @@
 <?php
-namespace Iresults\Core;
 
-/*
- * The MIT License (MIT)
- * Copyright (c) 2013 Andreas Thurnheer-Meier <tma@iresults.li>, iresults
- *
- * Permission is hereby granted, free of charge, to any person obtaining a copy
- * of this software and associated documentation files (the "Software"), to deal
- * in the Software without restriction, including without limitation the rights
- * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
- * copies of the Software, and to permit persons to whom the Software is
- * furnished to do so, subject to the following conditions:
- *
- * The above copyright notice and this permission notice shall be included in
- * all copies or substantial portions of the Software.
- *
- * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
- * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
- * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
- * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
- * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
- * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
- * SOFTWARE.
- */
+namespace Iresults\Core;
 
 use Iresults\Core\Exception\UndefinedMethod;
 
@@ -59,8 +37,8 @@ abstract class Core implements \Iresults\Core\ObjectInterface
     /**
      * Tries to invoke a dynamically added method.
      *
-     * @param    string $name      The originally called method
-     * @param    array  $arguments The arguments passed to the original method
+     * @param string $name      The originally called method
+     * @param array  $arguments The arguments passed to the original method
      * @return    mixed
      * @throws    UndefinedMethod    If no dynamic method was found
      */
@@ -83,8 +61,8 @@ abstract class Core implements \Iresults\Core\ObjectInterface
     /**
      * Triggered when invoking inaccessible methods in a static context.
      *
-     * @param    string $name      The name of the called function
-     * @param    array  $arguments An enumerated array containing the parameters passed to the inaccessible method
+     * @param string $name      The name of the called function
+     * @param array  $arguments An enumerated array containing the parameters passed to the inaccessible method
      * @return    mixed    The return value
      *
      * @throws UndefinedMethod    If no dynamic method was found
@@ -104,8 +82,8 @@ abstract class Core implements \Iresults\Core\ObjectInterface
      * is compiled after function a() has been added to class A. Please be
      * aware that you should not rely on this behaviour!
      *
-     * @param  string   $methodName
-     * @param  callback $callback
+     * @param string   $methodName
+     * @param callback $callback
      * @return callback    Returns the method for the given name or FALSE
      */
     static public function _instanceMethodForSelector($methodName, $callback = null)
@@ -115,7 +93,7 @@ abstract class Core implements \Iresults\Core\ObjectInterface
          *
          * @var array
          */
-        static $categoryMethods = array();
+        static $categoryMethods = [];
 
         if ($callback) {
             $categoryMethods[$methodName] = $callback;
@@ -156,13 +134,13 @@ abstract class Core implements \Iresults\Core\ObjectInterface
     {
         $args = func_get_args();
 
-        return call_user_func_array(array('\Iresults\Core\Iresults', 'pd'), $args);
+        return call_user_func_array(['\Iresults\Core\Iresults', 'pd'], $args);
     }
 
     /**
      * Prints a given message if the debug level is set to DEBUG_PRINT_LEVEL_ALL.
      *
-     * @param    string|mixed $msg
+     * @param string|mixed $msg
      */
     public function debug($msg, $level = -1)
     {
@@ -205,19 +183,19 @@ abstract class Core implements \Iresults\Core\ObjectInterface
      * Tries to call a method on the delegate or, if the delegate doesn't respond,
      * the method will be tried on $this.
      *
-     * @param    string $method    The name of the method to invoke
-     * @param    array  $arguments Optional arguments to pass to the object
-     * @param    object $object    Optional object to be checked first
+     * @param string $method    The name of the method to invoke
+     * @param array  $arguments Optional arguments to pass to the object
+     * @param object $object    Optional object to be checked first
      * @return    mixed|Core::IR_METHOD_NOT_FOUND
      * @throws \InvalidArgumentException if the arguments are not of type array
      */
-    protected function _callMethodIfExists($method, $arguments = array(), $object = null)
+    protected function _callMethodIfExists($method, $arguments = [], $object = null)
     {
         if ($object !== null && is_object($object)) {
             if (method_exists($object, $method)) {
                 $arguments[] = $this;
 
-                return call_user_func_array(array($object, $method), $arguments);
+                return call_user_func_array([$object, $method], $arguments);
             }
         }
         if ($this->_delegate && is_object($this->_delegate) && method_exists($this->_delegate, $method)) {
@@ -228,12 +206,12 @@ abstract class Core implements \Iresults\Core\ObjectInterface
             }
             $arguments[] = $this;
 
-            return call_user_func_array(array($this->_delegate, $method), $arguments);
+            return call_user_func_array([$this->_delegate, $method], $arguments);
         }
         if (method_exists($this, $method)) {
             $arguments[] = $this;
 
-            return call_user_func_array(array($this, $method), $arguments);
+            return call_user_func_array([$this, $method], $arguments);
         }
 
         return self::IR_METHOD_NOT_FOUND;

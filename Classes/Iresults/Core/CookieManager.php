@@ -1,28 +1,6 @@
 <?php
-namespace Iresults\Core;
 
-    /*
-     * The MIT License (MIT)
-     * Copyright (c) 2013 Andreas Thurnheer-Meier <tma@iresults.li>, iresults
-     *
-     * Permission is hereby granted, free of charge, to any person obtaining a copy
-     * of this software and associated documentation files (the "Software"), to deal
-     * in the Software without restriction, including without limitation the rights
-     * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-     * copies of the Software, and to permit persons to whom the Software is
-     * furnished to do so, subject to the following conditions:
-     *
-     * The above copyright notice and this permission notice shall be included in
-     * all copies or substantial portions of the Software.
-     *
-     * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-     * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-     * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-     * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-     * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-     * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
-     * SOFTWARE.
-     */
+namespace Iresults\Core;
 
 
 /**
@@ -87,7 +65,7 @@ class CookieManager extends \Iresults\Core\Singleton implements \Iresults\Core\K
     /**
      * Returns if an object for the given key exists.
      *
-     * @param    string $key
+     * @param string $key
      * @return    boolean            Returns TRUE if a cookie for key exists, otherwise FALSE
      */
     public function hasObjectForKey($key)
@@ -100,7 +78,7 @@ class CookieManager extends \Iresults\Core\Singleton implements \Iresults\Core\K
     /**
      * Returns the object at the given key.
      *
-     * @param    string $key
+     * @param string $key
      * @return    mixed
      */
     public function getObjectForKey($key)
@@ -116,8 +94,8 @@ class CookieManager extends \Iresults\Core\Singleton implements \Iresults\Core\K
     /**
      * Stores the value of $object at the given key.
      *
-     * @param    string $key
-     * @param    mixed  $object
+     * @param string $key
+     * @param mixed  $object
      * @return    void
      */
     public function setObjectForKey($key, $object)
@@ -128,9 +106,9 @@ class CookieManager extends \Iresults\Core\Singleton implements \Iresults\Core\K
     /**
      * Stores the value of $object at the given key, for the defined lifetime.
      *
-     * @param    string  $key
-     * @param    mixed   $object
-     * @param    integer $lifetime The cookie lifetime in seconds
+     * @param string  $key
+     * @param mixed   $object
+     * @param integer $lifetime The cookie lifetime in seconds
      * @return    void
      */
     public function setObjectForKeyWithLifeTime($key, $object, $lifetime)
@@ -180,7 +158,7 @@ class CookieManager extends \Iresults\Core\Singleton implements \Iresults\Core\K
     /**
      * Removes the object with the given key.
      *
-     * @param    string $key
+     * @param string $key
      * @return    void
      */
     public function removeObjectForKey($key)
@@ -237,8 +215,8 @@ class CookieManager extends \Iresults\Core\Singleton implements \Iresults\Core\K
      * If a second parameter is passed, the function sets the value $object at
      * the key $key.
      *
-     * @param    string $key
-     * @param    mixed  $object
+     * @param string $key
+     * @param mixed  $object
      * @return    mixed
      */
     public function object($key, $object = null)

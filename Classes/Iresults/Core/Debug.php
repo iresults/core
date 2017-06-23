@@ -1,36 +1,10 @@
 <?php
-namespace Iresults\Core;
 
-    /*
-     * The MIT License (MIT)
-     * Copyright (c) 2013 Andreas Thurnheer-Meier <tma@iresults.li>, iresults
-     *
-     * Permission is hereby granted, free of charge, to any person obtaining a copy
-     * of this software and associated documentation files (the "Software"), to deal
-     * in the Software without restriction, including without limitation the rights
-     * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-     * copies of the Software, and to permit persons to whom the Software is
-     * furnished to do so, subject to the following conditions:
-     *
-     * The above copyright notice and this permission notice shall be included in
-     * all copies or substantial portions of the Software.
-     *
-     * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-     * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-     * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-     * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-     * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-     * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
-     * SOFTWARE.
-     */
+namespace Iresults\Core;
 
 
 /**
  * Prints a debug output
- *
- * @author        Daniel Corn <cod@iresults.li>
- * @package       Iresults
- * @subpackage    Iresults
  */
 class Debug
 {
@@ -47,7 +21,7 @@ class Debug
     /**
      * @var array<mixed> A storage for objects that already have been processed.
      */
-    protected $_storage = array();
+    protected $_storage = [];
 
     /**
      * @var string The output.
@@ -70,7 +44,7 @@ class Debug
     /**
      * The constructor takes the object to debug as it's argument
      *
-     * @param    mixed $object
+     * @param mixed $object
      * @return    \Iresults\Core\Debug
      */
     public function __construct($object = null)
@@ -89,13 +63,13 @@ class Debug
     /**
      * Debugs a variable
      *
-     * @param    mixed   $object               The object/variable to debug
-     * @param    boolean $tempIsWebEnvironment Temporarily overwrite the isWebEnvironment configuration
+     * @param mixed   $object               The object/variable to debug
+     * @param boolean $tempIsWebEnvironment Temporarily overwrite the isWebEnvironment configuration
      * @return    $this
      */
     public function debug($object, $tempIsWebEnvironment = -1)
     {
-        $this->_storage = array();
+        $this->_storage = [];
         $this->_output = '';
         $this->_debug($object, $tempIsWebEnvironment);
 
@@ -108,8 +82,8 @@ class Debug
     /**
      * Debugs a variable
      *
-     * @param    mixed   $object               The object/variable to debug
-     * @param    boolean $tempIsWebEnvironment Temporarily overwrite the isWebEnvironment configuration
+     * @param mixed   $object               The object/variable to debug
+     * @param boolean $tempIsWebEnvironment Temporarily overwrite the isWebEnvironment configuration
      * @return    $this
      */
     protected function _debug($object, $tempIsWebEnvironment = -1)
@@ -203,7 +177,7 @@ class Debug
             $this->_currentLevel = $this->_currentLevel - 1;
             $this->_add('}');
             /* MWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWM */
-        } elseif (method_exists($object, '_ir_debug') && is_callable(array($object, '_ir_debug'))) {
+        } elseif (method_exists($object, '_ir_debug') && is_callable([$object, '_ir_debug'])) {
             $properties = $object->_ir_debug();
             $this->_add(get_class($object) . $objectId . ' => {');
             $this->_currentLevel = $this->_currentLevel + 1;
@@ -222,7 +196,7 @@ class Debug
             $dateTime = var_export($object, true);
             $dateTime = str_replace('::__set_state(array(', ' => {', $dateTime);
             $dateTime = str_replace('))', '}', $dateTime);
-            $dateTime = str_replace(array(",\n", ",\r", ",\r\n"), PHP_EOL, $dateTime);
+            $dateTime = str_replace([",\n", ",\r", ",\r\n"], PHP_EOL, $dateTime);
             $this->_add($dateTime);
             /* MWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWM */
         } elseif (is_a($object, 'Tx_Extbase_Error_Message')) {
@@ -309,7 +283,7 @@ class Debug
     /**
      * Adds a text to the output
      *
-     * @param    string  $text
+     * @param string $text
      * @return    void
      */
     protected function _add($text)
@@ -374,7 +348,7 @@ class Debug
     /**
      * Overwrite the environment setting
      *
-     * @param  boolean $isWebEnvironment
+     * @param boolean $isWebEnvironment
      * @return boolean                        Returns the original value
      */
     public function setIsWebEnvironment($isWebEnvironment)

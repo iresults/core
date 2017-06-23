@@ -1,28 +1,6 @@
 <?php
-namespace Iresults\Core\Model\PathAccess;
 
-/*
- * The MIT License (MIT)
- * Copyright (c) 2013 Andreas Thurnheer-Meier <tma@iresults.li>, iresults
- *
- * Permission is hereby granted, free of charge, to any person obtaining a copy
- * of this software and associated documentation files (the "Software"), to deal
- * in the Software without restriction, including without limitation the rights
- * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
- * copies of the Software, and to permit persons to whom the Software is
- * furnished to do so, subject to the following conditions:
- *
- * The above copyright notice and this permission notice shall be included in
- * all copies or substantial portions of the Software.
- *
- * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
- * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
- * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
- * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
- * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
- * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
- * SOFTWARE.
- */
+namespace Iresults\Core\Model\PathAccess;
 
 use Iresults\Core\Helpers\ObjectHelper;
 use Iresults\Core\Iresults;
@@ -59,14 +37,14 @@ abstract class AbstractContainer extends \Iresults\Core\Model implements \Iresul
      *
      * @var array<object>
      */
-    protected $pathToObjectMap = array();
+    protected $pathToObjectMap = [];
 
     /**
      * The dictionary holding the object hashes and the paths to the objects.
      *
      * @var array<string>
      */
-    protected $hashToPathMap = array();
+    protected $hashToPathMap = [];
 
     /**
      * The path separator that separates the individual parts of the path. This defaults to the dot character ('.').
@@ -99,7 +77,7 @@ abstract class AbstractContainer extends \Iresults\Core\Model implements \Iresul
      *
      * The path 1.2.0 would return the object in square brackets.
      *
-     * @param    string $path The path to the object
+     * @param string $path The path to the object
      * @return    object    The object at the given path, or NULL if none exists
      */
     public function getObjectAtPath($path)
@@ -124,8 +102,8 @@ abstract class AbstractContainer extends \Iresults\Core\Model implements \Iresul
      *
      * The path 1.2.0 would point to the object in square brackets.
      *
-     * @param    string $path   The path to set
-     * @param    object $object The new object
+     * @param string $path   The path to set
+     * @param object $object The new object
      * @throws \InvalidArgumentException if the given value is not an object.
      * @throws Exception\DuplicateEntry
      * @return    void
@@ -164,7 +142,7 @@ abstract class AbstractContainer extends \Iresults\Core\Model implements \Iresul
      *
      * The path 1.2.0 would return TRUE.
      *
-     * @param    string $path The path to the object
+     * @param string $path The path to the object
      * @return    boolean    TRUE if an object exists at the given path, otherwise FALSE
      */
     public function hasObjectAtPath($path)
@@ -186,7 +164,7 @@ abstract class AbstractContainer extends \Iresults\Core\Model implements \Iresul
     /**
      * Returns the path to the given object.
      *
-     * @param    object $object A object in the tree
+     * @param object $object A object in the tree
      * @return    string    The path to the given object
      *
      * @throws \Iresults\Core\Model\PathAccess\Exception\EntryNotFound if the object doesn't exist in the tree.
@@ -210,7 +188,7 @@ abstract class AbstractContainer extends \Iresults\Core\Model implements \Iresul
     /**
      * Returns if the object exists in the tree.
      *
-     * @param    object $object The object to search in the tree
+     * @param object $object The object to search in the tree
      * @return    boolean    TRUE if the object is in the tree, otherwise FALSE
      */
     public function containsObject($object)
@@ -237,8 +215,8 @@ abstract class AbstractContainer extends \Iresults\Core\Model implements \Iresul
      * If $isParsed is set to TRUE the given pattern will be treated as regular
      * expression and will not be parsed.
      *
-     * @param    string  $pattern  A path pattern
-     * @param    boolean $isParsed Indicates if the given pattern is already parsed
+     * @param string  $pattern  A path pattern
+     * @param boolean $isParsed Indicates if the given pattern is already parsed
      * @return    array<string>    The matching paths or an empty array if none was found
      */
     public function findAllPathsMatchingPattern($pattern, $isParsed = false)
@@ -269,7 +247,7 @@ abstract class AbstractContainer extends \Iresults\Core\Model implements \Iresul
     /**
      * Returns all the paths that begin with the given prefix
      *
-     * @param    string $prefix The prefix to search for
+     * @param string $prefix The prefix to search for
      * @return    array<string>    The matching paths or an empty array if none was found
      */
     public function findAllPathsWithPrefix($prefix)
@@ -303,8 +281,8 @@ abstract class AbstractContainer extends \Iresults\Core\Model implements \Iresul
      * If $isParsed is set to TRUE the given pattern will be treated as regular
      * expression and will not be parsed.
      *
-     * @param    string  $pattern  A path pattern
-     * @param    boolean $isParsed Indicates if the given pattern is already parsed
+     * @param string  $pattern  A path pattern
+     * @param boolean $isParsed Indicates if the given pattern is already parsed
      * @return    string    The best matching path
      */
     public function findPathMatchingPattern($pattern, $isParsed = false)
@@ -322,13 +300,13 @@ abstract class AbstractContainer extends \Iresults\Core\Model implements \Iresul
      * If $isParsed is set to TRUE the given pattern will be treated as regular
      * expression and will not be parsed.
      *
-     * @param    string  $pattern  A path pattern
-     * @param    boolean $isParsed Indicates if the given pattern is already parsed
+     * @param string  $pattern  A path pattern
+     * @param boolean $isParsed Indicates if the given pattern is already parsed
      * @return    array<object>    The matching objects or an empty array if none was found
      */
     public function findAllObjectsWithPathsMatchingPattern($pattern, $isParsed = false)
     {
-        $foundObjects = array();
+        $foundObjects = [];
         $foundPaths = $this->findAllPathsMatchingPattern($pattern);
         foreach ($foundPaths as $path) {
             $foundObjects['' . $path] = $this->pathToObjectMap['' . $path];
@@ -348,8 +326,8 @@ abstract class AbstractContainer extends \Iresults\Core\Model implements \Iresul
      * If $isParsed is set to TRUE the given pattern will be treated as regular
      * expression and will not be parsed.
      *
-     * @param    string  $pattern  A path pattern
-     * @param    boolean $isParsed Indicates if the given pattern is already parsed
+     * @param string  $pattern  A path pattern
+     * @param boolean $isParsed Indicates if the given pattern is already parsed
      * @return    object    The object with the best matching path
      */
     public function findObjectWithPathMatchingPattern($pattern, $isParsed = false)
@@ -372,13 +350,13 @@ abstract class AbstractContainer extends \Iresults\Core\Model implements \Iresul
      * The path 4.5.3 would return 4.5.1.
      * The path 5.12.4 would return 5.11.3.
      *
-     * @param    string $path The path to find the similar paths to
+     * @param string $path The path to find the similar paths to
      * @return    array<string>    The similar paths or an empty array if none are found
      */
     public function findPathMostSimilarToPath($path)
     {
-        $matchingPaths = array();
-        $matchingPathsParts = array();
+        $matchingPaths = [];
+        $matchingPathsParts = [];
         $currentPath = $path;
         $pathSeparatorL = $this->pathSeparator;
         $levels = substr_count($path, $pathSeparatorL) + 1;
@@ -412,7 +390,7 @@ abstract class AbstractContainer extends \Iresults\Core\Model implements \Iresul
         /*
          * Create the path hashes of the path parts from the comparison base level.
          */
-        $matchingPathsHashes = array();
+        $matchingPathsHashes = [];
         $hashElements = $levels - $comparisonBaseLevel;
         foreach ($matchingPaths as $matchingPath) {
             $pathPartsFromBaseLevel = array_slice(explode($pathSeparatorL, $matchingPath), $comparisonBaseLevel);
@@ -448,7 +426,7 @@ abstract class AbstractContainer extends \Iresults\Core\Model implements \Iresul
      * The path 4.5.3 would return obj3.
      * The path 5.12.4 would return obj4.
      *
-     * @param    string $path The path to find the similar paths to
+     * @param string $path The path to find the similar paths to
      * @return    object    The object with matching with similar paths or an empty array if none are found
      */
     public function findObjectMostSimilarToPath($path)
@@ -465,7 +443,7 @@ abstract class AbstractContainer extends \Iresults\Core\Model implements \Iresul
     /**
      * Returns the path to the parent node of the node at the given path.
      *
-     * @param    string $path A path
+     * @param string $path A path
      * @return    string    The path to the parent
      */
     public function getParentPathOfPath($path)
@@ -486,12 +464,12 @@ abstract class AbstractContainer extends \Iresults\Core\Model implements \Iresul
      * treats the containers paths as patterns and compares them against the
      * given path.
      *
-     * @param    string $path The path to find a matching pattern
+     * @param string $path The path to find a matching pattern
      * @return    array<string>    The matching patterns or an empty array if none was found
      */
     public function findAllPatternsMatchingPath($path)
     {
-        $foundPatterns = array();
+        $foundPatterns = [];
         $patternDelimiterL = $this->patternDelimiter;
 
         // Get all the paths and make sure they are strings.
@@ -518,12 +496,12 @@ abstract class AbstractContainer extends \Iresults\Core\Model implements \Iresul
      * method, but treats the containers paths as patterns and compares them
      * against the given path.
      *
-     * @param    string $path The path to find a matching pattern
+     * @param string $path The path to find a matching pattern
      * @return    array<object>    The objects with matching paths or an empty array if none was found
      */
     public function findAllObjectsWithPatternsMatchingPath($path)
     {
-        $foundObjects = array();
+        $foundObjects = [];
         $foundPatterns = $this->findAllPatternsMatchingPath($path);
         foreach ($foundPatterns as $pattern) {
             $foundObjects[$pattern] = $this->pathToObjectMap[$pattern];
@@ -539,8 +517,8 @@ abstract class AbstractContainer extends \Iresults\Core\Model implements \Iresul
      *
      * Property key paths may also be passed to compare those values.
      *
-     * @param    string $propertyKey   The property key to look for
-     * @param    mixed  $propertyValue The property value to look for
+     * @param string $propertyKey   The property key to look for
+     * @param mixed  $propertyValue The property value to look for
      * @return    array<object>    The objects with matching properties or an empty array if none are found
      */
     public function findObjectsWithProperty($propertyKey, $propertyValue)
@@ -569,7 +547,7 @@ abstract class AbstractContainer extends \Iresults\Core\Model implements \Iresul
     /**
      * Sets the path separator.
      *
-     * @param    string $newValue The new path seperator to use
+     * @param string $newValue The new path seperator to use
      * @return    void
      */
     public function setPathSeparator($newValue)
@@ -590,7 +568,7 @@ abstract class AbstractContainer extends \Iresults\Core\Model implements \Iresul
     /**
      * Sets the pattern delimiter.
      *
-     * @param    string $newValue The new pattern delimiter to use
+     * @param string $newValue The new pattern delimiter to use
      * @return    void
      */
     public function setPatternDelimiter($newValue)
@@ -613,7 +591,7 @@ abstract class AbstractContainer extends \Iresults\Core\Model implements \Iresul
      *    2.*.*.1
      *    *.1.*.1
      *
-     * @param    string $pattern A path pattern to search for
+     * @param string $pattern A path pattern to search for
      * @return    array<object> An array of objects whose path match the given pattern
      */
     //protected function _searchObjectsWithPathLikePattern($pattern) {
@@ -629,7 +607,7 @@ abstract class AbstractContainer extends \Iresults\Core\Model implements \Iresul
      *    2.*.*.1
      *    *.1.*.1
      *
-     * @param    string $pattern A path pattern to search for
+     * @param string $pattern A path pattern to search for
      * @return    array<string> An array of the tree's paths matching the given pattern
      */
     //protected function _searchPathsLikePattern($pattern) {
@@ -658,13 +636,13 @@ abstract class AbstractContainer extends \Iresults\Core\Model implements \Iresul
     /**
      * Returns the path parts at the given level.
      *
-     * @param    array   $paths Reference to the found paths
-     * @param    integer $level The level to get
+     * @param array   $paths Reference to the found paths
+     * @param integer $level The level to get
      * @return    array<string>    An array of path parts
      */
     protected function _getPathPartsOfPathsAtLevel(&$paths, $level)
     {
-        $comparisonLevelPathParts = array();
+        $comparisonLevelPathParts = [];
         $pathSeparatorL = $this->pathSeparator;
         foreach ($paths as $path) {
             $pathParts = explode($pathSeparatorL, $path);
@@ -679,8 +657,8 @@ abstract class AbstractContainer extends \Iresults\Core\Model implements \Iresul
      * Compares the found paths' hashes to the input's path hash and returns the
      * path that fitts the best.
      *
-     * @param    array   $pathHashes    Reference to the path hashes array
-     * @param    integer $inputPathHash The hash of the input path
+     * @param array   $pathHashes    Reference to the path hashes array
+     * @param integer $inputPathHash The hash of the input path
      * @return    string    The path that matches best
      */
     protected function _comparePathHashesToInputPathHash(&$pathHashes, $inputPathHash)
@@ -746,8 +724,8 @@ abstract class AbstractContainer extends \Iresults\Core\Model implements \Iresul
      *  The index of '56' (1) would be returned, because the input is the first
      *  element.
      *
-     * @param    array  $pathParts     Reference to the array of path parts
-     * @param    string $inputPathPart The input path part to search for
+     * @param array  $pathParts     Reference to the array of path parts
+     * @param string $inputPathPart The input path part to search for
      * @return    integer    The index of the best match or -1 on error
      */
     protected function _compareComparisonLevelPathPartsToInputPathPart(&$pathParts, $inputPathPart)
@@ -791,8 +769,8 @@ abstract class AbstractContainer extends \Iresults\Core\Model implements \Iresul
     /**
      * Creates a weighted sum of the given path parts.
      *
-     * @param    array   $pathParts Reference to the path parts array
-     * @param    integer $depth     The number of elements to sum
+     * @param array   $pathParts Reference to the path parts array
+     * @param integer $depth     The number of elements to sum
      * @return    integer    A weighted sum of the array elements values
      */
     protected function _createPathHashOfPathPartsWithDepth(&$pathParts, $depth)
@@ -815,8 +793,8 @@ abstract class AbstractContainer extends \Iresults\Core\Model implements \Iresul
      * Invoked by array_walk inside findAllPathsMatchingPattern() to cast the
      * paths into strings.
      *
-     * @param    mixed $element The path to cast into a string
-     * @param    mixed $key     The array key/index of the element
+     * @param mixed $element The path to cast into a string
+     * @param mixed $key     The array key/index of the element
      * @return    void
      */
     static public function arrayKeysToStringsInArrayWalk(&$element, $key)
@@ -836,9 +814,9 @@ abstract class AbstractContainer extends \Iresults\Core\Model implements \Iresul
      *
      *  !^[1|2][\w|_|\-][\w|_|\-]\.[\w|_|\-]*\.[0|1][\w|_|\-]$!
      *
-     * @param    string $pattern   The pattern with wildcards
-     * @param    string $delimiter !' The pattern delimiter
-     * @param    string $options   The regular expression options that will be applied
+     * @param string $pattern   The pattern with wildcards
+     * @param string $delimiter !' The pattern delimiter
+     * @param string $options   The regular expression options that will be applied
      * @return    string    The transformed regular expression
      */
     static public function wildcardStringToRegularExpression($pattern, $delimiter = self::DELIMITER, $options = '')
@@ -874,15 +852,15 @@ abstract class AbstractContainer extends \Iresults\Core\Model implements \Iresul
      *
      *  (91|92|93|94|95|96|97|98|99|100|101|102|103|104|105|106|107)
      *
-     * @param    string $pattern            The pattern in which to replace the Number Range Expressions
-     * @param    string $numberRangePattern The pattern to find Number Range Expressions
+     * @param string $pattern            The pattern in which to replace the Number Range Expressions
+     * @param string $numberRangePattern The pattern to find Number Range Expressions
      * @return    string
      */
     static public function replaceNumberRangeToRegularExpression(
         $pattern,
         $numberRangePattern = self::PATTERN_NUMBER_RANGE_EXPRESSION
     ) {
-        $foundNumberRange = array();
+        $foundNumberRange = [];
         if (preg_match_all($numberRangePattern, $pattern, $foundNumberRange)) {
             $foundNumberRange = $foundNumberRange[0];
             foreach ($foundNumberRange as $numberRange) {
@@ -902,7 +880,7 @@ abstract class AbstractContainer extends \Iresults\Core\Model implements \Iresul
     /**
      * Returns the regular expression for the given Number Range Expression.
      *
-     * @param    string $numberRange The Number Range
+     * @param string $numberRange The Number Range
      * @return    string
      */
     static public function numberRangeToRegularExpression($numberRange)

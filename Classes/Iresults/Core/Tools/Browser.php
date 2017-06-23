@@ -1,28 +1,6 @@
 <?php
-namespace Iresults\Core\Tools;
 
-    /*
-     * The MIT License (MIT)
-     * Copyright (c) 2013 Andreas Thurnheer-Meier <tma@iresults.li>, iresults
-     *
-     * Permission is hereby granted, free of charge, to any person obtaining a copy
-     * of this software and associated documentation files (the "Software"), to deal
-     * in the Software without restriction, including without limitation the rights
-     * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-     * copies of the Software, and to permit persons to whom the Software is
-     * furnished to do so, subject to the following conditions:
-     *
-     * The above copyright notice and this permission notice shall be included in
-     * all copies or substantial portions of the Software.
-     *
-     * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-     * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-     * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-     * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-     * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-     * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
-     * SOFTWARE.
-     */
+namespace Iresults\Core\Tools;
 
 
 /**
@@ -40,7 +18,7 @@ class Browser extends \Iresults\Core\Model
 {
     protected $host = '';
 
-    protected $accept = array();
+    protected $accept = [];
 
     protected $cacheControl = '';
 
@@ -50,7 +28,7 @@ class Browser extends \Iresults\Core\Model
 
     protected $acceptLanguage = '';
 
-    protected $acceptEncoding = array();
+    protected $acceptEncoding = [];
 
     protected $cookie = '';
 
@@ -67,7 +45,7 @@ class Browser extends \Iresults\Core\Model
     protected $name = '';
 
 
-    static public $knownBrowsers = array(
+    static public $knownBrowsers = [
         'IE',
         'MSIE',
         'Firefox',
@@ -78,15 +56,15 @@ class Browser extends \Iresults\Core\Model
         'Netscape',
         'Konqueror',
         'Gecko',
-    );
+    ];
 
 
     /**
      * The constructor
      *
-     * @param    array $parameters Optional parameters to pass to the constructor
+     * @param array $parameters Optional parameters to pass to the constructor
      */
-    public function __construct(array $parameters = array())
+    public function __construct(array $parameters = [])
     {
         parent::__construct($parameters);
 
@@ -133,14 +111,14 @@ class Browser extends \Iresults\Core\Model
     /**
      * Die Methode bietet einen Ersatz für die in PHP integrierte Funktion get_browser().
      *
-     * @param    unknown_type $agent
+     * @param unknown_type $agent
      * @return    multitype:|multitype:NULL
      */
     protected function _browserInfo($agent = null)
     {
         // Declare known browsers to look for
         $known = self::$knownBrowsers;
-        $knownLC = array();
+        $knownLC = [];
         foreach ($known as $knownBrowser) {
             $knownLC[] = strtolower($knownBrowser);
         }
@@ -155,7 +133,7 @@ class Browser extends \Iresults\Core\Model
 
         // Find all phrases (or return empty array if none found)
         if (!preg_match_all($pattern, $agent, $matches)) {
-            return array();
+            return [];
         }
 
 
@@ -171,13 +149,13 @@ class Browser extends \Iresults\Core\Model
         $this->name = self::$knownBrowsers[$oldBrowserId];
         $version = $this->_parseVersion($agent);
 
-        return array($this->name => $version);
+        return [$this->name => $version];
     }
 
     /**
      * Parses the version of the client's browser.
      *
-     * @param    string $agent The agent string
+     * @param string $agent The agent string
      * @return    string    Returns the detected version
      */
     protected function _parseVersion($agent)
@@ -209,7 +187,7 @@ class Browser extends \Iresults\Core\Model
          * 5.0 (Macintosh; U; Intel Mac OS X 10_6_4; en-US) AppleWebKit/533.4 (KHTML, like Gecko) Iron/5.0.381.0 Chrome/5.0.381 Safari/533.4
          *
          */
-        $results = array();
+        $results = [];
         $pattern = "";
         $name = $this->name;
         $i = 'i';
@@ -223,7 +201,7 @@ class Browser extends \Iresults\Core\Model
                 return;
             }
 
-            $this->version = str_replace(array('Version/', 'version/'), '', $results[0][0]);
+            $this->version = str_replace(['Version/', 'version/'], '', $results[0][0]);
 
         } elseif ($name == 'IE' || $name == 'MSIE') { // Pattern 2: "MSIE 7.0" => IE
             $pattern = '!MSIE [0-9]*!i';
@@ -231,7 +209,7 @@ class Browser extends \Iresults\Core\Model
                 return;
             }
 
-            $this->version = str_replace(array('MSIE ', 'msie '), '', $results[0][0]);
+            $this->version = str_replace(['MSIE ', 'msie '], '', $results[0][0]);
 
         } elseif ($name == 'Firefox' || $name == 'Chrome') { // Pattern 3: "Firefox/3.6.3" => Firefox, Chrome, Iron
             $pattern = '/' . $name . '\/[\d|.]*/i';
@@ -239,7 +217,7 @@ class Browser extends \Iresults\Core\Model
                 return;
             }
 
-            $this->version = str_replace(array($name . '/', strtolower($name) . '/'), '', $results[0][0]);
+            $this->version = str_replace([$name . '/', strtolower($name) . '/'], '', $results[0][0]);
 
         } elseif ($name == 'Opera') { // Pattern 4: "9.80 " => Opera
             $pattern = '!\/[\d|.]*!i';
@@ -260,7 +238,7 @@ class Browser extends \Iresults\Core\Model
     /**
      * Die Methode ermittelt das Betriebssystem des Clients.
      *
-     * @param    string $agent
+     * @param string $agent
      * @return    string
      */
     protected function _getPlatform($agent = null)
@@ -347,7 +325,7 @@ class Browser extends \Iresults\Core\Model
     /**
      * Die Methode überprüft ob das Client-OS dem übergebenen Parameter entspricht.
      *
-     * @param    string $osSpec mac|win|linux|iphone|ipod
+     * @param string $osSpec mac|win|linux|iphone|ipod
      * @return    boolean|boolean
      */
     static public function osIsFromString($osSpec)
@@ -446,7 +424,7 @@ class Browser extends \Iresults\Core\Model
     /**
      * Die Methode überprüft ob der Browser dem übergebenen String entspricht.
      *
-     * @param    string $browserStr msie|firefox|safari|webkit|opera|netscape|konqueror|gecko
+     * @param string $browserStr msie|firefox|safari|webkit|opera|netscape|konqueror|gecko
      * @return    boolean
      */
     static public function browserIsFromString($browserStr)

@@ -1,28 +1,6 @@
 <?php
-namespace Iresults\Core\System;
 
-/*
- * The MIT License (MIT)
- * Copyright (c) 2013 Andreas Thurnheer-Meier <tma@iresults.li>, iresults
- *
- * Permission is hereby granted, free of charge, to any person obtaining a copy
- * of this software and associated documentation files (the "Software"), to deal
- * in the Software without restriction, including without limitation the rights
- * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
- * copies of the Software, and to permit persons to whom the Software is
- * furnished to do so, subject to the following conditions:
- *
- * The above copyright notice and this permission notice shall be included in
- * all copies or substantial portions of the Software.
- *
- * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
- * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
- * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
- * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
- * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
- * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
- * SOFTWARE.
- */
+namespace Iresults\Core\System;
 
 use Iresults\Core\Iresults;
 
@@ -67,8 +45,8 @@ class Backtrace
      * The starting position in the backtrace stack may be passed as $startLevel.
      * Also a maximum depth of the backtrace can be specified.
      *
-     * @param    integer $startLevel The starting position in the backtrace stack
-     * @param    integer $depthLevel The depth of the backtrace
+     * @param integer $startLevel The starting position in the backtrace stack
+     * @param integer $depthLevel The depth of the backtrace
      * @return    \Iresults\Core\System\Backtrace
      */
     public function __construct($startLevel = 2, $depthLevel = -1)
@@ -143,8 +121,8 @@ class Backtrace
      * Returns the element of the backtrace level with the given key or an empty
      * string if the key doesn't exist.
      *
-     * @param    string $key          The element key
-     * @param    array  & $levelArray Reference to the backtrace level array
+     * @param string $key          The element key
+     * @param array  & $levelArray Reference to the backtrace level array
      *
      * @return    mixed
      */
@@ -163,12 +141,12 @@ class Backtrace
     /**
      * Returns a string representation of the arguments array.
      *
-     * @param    array $args The arguments array
+     * @param array $args The arguments array
      * @return    string
      */
     protected function _argsToString($args)
     {
-        $result = array();
+        $result = [];
         foreach ($args as $arg) {
             if (is_scalar($arg)) {
                 $result[] = $arg;

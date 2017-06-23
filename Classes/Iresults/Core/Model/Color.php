@@ -1,28 +1,6 @@
 <?php
-namespace Iresults\Core\Model;
 
-    /*
-     * The MIT License (MIT)
-     * Copyright (c) 2013 Andreas Thurnheer-Meier <tma@iresults.li>, iresults
-     *
-     * Permission is hereby granted, free of charge, to any person obtaining a copy
-     * of this software and associated documentation files (the "Software"), to deal
-     * in the Software without restriction, including without limitation the rights
-     * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-     * copies of the Software, and to permit persons to whom the Software is
-     * furnished to do so, subject to the following conditions:
-     *
-     * The above copyright notice and this permission notice shall be included in
-     * all copies or substantial portions of the Software.
-     *
-     * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-     * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-     * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-     * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-     * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-     * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
-     * SOFTWARE.
-     */
+namespace Iresults\Core\Model;
 
 
 /**
@@ -65,7 +43,7 @@ class Color extends \Iresults\Core\Core
     /**
      * The constructor
      *
-     * @param    mixed $color The color to transform into an object
+     * @param mixed $color The color to transform into an object
      * @return    \Iresults\Core\Model\Color
      */
     public function __construct($color)
@@ -143,12 +121,12 @@ class Color extends \Iresults\Core\Core
      */
     public function asHSL()
     {
-        return array(
+        return [
             'H' => $this->hue,
             'S' => $this->saturation,
             'L' => $this->lightness,
             'A' => $this->alpha,
-        );
+        ];
     }
 
     /**
@@ -158,12 +136,12 @@ class Color extends \Iresults\Core\Core
      */
     public function asHSB()
     {
-        return array(
+        return [
             'H' => $this->hue,
             'S' => $this->saturation,
             'B' => $this->lightness,
             'A' => $this->alpha,
-        );
+        ];
     }
 
     /**
@@ -174,7 +152,7 @@ class Color extends \Iresults\Core\Core
      */
     public function asRGB()
     {
-        return self::hsvToRgb(array($this->hue, $this->saturation, $this->lightness));
+        return self::hsvToRgb([$this->hue, $this->saturation, $this->lightness]);
     }
 
     /**
@@ -222,7 +200,7 @@ class Color extends \Iresults\Core\Core
     /**
      * Converts the HSV to RGB.
      *
-     * @param  array $hsv The HSV color array
+     * @param array $hsv The HSV color array
      * @return array<float>
      */
     static public function hsvToRgb(array $hsv)
@@ -240,27 +218,27 @@ class Color extends \Iresults\Core\Core
         //4
         switch ($I) {
             case 0:
-                list($R, $G, $B) = array($V, $K, $M);
+                list($R, $G, $B) = [$V, $K, $M];
                 break;
             case 1:
-                list($R, $G, $B) = array($N, $V, $M);
+                list($R, $G, $B) = [$N, $V, $M];
                 break;
             case 2:
-                list($R, $G, $B) = array($M, $V, $K);
+                list($R, $G, $B) = [$M, $V, $K];
                 break;
             case 3:
-                list($R, $G, $B) = array($M, $N, $V);
+                list($R, $G, $B) = [$M, $N, $V];
                 break;
             case 4:
-                list($R, $G, $B) = array($K, $M, $V);
+                list($R, $G, $B) = [$K, $M, $V];
                 break;
             case 5:
             case 6: //for when $H=1 is given
-                list($R, $G, $B) = array($V, $M, $N);
+                list($R, $G, $B) = [$V, $M, $N];
                 break;
         }
 
-        return array(
+        return [
             0 => $R,
             1 => $G,
             2 => $B,
@@ -268,7 +246,7 @@ class Color extends \Iresults\Core\Core
             'red'   => $red,
             'green' => $green,
             'blue'  => $blue,
-        );
+        ];
     }
 
     /**
@@ -276,9 +254,9 @@ class Color extends \Iresults\Core\Core
      *
      * Thanks to Hofstadler Andi http://www.php.net/manual/en/function.imagecolorsforindex.php#86198
      *
-     * @param  float|array<float>    $red   If the first argument is an array, it is treated as an array of RGB values
-     * @param  float $green
-     * @param  float $blue
+     * @param float|array<float>    $red   If the first argument is an array, it is treated as an array of RGB values
+     * @param float $green
+     * @param float $blue
      * @return array<float>
      */
     static public function rgbToHsl($red, $green = 0.0, $blue = 0.0)
@@ -326,13 +304,13 @@ class Color extends \Iresults\Core\Core
             }
         }
 
-        return array($H, $S, $L);
+        return [$H, $S, $L];
     }
 
     /**
      * Converts a hex color to RGBA.
      *
-     * @param  string $hex The hex color string
+     * @param string $hex The hex color string
      * @return array<float>            The array of floats
      */
     static public function hexToRgba($hex)
@@ -377,7 +355,7 @@ class Color extends \Iresults\Core\Core
                 break;
         }
 
-        return array(
+        return [
             0 => hexdec($red),
             1 => hexdec($green),
             2 => hexdec($blue),
@@ -387,14 +365,14 @@ class Color extends \Iresults\Core\Core
             'green' => hexdec($green),
             'blue'  => hexdec($blue),
             'alpha' => hexdec($alpha),
-        );
+        ];
     }
 
     /**
      * Converts a RGBA color to hex.
      *
-     * @param            array      <float>    $rgba        The RGBA color array
-     * @param    boolean $withAlpha Indicates if the alpha should be added to the output
+     * @param         array      <float>    $rgba        The RGBA color array
+     * @param boolean $withAlpha Indicates if the alpha should be added to the output
      * @return string                        The hex color string
      */
     static public function rgbaToHex($rgba, $withAlpha = true)

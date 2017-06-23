@@ -9,8 +9,6 @@
 
 namespace Iresults\Core\Tests\Unit\Core\Model;
 
-require_once __DIR__ . '/../../Autoloader.php';
-
 use Iresults\Core\Model\DataGrid;
 
 class DataGridTest extends \PHPUnit_Framework_TestCase
@@ -29,21 +27,21 @@ class DataGridTest extends \PHPUnit_Framework_TestCase
 
     public function setUp()
     {
-        $testArray = array(
-            array('name', 'address', 'weather') // The headers
-        );
-        $testArrayDummy = array(
+        $testArray = [
+            ['name', 'address', 'weather'] // The headers
+        ];
+        $testArrayDummy = [
             'name'    => 'Daniel',
-            'address' => array(
+            'address' => [
                 'street'  => 'Bingstreet ',
                 'city'    => 'NYC',
                 'country' => 'USA',
-            ),
-            'weather' => array(
+            ],
+            'weather' => [
                 'temperature'       => '29°C',
                 'relative humidity' => '89%',
-            ),
-        );
+            ],
+        ];
 
         $i = 1;
         while ($i < $this->dataRowCount) {
@@ -117,7 +115,7 @@ class DataGridTest extends \PHPUnit_Framework_TestCase
         $scale = 15;
         for ($i = $startRowIndex; $i > 0; $i -= 3 * $scale) {
             $position = $this->fixture->findValue('Daniel' . $i);
-            $this->assertEquals(array((object)array('row' => $i, 'column' => 0)), $position);
+            $this->assertEquals([(object)['row' => $i, 'column' => 0]], $position);
         }
     }
 
@@ -131,7 +129,7 @@ class DataGridTest extends \PHPUnit_Framework_TestCase
         $scale = 15;
         for ($i = ($this->dataRowCount - 1); $i > 0; $i -= 3 * $scale) {
             $position = $this->fixture->findValue('Daniel' . $i);
-            $this->assertEquals(array((object)array('row' => $i, 'column' => 0)), $position);
+            $this->assertEquals([(object)['row' => $i, 'column' => 0]], $position);
         }
     }
 

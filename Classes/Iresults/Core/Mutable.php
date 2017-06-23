@@ -1,28 +1,6 @@
 <?php
-namespace Iresults\Core;
 
-/*
- * The MIT License (MIT)
- * Copyright (c) 2013 Andreas Thurnheer-Meier <tma@iresults.li>, iresults
- *
- * Permission is hereby granted, free of charge, to any person obtaining a copy
- * of this software and associated documentation files (the "Software"), to deal
- * in the Software without restriction, including without limitation the rights
- * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
- * copies of the Software, and to permit persons to whom the Software is
- * furnished to do so, subject to the following conditions:
- *
- * The above copyright notice and this permission notice shall be included in
- * all copies or substantial portions of the Software.
- *
- * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
- * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
- * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
- * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
- * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
- * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
- * SOFTWARE.
- */
+namespace Iresults\Core;
 
 use Iresults\Core\Exception\UndefinedMethod;
 use Iterator;
@@ -31,10 +9,6 @@ use Iterator;
 /**
  * The base class for mutable objects.
  * Iresults mutable classes conform to the \Iresults\Core\KVC-interface.
- *
- * @author        Daniel Corn <cod@iresults.li>
- * @package       Iresults
- * @subpackage    Iresults
  */
 class Mutable extends \Iresults\Core\Model implements \Countable, \Iterator, \ArrayAccess, \JsonSerializable
 {
@@ -50,7 +24,7 @@ class Mutable extends \Iresults\Core\Model implements \Countable, \Iterator, \Ar
      *
      * @var array
      */
-    protected $_data = array();
+    protected $_data = [];
 
     /* MWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWM */
     /* INITIALIZATION        MWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWM */
@@ -58,7 +32,7 @@ class Mutable extends \Iresults\Core\Model implements \Countable, \Iterator, \Ar
     /**
      * Initialize the instance with the data from the given array.
      *
-     * @param    array|\Iterator The source from which to read the properties
+     * @param array|\Iterator The source from which to read the properties
      *
      * @return    \Iresults\Core\Mutable The mutable object
      */
@@ -72,9 +46,9 @@ class Mutable extends \Iresults\Core\Model implements \Countable, \Iterator, \Ar
     /**
      * The constructor
      *
-     * @param    array $parameters Optional parameters to pass to the constructor
+     * @param array $parameters Optional parameters to pass to the constructor
      */
-    public function __construct(array $parameters = array())
+    public function __construct(array $parameters = [])
     {
         parent::__construct($parameters);
         if (get_class($this) != __CLASS__) {
@@ -87,9 +61,9 @@ class Mutable extends \Iresults\Core\Model implements \Countable, \Iterator, \Ar
      * Traverses the given source and tries to handle each key-value-pair as a new
      * property value for that key.
      *
-     * @param    array   $source            The input array
-     * @param    boolean $prepareSourceKeys Indicates if the _prepareSourceKeys method should be invoked for the source
-     * @param    string  $prefix            Optional prefix to add to the keys
+     * @param array   $source            The input array
+     * @param boolean $prepareSourceKeys Indicates if the _prepareSourceKeys method should be invoked for the source
+     * @param string  $prefix            Optional prefix to add to the keys
      * @return    void
      */
     public function setPropertiesFromArray($source, $prepareSourceKeys = false, $prefix = '')
@@ -109,7 +83,7 @@ class Mutable extends \Iresults\Core\Model implements \Countable, \Iterator, \Ar
     /**
      * Sets a properties data.
      *
-     * @param    string $key
+     * @param string $key
      * @return    void
      */
     public function __set($key, $value)
@@ -120,7 +94,7 @@ class Mutable extends \Iresults\Core\Model implements \Countable, \Iterator, \Ar
     /**
      * Sets a properties data.
      *
-     * @param    string $key
+     * @param string $key
      * @return    void
      */
     public function setData($key, $value)
@@ -135,8 +109,8 @@ class Mutable extends \Iresults\Core\Model implements \Countable, \Iterator, \Ar
     /**
      * Sets an object/value for the given key.
      *
-     * @param    string $key   The key to set
-     * @param    mixed  $value The new value
+     * @param string $key   The key to set
+     * @param mixed  $value The new value
      * @return    void
      */
     public function setObjectForKey($key, $value)
@@ -147,7 +121,7 @@ class Mutable extends \Iresults\Core\Model implements \Countable, \Iterator, \Ar
     /**
      * Returns a properties data.
      *
-     * @param    string $key
+     * @param string $key
      * @return    mixed
      */
     public function __get($key)
@@ -162,7 +136,7 @@ class Mutable extends \Iresults\Core\Model implements \Countable, \Iterator, \Ar
     /**
      * Returns a properties data.
      *
-     * @param    string $key
+     * @param string $key
      * @return    mixed
      */
     public function getData($key = null)
@@ -177,7 +151,7 @@ class Mutable extends \Iresults\Core\Model implements \Countable, \Iterator, \Ar
     /**
      * Returns an object/value for the given key.
      *
-     * @param    string $key The key/property name to fetch
+     * @param string $key The key/property name to fetch
      * @return    mixed
      */
     public function getObjectForKey($key)
@@ -188,7 +162,7 @@ class Mutable extends \Iresults\Core\Model implements \Countable, \Iterator, \Ar
     /**
      * Called if no object was found for the given property key.for the give
      *
-     * @param    string $key The name of the undefined property
+     * @param string $key The name of the undefined property
      * @return    mixed    Returns a substitue value
      * @throws InvalidArgumentException on default.
      */
@@ -202,7 +176,7 @@ class Mutable extends \Iresults\Core\Model implements \Countable, \Iterator, \Ar
      *
      * Invoked when unset() is used on inaccessible properties.
      *
-     * @param    string $key The property to delete
+     * @param string $key The property to delete
      * @return    void
      */
     public function __unset($key)
@@ -215,7 +189,7 @@ class Mutable extends \Iresults\Core\Model implements \Countable, \Iterator, \Ar
     /**
      * Deletes a property.
      *
-     * @param    string $key The property to delete
+     * @param string $key The property to delete
      * @return    void
      */
     public function unsetData($key)
@@ -226,7 +200,7 @@ class Mutable extends \Iresults\Core\Model implements \Countable, \Iterator, \Ar
     /**
      * Removes the object with the given key.
      *
-     * @param    string $key
+     * @param string $key
      * @return    void
      */
     public function removeObjectForKey($key)
@@ -239,7 +213,7 @@ class Mutable extends \Iresults\Core\Model implements \Countable, \Iterator, \Ar
      *
      * Invoked by isset() or empty() for inaccessible properties.
      *
-     * @param    string $key The property name
+     * @param string $key The property name
      * @return    boolean    TRUE if the property exists, otherwise FALSE
      */
     public function __isset($key)
@@ -270,7 +244,7 @@ class Mutable extends \Iresults\Core\Model implements \Countable, \Iterator, \Ar
     /**
      * Sets the virtual class of the object
      *
-     * @param    string $newClass
+     * @param string $newClass
      */
     public function setClass($newClass)
     {
@@ -315,7 +289,7 @@ class Mutable extends \Iresults\Core\Model implements \Countable, \Iterator, \Ar
             return null;
         }
 
-        return $this->__call($name, array());
+        return $this->__call($name, []);
     }
 
     /**
@@ -326,7 +300,7 @@ class Mutable extends \Iresults\Core\Model implements \Countable, \Iterator, \Ar
     public function description()
     {
         return 'object(' . get_class($this) . ') \'virtualClass => \'' . $this->getClass(
-        ) . '\'\n) {\n\t' . Iresults::descriptionOfValue($this->_data) . '}';
+            ) . '\'\n) {\n\t' . Iresults::descriptionOfValue($this->_data) . '}';
     }
 
     /* MWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWM */
@@ -335,7 +309,7 @@ class Mutable extends \Iresults\Core\Model implements \Countable, \Iterator, \Ar
     /**
      * Makes the first character of the given string lowercase.
      *
-     * @param    string $string
+     * @param string $string
      * @return    string
      */
     protected function _lcfirst($string)
@@ -346,7 +320,7 @@ class Mutable extends \Iresults\Core\Model implements \Countable, \Iterator, \Ar
     /**
      * Converts a functionname to a property name.
      *
-     * @param    string $functionName The function name
+     * @param string $functionName The function name
      * @return    string    The property name
      */
     protected function _functionNameToPropertyName($name)
@@ -447,7 +421,7 @@ class Mutable extends \Iresults\Core\Model implements \Countable, \Iterator, \Ar
      * Factory method: Returns a mutable object representing the data from the
      * given URL.
      *
-     * @param    string $url URL of the file to read
+     * @param string $url URL of the file to read
      * @return    \Iresults\Core\Mutable
      */
     static public function mutableWithContentsOfUrl($url)
@@ -472,7 +446,7 @@ class Mutable extends \Iresults\Core\Model implements \Countable, \Iterator, \Ar
     /**
      * Factory method: Returns a mutable object with the data from the given array.
      *
-     * @param    array|Iterator The source from which to read the properties
+     * @param array|Iterator The source from which to read the properties
      * @return    \Iresults\Core\Mutable The mutable object
      */
     static public function mutableWithArray($array)
@@ -486,7 +460,7 @@ class Mutable extends \Iresults\Core\Model implements \Countable, \Iterator, \Ar
     /**
      * Factory method: Returns a mutable object with the data from the given array.
      *
-     * @param    Mutable $mutable The source from which to read the properties
+     * @param Mutable $mutable The source from which to read the properties
      * @return    \Iresults\Core\Mutable The mutable object
      */
     static public function mutableWithMutable($mutable)
@@ -501,7 +475,7 @@ class Mutable extends \Iresults\Core\Model implements \Countable, \Iterator, \Ar
     /**
      * Factory method: Returns a mutable object with the data from the given array.
      *
-     * @param    array|Iterator The source from which to read the properties
+     * @param array|Iterator The source from which to read the properties
      * @return    \Iresults\Core\Mutable The mutable object
      */
     static public function mutableWithStdClass($object)

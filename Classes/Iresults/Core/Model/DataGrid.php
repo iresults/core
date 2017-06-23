@@ -1,28 +1,6 @@
 <?php
-namespace Iresults\Core\Model;
 
-/*
- * The MIT License (MIT)
- * Copyright (c) 2013 Andreas Thurnheer-Meier <tma@iresults.li>, iresults
- *
- * Permission is hereby granted, free of charge, to any person obtaining a copy
- * of this software and associated documentation files (the "Software"), to deal
- * in the Software without restriction, including without limitation the rights
- * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
- * copies of the Software, and to permit persons to whom the Software is
- * furnished to do so, subject to the following conditions:
- *
- * The above copyright notice and this permission notice shall be included in
- * all copies or substantial portions of the Software.
- *
- * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
- * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
- * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
- * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
- * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
- * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
- * SOFTWARE.
- */
+namespace Iresults\Core\Model;
 
 use Iresults\Core\Core;
 use Iresults\Core\Mutable;
@@ -45,14 +23,14 @@ class DataGrid extends Core implements \Iterator, \ArrayAccess
      *
      * @var array<array<mixed>>
      */
-    protected $data = array();
+    protected $data = [];
 
     /**
      * The dictionary holding the data map with all missing fields filled.
      *
      * @var array<array<mixed>>
      */
-    protected $filledData = array();
+    protected $filledData = [];
 
     /**
      * The total number of rows in the grid.
@@ -122,14 +100,14 @@ class DataGrid extends Core implements \Iterator, \ArrayAccess
      *
      * @var array
      */
-    protected $_indexes = array();
+    protected $_indexes = [];
 
     /**
      * Array of columns to index
      *
      * @var array
      */
-    protected $_indexColumns = array();
+    protected $_indexColumns = [];
 
     /**
      * Defines if the data indexes are dirty and need to be rebuilt
@@ -145,7 +123,7 @@ class DataGrid extends Core implements \Iterator, \ArrayAccess
     /**
      * @param array $parameters Optional parameters to pass to the constructor
      */
-    public function __construct(array $parameters = array())
+    public function __construct(array $parameters = [])
     {
         //parent::__construct($parameters);
         $this->data = $parameters;
@@ -183,16 +161,16 @@ class DataGrid extends Core implements \Iterator, \ArrayAccess
      * Initializes the object with the contents from the CSV file at the given
      * path.
      *
-     * @param    string $filePath  The path to the file to load data from
-     * @param    string $delimiter ," The CSV field delimiter
-     * @param    string $enclosure The CSV field enclosure character
-     * @param    string $escape    \" The CSV files escape character
+     * @param string $filePath  The path to the file to load data from
+     * @param string $delimiter ," The CSV field delimiter
+     * @param string $enclosure The CSV field enclosure character
+     * @param string $escape    \" The CSV files escape character
      * @return    \Iresults\Core\Model\DataGrid    Returns the initialized object
      */
     public function initWithContentsOfCSVFile($filePath, $delimiter = ',', $enclosure = '"', $escape = '\\')
     {
         $csvParser = new \Iresults\Core\Parser\CsvFileParser();
-        $csvParserConfiguration = array();
+        $csvParserConfiguration = [];
         $numberOfArguments = func_num_args();
         switch (true) {
             /** @noinspection PhpMissingBreakStatementInspection */
@@ -308,8 +286,8 @@ class DataGrid extends Core implements \Iterator, \ArrayAccess
     /**
      * Returns the value of the cell in row $row and column $column.
      *
-     * @param    integer $row    The index of the row
-     * @param    integer $column The index of the column
+     * @param integer $row    The index of the row
+     * @param integer $column The index of the column
      * @return    mixed    The value of the cell, or FALSE if the coordinates are beyond the gounds of the grid
      */
     public function getCellInRowAndColumn($row, $column)
@@ -335,8 +313,8 @@ class DataGrid extends Core implements \Iterator, \ArrayAccess
      * Searches the given value in the grid and returns an array of objects
      * with the properties row and column, for the cells the value was found in.
      *
-     * @param    mixed   $value         The value to search for
-     * @param    boolean $strictCompare Defines if strict comparison should be used
+     * @param mixed   $value         The value to search for
+     * @param boolean $strictCompare Defines if strict comparison should be used
      * @return    array<object>
      */
     public function findValue($value, $strictCompare = false)
@@ -352,12 +330,12 @@ class DataGrid extends Core implements \Iterator, \ArrayAccess
         // Check the indexes
         $indexedObjectPoint = $this->getIndexedDataForValue($value, true);
         if ($indexedObjectPoint) {
-            return array($indexedObjectPoint);
+            return [$indexedObjectPoint];
         }
 
 
         $filledGrid = $this->getFilledGridData();
-        $foundCells = array();
+        $foundCells = [];
 
         $currentRowIndex = 0;
         while (($currentRow = current($filledGrid)) !== false) {
@@ -429,7 +407,7 @@ class DataGrid extends Core implements \Iterator, \ArrayAccess
      */
     protected function _rebuildIndexOfColumn($columnIndex)
     {
-        $temporaryPrimaryKeys = array();
+        $temporaryPrimaryKeys = [];
         $columnData = $this->getColumnAtIndex($columnIndex);
 
         $rowCount = count($columnData);
@@ -441,10 +419,10 @@ class DataGrid extends Core implements \Iterator, \ArrayAccess
 
             $data = $columnData[$currentRowIndex];
 
-            $primaryKeyObject = array(
+            $primaryKeyObject = [
                 'data'  => $data,
                 'point' => $point,
-            );
+            ];
 
             if (is_scalar($data)) {
                 $temporaryPrimaryKeys[$data] = $primaryKeyObject;
@@ -503,7 +481,7 @@ class DataGrid extends Core implements \Iterator, \ArrayAccess
     /**
      * Returns the contents of the row at the given index.
      *
-     * @param    integer $index The index of the row
+     * @param integer $index The index of the row
      * @return    array|bool Returns the contents of the row or FALSE if the index lies beyond bounds
      */
     public function getRowAtIndex($index)
@@ -521,8 +499,8 @@ class DataGrid extends Core implements \Iterator, \ArrayAccess
      * If the property keys should be built from the column index instead of the contents of the first row, set
      * $useIndexedPropertyKeys to TRUE.
      *
-     * @param    integer $index                  The index of the row
-     * @param    boolean $useIndexedPropertyKeys Set this to TRUE to create the property keys from column index
+     * @param integer $index                  The index of the row
+     * @param boolean $useIndexedPropertyKeys Set this to TRUE to create the property keys from column index
      * @return    Mutable Returns the mutable object or FALSE if the index lies beyond bounds
      */
     public function getRowAtIndexAsMutable($index, $useIndexedPropertyKeys = false)
@@ -543,7 +521,7 @@ class DataGrid extends Core implements \Iterator, \ArrayAccess
     /**
      * Returns the contents of the row at the given index as a dictionary.
      *
-     * @param    integer $index The index of the row
+     * @param integer $index The index of the row
      * @return    array|bool Returns the dictionary or FALSE if the index lies beyond bounds
      */
     public function getRowAtIndexAsDictionary($index)
@@ -570,7 +548,7 @@ class DataGrid extends Core implements \Iterator, \ArrayAccess
      */
     protected function _buildKeysFromArray($input)
     {
-        $keysArray = array();
+        $keysArray = [];
         $currentElement = reset($input);
         do {
             switch (true) {
@@ -601,8 +579,8 @@ class DataGrid extends Core implements \Iterator, \ArrayAccess
      *
      * If no row exists at the given index, it will be created.
      *
-     * @param    integer $index  The index of the row to replace
-     * @param    array   $newRow The new row data
+     * @param integer $index  The index of the row to replace
+     * @param array   $newRow The new row data
      * @return    void
      */
     public function setRowAtIndex($index, $newRow)
@@ -614,12 +592,12 @@ class DataGrid extends Core implements \Iterator, \ArrayAccess
     /**
      * Removes the row at the given index with all of it's data.
      *
-     * @param    integer $index The index of the row to remove
+     * @param integer $index The index of the row to remove
      * @return    void
      */
     public function removeRowAtIndex($index)
     {
-        $tempData = array();
+        $tempData = [];
         foreach ($this->data as $key => $row) {
             if ($key !== $index) {
                 $tempData[] = $row;
@@ -652,12 +630,12 @@ class DataGrid extends Core implements \Iterator, \ArrayAccess
     /**
      * Returns the contents of the column at the given index.
      *
-     * @param    integer $index The index of the column
+     * @param integer $index The index of the column
      * @return    array|bool Returns the contents of the column or FALSE if the index lies beyond bounds
      */
     public function getColumnAtIndex($index)
     {
-        $columnData = array();
+        $columnData = [];
 
         $filledDataL = $this->getFilledGridData();
         $count = count($filledDataL);
@@ -684,8 +662,8 @@ class DataGrid extends Core implements \Iterator, \ArrayAccess
      * If the property keys should be built from the row index instead of the
      * contents of the first column, set $useIndexedPropertyKeys to TRUE.
      *
-     * @param    integer $index                  The index of the column
-     * @param    boolean $useIndexedPropertyKeys Set this to TRUE to create the property keys from row index
+     * @param integer $index                  The index of the column
+     * @param boolean $useIndexedPropertyKeys Set this to TRUE to create the property keys from row index
      * @return    Mutable Returns the mutable object or FALSE if the index lies beyond bounds
      */
     public function getColumnAtIndexAsMutable($index, $useIndexedPropertyKeys = false)
@@ -705,7 +683,7 @@ class DataGrid extends Core implements \Iterator, \ArrayAccess
      * Returns a dictionary The contents of the column at the given index define
      * the values whereas the contents of the first column define the keys.
      *
-     * @param    integer $index The index of the column
+     * @param integer $index The index of the column
      * @return    array|bool Returns the mutable object or FALSE if the index lies beyond bounds
      */
     public function getColumnAtIndexAsDictionary($index)
@@ -729,8 +707,8 @@ class DataGrid extends Core implements \Iterator, \ArrayAccess
      *
      * If no column exists at the given index, it will be created.
      *
-     * @param    integer $index     The index of the row to replace
-     * @param    array   $newColumn The new column data
+     * @param integer $index     The index of the row to replace
+     * @param array   $newColumn The new column data
      * @return    void
      */
     public function setColumnAtIndex($index, $newColumn)
@@ -741,7 +719,7 @@ class DataGrid extends Core implements \Iterator, \ArrayAccess
              * Check if the row exists.
              */
             if (!array_key_exists($i, $this->data)) {
-                $this->data[$i] = array();
+                $this->data[$i] = [];
             }
             $this->data[$i][$index] = $newColumn[$i];
         }
@@ -751,7 +729,7 @@ class DataGrid extends Core implements \Iterator, \ArrayAccess
     /**
      * Removes the column at the given index with all of it's data.
      *
-     * @param    integer $index The index of the column to remove
+     * @param integer $index The index of the column to remove
      * @return    void
      */
     public function removeColumnAtIndex($index)
@@ -762,7 +740,7 @@ class DataGrid extends Core implements \Iterator, \ArrayAccess
              * Check if the row exists.
              */
             if (isset($this->data[$i]) && is_array($this->data[$i])) {
-                $tempData = array();
+                $tempData = [];
                 $row = $this->data[$i];
                 foreach ($row as $key => $column) {
                     if ($key !== $index) {
@@ -807,8 +785,8 @@ class DataGrid extends Core implements \Iterator, \ArrayAccess
     /**
      * Sorts the grid by the values of the column at the given index.
      *
-     * @param    integer $index       The index of the column by which to sort
-     * @param    array   $sortOptions An array of sort options
+     * @param integer $index       The index of the column by which to sort
+     * @param array   $sortOptions An array of sort options
      * @return    boolean    Returns TRUE on success, otherwise FALSE
      */
     public function sortByColumnAtIndex($index, $sortOptions = null)
@@ -877,8 +855,8 @@ class DataGrid extends Core implements \Iterator, \ArrayAccess
     /**
      * Sorts the grid by the values of the row at the given index.
      *
-     * @param    integer $index       The index of the row by which to sort
-     * @param    array   $sortOptions An array of sort options
+     * @param integer $index       The index of the row by which to sort
+     * @param array   $sortOptions An array of sort options
      * @return    boolean    Returns TRUE on success, otherwise FALSE
      */
     public function sortByRowAtIndex($index)
@@ -985,10 +963,10 @@ class DataGrid extends Core implements \Iterator, \ArrayAccess
      * Set the cell values to the elements of $newRow, starting at the cell with
      * the row index $rowNumber and column index $columnNumber.
      *
-     * @param    array   & $target       Reference to the target array to set the data
-     * @param    array   $newColumn      The data to set the cells to
-     * @param    integer & $rowNumber    Reference to the y offset
-     * @param    integer & $columnNumber Reference to the x offset
+     * @param array   & $target       Reference to the target array to set the data
+     * @param array   $newColumn      The data to set the cells to
+     * @param integer & $rowNumber    Reference to the y offset
+     * @param integer & $columnNumber Reference to the x offset
      *
      * @return    void
      */
@@ -1005,10 +983,10 @@ class DataGrid extends Core implements \Iterator, \ArrayAccess
      * Each element of $newColumns is treated a single column, starting at the
      * position $rowNumber/$columnNumber.
      *
-     * @param    array   & $target       Reference to the target array to set the data
-     * @param    array   $newColumns     The data to set the cells to
-     * @param    integer & $rowNumber    Reference to the y offset
-     * @param    integer & $columnNumber Reference to the x offset
+     * @param array   & $target       Reference to the target array to set the data
+     * @param array   $newColumns     The data to set the cells to
+     * @param integer & $rowNumber    Reference to the y offset
+     * @param integer & $columnNumber Reference to the x offset
      *
      * @return    void
      */
@@ -1027,10 +1005,10 @@ class DataGrid extends Core implements \Iterator, \ArrayAccess
      * Set the cell values to the elements of $newRow, starting at the position
      * $rowNumber/$columnNumber.
      *
-     * @param    array   & $target       Reference to the target array to set the data
-     * @param    array   $newRow         The data to set the cells to
-     * @param    integer & $rowNumber    Reference to the y offset
-     * @param    integer & $columnNumber Reference to the x offset
+     * @param array   & $target       Reference to the target array to set the data
+     * @param array   $newRow         The data to set the cells to
+     * @param integer & $rowNumber    Reference to the y offset
+     * @param integer & $columnNumber Reference to the x offset
      *
      * @return    void
      */
@@ -1046,10 +1024,10 @@ class DataGrid extends Core implements \Iterator, \ArrayAccess
      * Set the rows to the values in newRows, starting at the position
      * $rowNumber/$columnNumber. Each element of newRows is treated a single row.
      *
-     * @param    array   & $target       Reference to the target array to set the data
-     * @param    array   $newRows        The data to set the cells to
-     * @param    integer & $rowNumber    Reference to the y offset
-     * @param    integer & $columnNumber Reference to the x offset
+     * @param array   & $target       Reference to the target array to set the data
+     * @param array   $newRows        The data to set the cells to
+     * @param integer & $rowNumber    Reference to the y offset
+     * @param integer & $columnNumber Reference to the x offset
      *
      * @return    void
      */
@@ -1067,16 +1045,16 @@ class DataGrid extends Core implements \Iterator, \ArrayAccess
     /**
      * Set the value of the cell at $rowNumber/$columnNumber to the given value.
      *
-     * @param    mixed   $newCell        The data to set the cell value to
-     * @param    integer & $rowNumber    Reference to the row offset
-     * @param    integer & $columnNumber Reference to the column offset
+     * @param mixed   $newCell        The data to set the cell value to
+     * @param integer & $rowNumber    Reference to the row offset
+     * @param integer & $columnNumber Reference to the column offset
      *
      * @return    integer The number of columns inserted
      */
     public function setCellAtRowNumberAndColumnNumber($newCell, &$rowNumber, &$columnNumber)
     {
         if (!isset($this->data[$rowNumber])) {
-            $this->data[$rowNumber] = array();
+            $this->data[$rowNumber] = [];
         }
         $this->data[$rowNumber][$columnNumber] = $newCell;
 
@@ -1175,9 +1153,9 @@ class DataGrid extends Core implements \Iterator, \ArrayAccess
      * If $length is given the loop stops after $length run. If $length is not
      * specified the length of the longest element in $input is determined.
      *
-     * @param    array   & $input      Reference to the array to fill
-     * @param    integer $length       The length of the filled array
-     * @param    boolean $insertArrays If set to true an array will be inserted
+     * @param array   & $input         Reference to the array to fill
+     * @param integer $length          The length of the filled array
+     * @param boolean $insertArrays    If set to true an array will be inserted
      *                                 for a missing element, otherwise an empty string.
      *
      * @return    void
@@ -1216,7 +1194,7 @@ class DataGrid extends Core implements \Iterator, \ArrayAccess
             } else {
                 //echo "NEW INPUT $i<br>";
                 if ($insertArrays || $this->_fillMissingArrayElementsDepth < 2) {
-                    $input[$i] = array();
+                    $input[$i] = [];
                 } else {
                     $input[$i] = $this->_missingElementPlaceholder;
                 }
@@ -1236,7 +1214,7 @@ class DataGrid extends Core implements \Iterator, \ArrayAccess
     /**
      * Returns the length of the longest element in the given input.
      *
-     * @param    array <array<mixed>> $input Reference to the input array
+     * @param array <array<mixed>> $input Reference to the input array
      *
      * @return    integer    The length of the longest element
      */
@@ -1259,7 +1237,7 @@ class DataGrid extends Core implements \Iterator, \ArrayAccess
     /**
      * Returns the length of the element while taking account of missing elements.
      *
-     * @param    array $element The element array
+     * @param array $element The element array
      * @return    integer    The length of the element
      */
     protected function _getLengthOfElement(&$element)
@@ -1367,7 +1345,7 @@ class DataGrid extends Core implements \Iterator, \ArrayAccess
      *  V (y)
      *
      *
-     * @param    array $input The input data
+     * @param array $input The input data
      * @return    array    The prepared data
      */
     //public function prepareData() {
@@ -1429,7 +1407,7 @@ class DataGrid extends Core implements \Iterator, \ArrayAccess
     /**
      * Setter for the placeholder for empty elements.
      *
-     * @param    string $newValue The new placeholder to use
+     * @param string $newValue The new placeholder to use
      * @return    void
      */
     public function setEmptyElementPlaceholder($newValue)
@@ -1450,7 +1428,7 @@ class DataGrid extends Core implements \Iterator, \ArrayAccess
     /**
      * Setter for the placeholder for missing elements.
      *
-     * @param    string $newValue The new value to set
+     * @param string $newValue The new value to set
      * @return    void
      */
     public function setMissingElementPlaceholder($newValue)
@@ -1483,7 +1461,7 @@ class DataGrid extends Core implements \Iterator, \ArrayAccess
      * Factory method: Returns a mutable object representing the data from the
      * given URL.
      *
-     * @param    string $url URL of the file to read
+     * @param string $url URL of the file to read
      * @return    \Iresults\Core\Model\DataGrid
      */
     static public function gridWithContentsOfUrl($url)

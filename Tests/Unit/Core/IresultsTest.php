@@ -1,29 +1,4 @@
 <?php
-/*
- *  Copyright notice
- *
- *  (c) 2013 Andreas Thurnheer-Meier <tma@iresults.li>, iresults
- *  Daniel Corn <cod@iresults.li>, iresults
- *
- *  All rights reserved
- *
- *  This script is part of the TYPO3 project. The TYPO3 project is
- *  free software; you can redistribute it and/or modify
- *  it under the terms of the GNU General Public License as published by
- *  the Free Software Foundation; either version 3 of the License, or
- *  (at your option) any later version.
- *
- *  The GNU General Public License can be found at
- *  http://www.gnu.org/copyleft/gpl.html.
- *
- *  This script is distributed in the hope that it will be useful,
- *  but WITHOUT ANY WARRANTY; without even the implied warranty of
- *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- *  GNU General Public License for more details.
- *
- *  This copyright notice MUST APPEAR in all copies of the script!
- */
-
 /**
  * @author Daniel Corn <cod@iresults.li>
  * Created 02.10.13 16:07
@@ -31,8 +6,6 @@
 
 
 namespace Iresults\Core\Tests\Unit\Core;
-
-require_once __DIR__ . '/../Autoloader.php';
 
 use Iresults\Core\Iresults;
 use Iresults\Core\Tests\Fixture\IresultsTestImplementation;
@@ -296,9 +269,9 @@ class IresultsTest extends \PHPUnit_Framework_TestCase
     public function descriptionOfValueTest()
     {
         $testValue1 = 'hallo';
-        $testValue2 = array('hallo');
-        $testValue3 = array('message' => 'hallo');
-        $testValue4 = (object)array('message' => 'hallo');
+        $testValue2 = ['hallo'];
+        $testValue3 = ['message' => 'hallo'];
+        $testValue4 = (object)['message' => 'hallo'];
         $testValue5 = 10;
         $this->assertEquals('hallo', Iresults::descriptionOfValue($testValue1));
         $this->assertEquals("Array(\n\thallo\n)", Iresults::descriptionOfValue($testValue2));
@@ -334,7 +307,7 @@ class IresultsTest extends \PHPUnit_Framework_TestCase
         $this->assertNull(Iresults::getConfiguration());
         Iresults::setConfiguration($key, $value);
         $this->assertEquals($value, Iresults::getConfiguration($key));
-        $this->assertEquals(array($key => $value), Iresults::getConfiguration());
+        $this->assertEquals([$key => $value], Iresults::getConfiguration());
     }
 
     /**

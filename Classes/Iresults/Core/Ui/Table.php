@@ -1,41 +1,13 @@
 <?php
-/**
- * Copyright notice
- *
- * (c) 2010 Andreas Thurnheer-Meier <tma@iresults.li>, iresults
- *            Daniel Corn <cod@iresults.li>, iresults
- *
- *  All rights reserved
- *
- *  This script is part of the TYPO3 project. The TYPO3 project is
- *  free software; you can redistribute it and/or modify
- *  it under the terms of the GNU General Public License as published by
- *  the Free Software Foundation; either version 2 of the License, or
- *  (at your option) any later version.
- *
- *  The GNU General Public License can be found at
- *  http://www.gnu.org/copyleft/gpl.html.
- *
- *  This script is distributed in the hope that it will be useful,
- *  but WITHOUT ANY WARRANTY; without even the implied warranty of
- *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- *  GNU General Public License for more details.
- *
- *  This copyright notice MUST APPEAR in all copies of the script!
- */
 
 namespace Iresults\Core\Ui;
 
-use Iresults\Core\Cli\ColorInterface;
 use Iresults\Core\Cli\Table as CliTable;
 use Iresults\Core\Core;
 use Iresults\Core\Iresults;
-use Iresults\Core\Tools\StringTool;
 
 /**
  * Displays given input data in a simple table
- *
- * @package Iresults\Core\Ui
  */
 class Table extends Core
 {
@@ -44,7 +16,7 @@ class Table extends Core
      *
      * @var array
      */
-    protected $data = array();
+    protected $data = [];
 
     /**
      * The table header row
@@ -87,11 +59,11 @@ class Table extends Core
     /**
      * Displays the rendered table
      *
-     * @param    array  $data       The data to output
-     * @param    string $tableClass The class of the table
-     * @param    string $rowClass   The class of the rows (TR-tags)
-     * @param    string $cellClass  The class of the cells (TD-tags)
-     * @param    string $headClass  The class of the header cells (TH-tags)
+     * @param array  $data       The data to output
+     * @param string $tableClass The class of the table
+     * @param string $rowClass   The class of the rows (TR-tags)
+     * @param string $cellClass  The class of the cells (TD-tags)
+     * @param string $headClass  The class of the header cells (TH-tags)
      * @return    string The rendered table
      */
     public function display($data = null, $tableClass = 'list', $rowClass = '', $cellClass = '', $headClass = '')
@@ -105,11 +77,11 @@ class Table extends Core
     /**
      * Returns the rendered table
      *
-     * @param    array  $data       The data to output
-     * @param    string $tableClass The class of the table
-     * @param    string $rowClass   The class of the rows (TR-tags)
-     * @param    string $cellClass  The class of the cells (TD-tags)
-     * @param    string $headClass  The class of the header cells (TH-tags)
+     * @param array  $data       The data to output
+     * @param string $tableClass The class of the table
+     * @param string $rowClass   The class of the rows (TR-tags)
+     * @param string $cellClass  The class of the cells (TD-tags)
+     * @param string $headClass  The class of the header cells (TH-tags)
      * @return    string The rendered table
      */
     public function render($data = null, $tableClass = 'list', $rowClass = '', $cellClass = '', $headClass = '')
@@ -124,11 +96,11 @@ class Table extends Core
     /**
      * Returns the rendered HTML table.
      *
-     * @param    array  $data       The data to output
-     * @param    string $tableClass The class of the table
-     * @param    string $rowClass   The class of the rows (TR-tags)
-     * @param    string $cellClass  The class of the cells (TD-tags)
-     * @param    string $headClass  The class of the header cells (TH-tags)
+     * @param array  $data       The data to output
+     * @param string $tableClass The class of the table
+     * @param string $rowClass   The class of the rows (TR-tags)
+     * @param string $cellClass  The class of the cells (TD-tags)
+     * @param string $headClass  The class of the header cells (TH-tags)
      * @return    string The rendered table
      */
     public function renderHtml($data = null, $tableClass = 'list', $rowClass = '', $cellClass = '', $headClass = '')
@@ -196,10 +168,10 @@ class Table extends Core
     /**
      * Returns the rendered table for terminal output.
      *
-     * @param    array   $data           The data to output
-     * @param    integer $maxColumnWidth Maximum column width
-     * @param    boolean $disableHead    Indicates if the head row should be rendered
-     * @param    string  $separator      The column separator
+     * @param array   $data           The data to output
+     * @param integer $maxColumnWidth Maximum column width
+     * @param boolean $disableHead    Indicates if the head row should be rendered
+     * @param string  $separator      The column separator
      * @return    string                        The rendered table
      */
     public function renderShell($data = null, $maxColumnWidth = PHP_INT_MAX, $disableHead = false, $separator = '|')
@@ -216,7 +188,13 @@ class Table extends Core
         $headerPosition = $disableHead ? CliTable::HEADER_POSITION_NONE : CliTable::HEADER_POSITION_TOP;
         $cliTable = new CliTable();
 
-        return $cliTable->render($data, $headerPosition, $separator, $maxColumnWidth, $this->getUseFirstRowAsHeaderRow());
+        return $cliTable->render(
+            $data,
+            $headerPosition,
+            $separator,
+            $maxColumnWidth,
+            $this->getUseFirstRowAsHeaderRow()
+        );
     }
 
     /**
@@ -317,7 +295,7 @@ class Table extends Core
 
         $firstRow = reset($data);
         if (!is_array($firstRow) && !($firstRow instanceof \Traversable)) {
-            $data = array($data);
+            $data = [$data];
         }
 
         return $data;

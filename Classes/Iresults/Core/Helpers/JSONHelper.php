@@ -1,28 +1,6 @@
 <?php
-namespace Iresults\Core\Helpers;
 
-    /*
-     * The MIT License (MIT)
-     * Copyright (c) 2013 Andreas Thurnheer-Meier <tma@iresults.li>, iresults
-     *
-     * Permission is hereby granted, free of charge, to any person obtaining a copy
-     * of this software and associated documentation files (the "Software"), to deal
-     * in the Software without restriction, including without limitation the rights
-     * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-     * copies of the Software, and to permit persons to whom the Software is
-     * furnished to do so, subject to the following conditions:
-     *
-     * The above copyright notice and this permission notice shall be included in
-     * all copies or substantial portions of the Software.
-     *
-     * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-     * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-     * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-     * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-     * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-     * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
-     * SOFTWARE.
-     */
+namespace Iresults\Core\Helpers;
 
 
 /**
@@ -50,16 +28,16 @@ class JSONHelper
     /**
      * Returns the given value in a JSON representation.
      *
-     * @param    mixed   $object     The object to translate
-     * @param    integer $options    Bitmask consisting of JSON_HEX_QUOT, JSON_HEX_TAG, JSON_HEX_AMP, JSON_HEX_APOS, JSON_NUMERIC_CHECK, JSON_PRETTY_PRINT, JSON_UNESCAPED_SLASHES, JSON_FORCE_OBJECT, JSON_UNESCAPED_UNICODE
-     * @param    string  $objectWrap A string to wrap the JavaScript objects into
+     * @param mixed   $object     The object to translate
+     * @param integer $options    Bitmask consisting of JSON_HEX_QUOT, JSON_HEX_TAG, JSON_HEX_AMP, JSON_HEX_APOS, JSON_NUMERIC_CHECK, JSON_PRETTY_PRINT, JSON_UNESCAPED_SLASHES, JSON_FORCE_OBJECT, JSON_UNESCAPED_UNICODE
+     * @param string  $objectWrap A string to wrap the JavaScript objects into
      * @return    string        Returns the given value in a JSON representation.
      */
     static public function createJSONStringFromObject($object, $options = 0, $objectWrap = '|')
     {
         $JSONString = self::_createJSONStringFromObject($object, $options, $objectWrap);
 
-        return str_replace(array("\r", "\n"), '', $JSONString);
+        return str_replace(["\r", "\n"], '', $JSONString);
     }
 
     /**
@@ -87,9 +65,9 @@ class JSONHelper
      * This behaviour allows you to specify JavaScript function calls in PHP
      * objects that will be parsed as JSON objects.
      *
-     * @param    mixed   $object     The object to translate
-     * @param    integer $options    Bitmask consisting of JSON_HEX_QUOT, JSON_HEX_TAG, JSON_HEX_AMP, JSON_HEX_APOS, JSON_NUMERIC_CHECK, JSON_PRETTY_PRINT, JSON_UNESCAPED_SLASHES, JSON_FORCE_OBJECT, JSON_UNESCAPED_UNICODE
-     * @param    string  $objectWrap A string to wrap the JavaScript objects into
+     * @param mixed   $object     The object to translate
+     * @param integer $options    Bitmask consisting of JSON_HEX_QUOT, JSON_HEX_TAG, JSON_HEX_AMP, JSON_HEX_APOS, JSON_NUMERIC_CHECK, JSON_PRETTY_PRINT, JSON_UNESCAPED_SLASHES, JSON_FORCE_OBJECT, JSON_UNESCAPED_UNICODE
+     * @param string  $objectWrap A string to wrap the JavaScript objects into
      * @return    string        Returns the given value in a JSON representation.
      */
     static protected function _createJSONStringFromObject($object, $options = 0, $objectWrap = null)
@@ -130,16 +108,16 @@ class JSONHelper
     /**
      * Returns the given array or object in a JSON representation.
      *
-     * @param    array|object $value      The array or object to transform
-     * @param    integer      $options    Bitmask consisting of JSON_HEX_QUOT, JSON_HEX_TAG, JSON_HEX_AMP, JSON_HEX_APOS, JSON_NUMERIC_CHECK, JSON_PRETTY_PRINT, JSON_UNESCAPED_SLASHES, JSON_FORCE_OBJECT, JSON_UNESCAPED_UNICODE
-     * @param    string       $objectWrap A string to wrap the JavaScript objects into
+     * @param array|object $value      The array or object to transform
+     * @param integer      $options    Bitmask consisting of JSON_HEX_QUOT, JSON_HEX_TAG, JSON_HEX_AMP, JSON_HEX_APOS, JSON_NUMERIC_CHECK, JSON_PRETTY_PRINT, JSON_UNESCAPED_SLASHES, JSON_FORCE_OBJECT, JSON_UNESCAPED_UNICODE
+     * @param string       $objectWrap A string to wrap the JavaScript objects into
      * @return    string        Returns the given value in a JSON representation
      */
     static protected function arrayOrDictionaryToJSON($value, $options = 0, $objectWrap = '|')
     {
         $isDictionary = false;
         $allKeys = null;
-        $JSONStrings = array();
+        $JSONStrings = [];
 
         /*
          * Treat instances of Tx_Extbase_Persistence_QueryResultInterface as
@@ -191,7 +169,7 @@ class JSONHelper
     /**
      * Returns the JSON representation of the given value.
      *
-     * @param    mixed $value The value to parse as a JSON value
+     * @param mixed $value The value to parse as a JSON value
      * @return    string    Returns the JSON representation of the given value
      */
     static public function stringFromValue($value)

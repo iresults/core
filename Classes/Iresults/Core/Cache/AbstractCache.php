@@ -1,28 +1,6 @@
 <?php
-namespace Iresults\Core\Cache;
 
-/*
- * The MIT License (MIT)
- * Copyright (c) 2013 Andreas Thurnheer-Meier <tma@iresults.li>, iresults
- *
- * Permission is hereby granted, free of charge, to any person obtaining a copy
- * of this software and associated documentation files (the "Software"), to deal
- * in the Software without restriction, including without limitation the rights
- * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
- * copies of the Software, and to permit persons to whom the Software is
- * furnished to do so, subject to the following conditions:
- *
- * The above copyright notice and this permission notice shall be included in
- * all copies or substantial portions of the Software.
- *
- * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
- * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
- * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
- * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
- * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
- * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
- * SOFTWARE.
- */
+namespace Iresults\Core\Cache;
 
 use Iresults\Core\Core;
 use Iresults\Core\Iresults;
@@ -183,8 +161,8 @@ abstract class AbstractCache extends Core implements KVCInterface
      * If only one parameter is passed, getObjectForKey() is invoked with the
      * given $key as argument.
      *
-     * @param    string $key
-     * @param    mixed  $object [optional]
+     * @param string $key
+     * @param mixed  $object [optional]
      * @return    mixed
      */
     public function object($key, $object = null)
@@ -200,9 +178,9 @@ abstract class AbstractCache extends Core implements KVCInterface
      * Returns the value for the given key, if it exists, otherwise performs the
      * closure given as the second argument.
      *
-     * @param  string   $key        The property key to retrieve
-     * @param  \Closure $closure    The closure to perform if the property isn't set
-     * @param  boolean  $saveResult If set to FALSE to result will not be stored using setObjectForKey()
+     * @param string   $key        The property key to retrieve
+     * @param \Closure $closure    The closure to perform if the property isn't set
+     * @param boolean  $saveResult If set to FALSE to result will not be stored using setObjectForKey()
      * @return mixed                 Returns the value for the given key, or the result of the closure
      */
     public function getObjectForKeyOrPerformClosure($key, $closure, $saveResult = true)
@@ -240,7 +218,7 @@ abstract class AbstractCache extends Core implements KVCInterface
     /**
      * Set the scope of the cache.
      *
-     * @param    integer $newScope The new scope as one of the SCOPE constants
+     * @param integer $newScope The new scope as one of the SCOPE constants
      * @return    void
      */
     public function setScope($newScope)

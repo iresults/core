@@ -1,28 +1,6 @@
 <?php
-namespace Iresults\Core\Helpers;
 
-    /*
-     * The MIT License (MIT)
-     * Copyright (c) 2013 Andreas Thurnheer-Meier <tma@iresults.li>, iresults
-     *
-     * Permission is hereby granted, free of charge, to any person obtaining a copy
-     * of this software and associated documentation files (the "Software"), to deal
-     * in the Software without restriction, including without limitation the rights
-     * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-     * copies of the Software, and to permit persons to whom the Software is
-     * furnished to do so, subject to the following conditions:
-     *
-     * The above copyright notice and this permission notice shall be included in
-     * all copies or substantial portions of the Software.
-     *
-     * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-     * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-     * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-     * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-     * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-     * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
-     * SOFTWARE.
-     */
+namespace Iresults\Core\Helpers;
 
 
 /**
@@ -37,13 +15,13 @@ namespace Iresults\Core\Helpers;
  */
 abstract class SortHelperAbstract
 {
-    protected $_alternativeCompare = array();
+    protected $_alternativeCompare = [];
 
-    protected $_alternativeCompareWorkingCopy = array();
+    protected $_alternativeCompareWorkingCopy = [];
 
-    protected $_alternativeCompareConfig = array();
+    protected $_alternativeCompareConfig = [];
 
-    protected $_subgroups = array();
+    protected $_subgroups = [];
 
     protected $_subgroupLevel = 0;
 
@@ -63,7 +41,7 @@ abstract class SortHelperAbstract
     /**
      * @var array The last result of the subgroup creation.
      */
-    protected $_lastSubgroupsArray = array();
+    protected $_lastSubgroupsArray = [];
 
     /**
      * @var string The last used getter method.
@@ -100,11 +78,11 @@ abstract class SortHelperAbstract
     /**
      * The sorting function sorts the Varien objects by the given key.
      *
-     * @param    string  $propertyKey      The property key to sort by
-     * @param    object  $objectA          The first object to compare
-     * @param    object  $objectB          The second object to compare
-     * @param    boolean $desc             Sort desc
-     * @param    boolean $useAttributeText If set to true getAttributeText() will be invoked on the objects instead of getData()
+     * @param string  $propertyKey      The property key to sort by
+     * @param object  $objectA          The first object to compare
+     * @param object  $objectB          The second object to compare
+     * @param boolean $desc             Sort desc
+     * @param boolean $useAttributeText If set to true getAttributeText() will be invoked on the objects instead of getData()
      * @return    integer
      */
     public function sortByProperty($propertyKey, $objectA, $objectB, $desc = false, $useAttributeText = false)
@@ -215,10 +193,10 @@ abstract class SortHelperAbstract
      * Sorts an array by the given property, or properties if more then one are
      * passed.
      *
-     * @param    array  $array           The array to sort
-     * @param    string|array<string> $propertyKey        The key of the primary property
-     * @param    string $propertyKeyAlt1 Additional property keys to sort
-     * @param    string $propertyKeyAlt2 Additional property keys to sort
+     * @param array  $array           The array to sort
+     * @param string|array<string> $propertyKey        The key of the primary property
+     * @param string $propertyKeyAlt1 Additional property keys to sort
+     * @param string $propertyKeyAlt2 Additional property keys to sort
      * @return    array    Returns the sorted array
      */
     public function sortArrayAscByProperty(&$array, $propertyKey, $propertyKeyAlt1 = null)
@@ -244,7 +222,7 @@ abstract class SortHelperAbstract
             } else /**
              * Use only the given property key.
              */ {
-                $this->_alternativeCompare = array('asc' => $propertyKey);
+                $this->_alternativeCompare = ['asc' => $propertyKey];
             }
         }
 
@@ -259,7 +237,7 @@ abstract class SortHelperAbstract
             $propertyKey,
             '' . $this->_alternativeCompareConfig[0]
         );
-        @usort($array, array($this, $callback));
+        @usort($array, [$this, $callback]);
 
         if (count($this->_alternativeCompare) > 1) {
             $this->sortSubgroups($array);
@@ -282,13 +260,13 @@ abstract class SortHelperAbstract
      * the subgroups will be sorted. Furthermore you can set recursive to TRUE so
      * the sortSubgroups() method will be called recursively.
      *
-     * @param    array   $inputArray       Reference to the input array
-     * @param    string  $groupPropertyKey The property key by which to group
-     * @param    string  $sortPropertyKey  The key by which to sort
-     * @param    string  $config           A string containing additional
+     * @param array   $inputArray          Reference to the input array
+     * @param string  $groupPropertyKey    The property key by which to group
+     * @param string  $sortPropertyKey     The key by which to sort
+     * @param string  $config              A string containing additional
      *                                     information about how to sort using the sort property key.
      *
-     * @param    boolean $recursively      Indicates if this method should be
+     * @param boolean $recursively         Indicates if this method should be
      *                                     called recursively.
      *
      * @return    array
@@ -332,7 +310,7 @@ abstract class SortHelperAbstract
         /**
          * Sort the subgroups
          */
-        $returnArray = array();
+        $returnArray = [];
 
         $callback = $this->_getSortCallbackForPropertyKeyAndConfig($sortPropertyKey, $config);
 
@@ -343,7 +321,7 @@ abstract class SortHelperAbstract
              * than 1 entries.
              */
             if ($sortPropertyKey && count($subgroup) > 1) {
-                @usort($subgroup, array($this, $callback));
+                @usort($subgroup, [$this, $callback]);
             }
 
 
@@ -394,9 +372,9 @@ abstract class SortHelperAbstract
      * an array of objects that share the same property value for the property
      * key given in $groupPropertyKey.
      *
-     * @param    array  $inputArray       The array to group
-     * @param    string $groupPropertyKey The property to group by
-     * @param    string $getterMethod     If a getter method is specified, this
+     * @param array  $inputArray          The array to group
+     * @param string $groupPropertyKey    The property to group by
+     * @param string $getterMethod        If a getter method is specified, this
      *                                    method will be used to get the group properties instead of using getData().
      *
      * @return    array
@@ -425,13 +403,13 @@ abstract class SortHelperAbstract
 
 
         // Create the groups
-        $subgroups = array();
+        $subgroups = [];
         $value = null;
         foreach ($inputArray as $key => $element) {
             $value = $this->_invokeGetterMethodOnObject($element, $groupPropertyKey, $getterMethod);
             //if (is_null($value)) continue;
             if (!isset($subgroups['' . $value])) {
-                $subgroups['' . $value] = array();
+                $subgroups['' . $value] = [];
                 //$this->debugSubgroup("new value=$value");
             }
             $subgroups['' . $value][] = $element;
@@ -453,10 +431,10 @@ abstract class SortHelperAbstract
     /**
      * Returns a single subgroup identified by its name.
      *
-     * @param    string $subgroupName     The name of the subgroup to return
-     * @param    array  $inputArray       The array to group
-     * @param    string $groupPropertyKey The property to group by
-     * @param    string $getterMethod     If a getter method is specified, this
+     * @param string $subgroupName        The name of the subgroup to return
+     * @param array  $inputArray          The array to group
+     * @param string $groupPropertyKey    The property to group by
+     * @param string $getterMethod        If a getter method is specified, this
      *                                    method will be used to get the group properties instead of using getData().
      *
      * @return    array
@@ -471,7 +449,7 @@ abstract class SortHelperAbstract
             return $subgroups[$subgroupName];
         }
 
-        return array();
+        return [];
     }
 
     /**
@@ -495,17 +473,17 @@ abstract class SortHelperAbstract
      *
      * For more information about the sorting method see getSubgroups().
      *
-     * @param    array  $inputArray       The input array
-     * @param    array  $order            The array of subgroup names to return
-     * @param    string $groupPropertyKey The property to group by
-     * @param    string $getterMethod     If a getter method is specified, this
+     * @param array  $inputArray          The input array
+     * @param array  $order               The array of subgroup names to return
+     * @param string $groupPropertyKey    The property to group by
+     * @param string $getterMethod        If a getter method is specified, this
      *                                    method will be used to get the group properties instead of using getData().
      *
      * @return    array
      */
     public function getSubgroupsByCustomOrder($inputArray, $order, $groupPropertyKey, $getterMethod = null)
     {
-        $result = array();
+        $result = [];
         $subgroups = $this->getSubgroups($inputArray, $groupPropertyKey, $getterMethod);
 
         /**
@@ -540,8 +518,8 @@ abstract class SortHelperAbstract
     /**
      * Handles the comparison if the values are equal (for the primary property key).
      *
-     * @param    object $objectA
-     * @param    object $objectB
+     * @param object $objectA
+     * @param object $objectB
      * @return    integer
      */
     protected function _handleEqual($objectA, $objectB)
@@ -567,8 +545,8 @@ abstract class SortHelperAbstract
      * Creates the sort callback for the given property key and configuration
      * string.
      *
-     * @param    string $propertyKey The key of the property to sort by
-     * @param    string $config      The callback configuration as string
+     * @param string $propertyKey The key of the property to sort by
+     * @param string $config      The callback configuration as string
      * @return    string    The name of the callback function
      */
     protected function _getSortCallbackForPropertyKeyAndConfig($propertyKey, $config = '')
@@ -579,7 +557,7 @@ abstract class SortHelperAbstract
     /**
      * Constructs the sort callback for the given configuration string.
      *
-     * @param    string $config
+     * @param string $config
      * @return    string
      */
     protected function _getSortCallbackForConfig($config)
@@ -600,8 +578,8 @@ abstract class SortHelperAbstract
     /**
      * Calls sortAscByProperty
      *
-     * @param    string $name      Function name
-     * @param    array  $arguments Function arguments
+     * @param string $name      Function name
+     * @param array  $arguments Function arguments
      * @return    integer
      */
     public function __call($name, $arguments)
@@ -616,7 +594,7 @@ abstract class SortHelperAbstract
         if (strpos($name, 'sortAscBy') !== false) {
             $propertyKey = self::lcfirst(str_replace('sortAscBy', '', $name));
         } elseif (strpos($name, 'sortDescBy') !== false || strpos($name, 'sortDscBy') !== false) {
-            $propertyKey = self::lcfirst(str_replace(array('sortDscBy', 'sortDescBy'), '', $name));
+            $propertyKey = self::lcfirst(str_replace(['sortDscBy', 'sortDescBy'], '', $name));
             $sortDesc = true;
         } elseif (strpos($name, 'sortBy') !== false) {
             $propertyKey = self::lcfirst(str_replace('sortBy', '', $name));
@@ -632,8 +610,8 @@ abstract class SortHelperAbstract
     /**
      * Calls sortAscByProperty
      *
-     * @param    string $name      Function name
-     * @param    array  $arguments Function arguments
+     * @param string $name      Function name
+     * @param array  $arguments Function arguments
      * @return    integer
      */
     static public function __callStatic($name, $arguments)
@@ -649,7 +627,7 @@ abstract class SortHelperAbstract
     /**
      * Makes the first character of a string lower case.
      *
-     * @param    string $string Input string
+     * @param string $string Input string
      * @return    string
      */
     static public function lcfirst($string)
@@ -668,7 +646,7 @@ abstract class SortHelperAbstract
     /**
      * Debug a message.
      *
-     * @param    string $message
+     * @param string $message
      * @return    void
      */
     static public function debug($message)
@@ -697,7 +675,7 @@ abstract class SortHelperAbstract
     /**
      * Profile a message.
      *
-     * @param    string $message
+     * @param string $message
      * @return    void
      */
     static public function profile($message)
@@ -715,7 +693,7 @@ abstract class SortHelperAbstract
     /**
      * Prints a message with an intend that visualizes the current subgroup level.
      *
-     * @param    string|object $message
+     * @param string|object $message
      *
      * @return    void
      */
@@ -766,9 +744,9 @@ abstract class SortHelperAbstract
      * Invokes the getter method on the given object. If no getter method is specified
      * or the given value is NULL _getProperty() will be called.
      *
-     * @param    object $object       The object to get the value from
-     * @param    string $propertyKey  The name of the property
-     * @param    string $getterMethod The name of the method to be used
+     * @param object $object       The object to get the value from
+     * @param string $propertyKey  The name of the property
+     * @param string $getterMethod The name of the method to be used
      * @return    mixed
      */
     abstract protected function _invokeGetterMethodOnObject($object, $propertyKey, $getterMethod = null);

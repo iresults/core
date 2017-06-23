@@ -1,28 +1,7 @@
 <?php
+
 namespace Iresults\Core\Mutable;
 
-    /*
-     * The MIT License (MIT)
-     * Copyright (c) 2013 Andreas Thurnheer-Meier <tma@iresults.li>, iresults
-     *
-     * Permission is hereby granted, free of charge, to any person obtaining a copy
-     * of this software and associated documentation files (the "Software"), to deal
-     * in the Software without restriction, including without limitation the rights
-     * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-     * copies of the Software, and to permit persons to whom the Software is
-     * furnished to do so, subject to the following conditions:
-     *
-     * The above copyright notice and this permission notice shall be included in
-     * all copies or substantial portions of the Software.
-     *
-     * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-     * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-     * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-     * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-     * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-     * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
-     * SOFTWARE.
-     */
 use InvalidArgumentException;
 
 
@@ -43,8 +22,8 @@ class AutoExpanding extends \Iresults\Core\Mutable
      * Returns the object for the given (undefined) key, of this instance, or
      * the given object (if specified).
      *
-     * @param    string $key    The name of the undefined property
-     * @param    object $object The object to get the property from
+     * @param string $key    The name of the undefined property
+     * @param object $object The object to get the property from
      * @return    mixed    Returns the property's value
      */
     protected function _getObjectForUndefinedKeyOfObject($key, $object)
@@ -76,8 +55,8 @@ class AutoExpanding extends \Iresults\Core\Mutable
     /**
      * Creates a new object that will be set as the property of the parent object.
      *
-     * @param    string $key    The property key to set
-     * @param    object $object The object to set the property of
+     * @param string $key    The property key to set
+     * @param object $object The object to set the property of
      * @return    \Iresults\Core\Mutable Returns the new created object
      */
     protected function _createSubObjectForKeyOfObject($key, $object)
@@ -130,7 +109,7 @@ class AutoExpanding extends \Iresults\Core\Mutable
      *
      * Will always return TRUE for auto expanding objects.
      *
-     * @param    string $key The property name
+     * @param string $key The property name
      * @return    boolean    Always return TRUE for auto expanding objects
      */
     public function __isset($key)
@@ -141,7 +120,7 @@ class AutoExpanding extends \Iresults\Core\Mutable
     /**
      * Called if no object was found for the given property key.for the give
      *
-     * @param    string $key The name of the undefined property
+     * @param string $key The name of the undefined property
      * @return    mixed    Returns a substitute value
      * @throws InvalidArgumentException on default.
      */
@@ -156,7 +135,7 @@ class AutoExpanding extends \Iresults\Core\Mutable
      * The method will ignore the auto-expanding functionality and will return
      * FALSE if a key isn't set, without creating it.
      *
-     * @param    string $key The property key to test
+     * @param string $key The property key to test
      * @return    boolean    TRUE if the property is set, otherwise FALSE
      */
     public function hasRealObjectForKey($key)
