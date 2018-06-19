@@ -2,8 +2,7 @@
 ### PROJECT SETTINGS
 vendor
 
-.idea/magicento.xml
-.idea/workspace.xml
+.idea
 
 #################################
 ### GENERAL SETTINGS
