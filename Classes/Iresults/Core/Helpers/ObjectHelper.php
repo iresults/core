@@ -100,10 +100,16 @@ class ObjectHelper
                 }
             } elseif ($parentObject instanceof KVCInterface) { // \Iresults\Core\KVCInterface
                 $currentObject = $parentObject->getObjectForKey($path);
-            } elseif (is_a(
-                $parentObject,
-                'Tx_Extbase_DomainObject_DomainObjectInterface'
-            )) { // Tx_Extbase_DomainObject_DomainObjectInterface
+            } elseif (
+                is_a(
+                    $parentObject,
+                    'Tx_Extbase_DomainObject_DomainObjectInterface'
+                )
+                || is_a(
+                    $parentObject,
+                    'TYPO3\\CMS\\Extbase\\DomainObject\\DomainObjectInterface'
+                )
+            ) { // Tx_Extbase_DomainObject_DomainObjectInterface
                 $currentObject = $parentObject->_getProperty($path);
             } elseif (is_a($parentObject, '\Iresults\Core\Value')) { // \Iresults\Core\Value
                 if ($path === 'value') {
