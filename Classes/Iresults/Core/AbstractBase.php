@@ -840,7 +840,7 @@ abstract class AbstractBase implements IresultsBaseInterface
             foreach ($value as $key => $element) {
                 $elementContainer[] = ($key && is_string($key) ? "$key: " : '') . $this->descriptionOfValue($element);
             }
-            $string = 'Array(' . PHP_EOL . "\t" . implode($elementContainer, $glue) . PHP_EOL . ')';
+            $string = 'Array(' . PHP_EOL . "\t" . implode($glue, $elementContainer) . PHP_EOL . ')';
         } elseif (is_object($value) && method_exists($value, 'description')) {
             $string = $value->description();
         } elseif (is_object($value) && method_exists($value, '__toString')) {
