@@ -1,9 +1,4 @@
 <?php
-/**
- * @author Daniel Corn <cod@iresults.li>
- * Created 02.10.13 17:35
- */
-
 
 namespace Iresults\Core;
 
@@ -13,8 +8,6 @@ namespace Iresults\Core;
  * One implementation of the shared instance for \Iresults\Core\Iresults which
  * does not implement the methods that are likely to have to be changed on
  * different platforms (frameworks)
- *
- * @package Iresults\Core
  */
 abstract class AbstractBase implements IresultsBaseInterface
 {
@@ -69,7 +62,6 @@ abstract class AbstractBase implements IresultsBaseInterface
      * @var array
      */
     static protected $configuration = null;
-
 
     # MWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWM
     # MWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWM
@@ -302,7 +294,6 @@ abstract class AbstractBase implements IresultsBaseInterface
 
         $printPathInformation = $this->getDisplayDebugPath();
 
-
         /*
          * If the environment is a shell or the output type is not XML capture
          * the output.
@@ -320,7 +311,6 @@ abstract class AbstractBase implements IresultsBaseInterface
             $this->sendDebugHeaders();
         }
 
-
         $args = func_get_args();
 
         /** @var bool $isFullDebugRenderer */
@@ -335,7 +325,6 @@ abstract class AbstractBase implements IresultsBaseInterface
 
         // If the debug renderer provides all information don't step into below
         if (!$isFullDebugRenderer) {
-
             // Output the dumps
             if ($printTags) {
                 if ($printAnchor) {
@@ -381,7 +370,6 @@ abstract class AbstractBase implements IresultsBaseInterface
             }
         }
 
-
         $i = 0;
         if ($printPathInformation) {
             $backtrace = null;
@@ -397,7 +385,7 @@ abstract class AbstractBase implements IresultsBaseInterface
             }
 
             $function = @$backtrace[$i]['function'];
-            while ($function == 'pd' OR $function == 'call_user_func_array' OR
+            while ($function == 'pd' or $function == 'call_user_func_array' or
                 $function == 'call_user_func') {
                 $i++;
                 $function = @$backtrace[$i]['function'];
@@ -478,7 +466,7 @@ abstract class AbstractBase implements IresultsBaseInterface
 
                 return;
             case $this->getOutputFormat() === self::OUTPUT_FORMAT_JSON:
-//				$message = json_encode(array('output' => $message)) . PHP_EOL;
+                //				$message = json_encode(array('output' => $message)) . PHP_EOL;
                 $message = '[{ "output": "' . $message . '"},';
                 break;
 
@@ -543,7 +531,6 @@ abstract class AbstractBase implements IresultsBaseInterface
             $willDebugL = false;
         }
 
-
         /**
          * HIGHEST PRIORITY
          * Check if the DEVELOPER_MODE_IP_MASK is set inside the .htaccess file
@@ -591,8 +578,8 @@ abstract class AbstractBase implements IresultsBaseInterface
      * Send the headers to enable UTF-8 output after debugging
      *
      * @param bool $graceful
-     * @throws \UnexpectedValueException if the headers already have been sent
      * @return boolean
+     * @throws \UnexpectedValueException if the headers already have been sent
      */
     public function sendDebugHeaders($graceful = true)
     {
@@ -619,9 +606,7 @@ abstract class AbstractBase implements IresultsBaseInterface
         } elseif (!$graceful) {
             throw new \UnexpectedValueException("Headers already sent in $file @ $line", 1405001760);
         }
-
     }
-
 
     /**
      * Returns if the path information will be displayed
@@ -689,7 +674,6 @@ abstract class AbstractBase implements IresultsBaseInterface
             $headers = headers_list();
             foreach ($headers as $header) {
                 if (substr($header, 0, 13) === 'Content-type:') {
-                    $outputFormat = trim(substr($header, 13));
                     break;
                 }
             }
@@ -735,9 +719,9 @@ abstract class AbstractBase implements IresultsBaseInterface
                 case $outputFormat == 'application/gzip':
                 case $outputFormat == 'application/postscript':
                 case $outputFormat == 'application/octet-stream':
-                case strpos($outputFormat, 'audio/') !== false:
-                case strpos($outputFormat, 'image/') !== false:
-                case strpos($outputFormat, 'video/') !== false:
+                case str_contains($outputFormat, 'audio/'):
+                case str_contains($outputFormat, 'image/'):
+                case str_contains($outputFormat, 'video/'):
                 default:
                     $outputFormat = self::OUTPUT_FORMAT_BINARY;
                     break;
